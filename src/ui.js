@@ -205,7 +205,11 @@ export class UIManager {
                 `;
                 if (this.game.state === GameState.COMBAT) {
                     slot.style.border = '2px dashed var(--color-primary)';
-                    if (this.game.combat && this.game.combat.targetDistance === i) slot.style.borderColor = '#fff';
+                    slot.style.cursor = 'crosshair';
+                    if (this.game.combat && this.game.combat.targetDistance === i) {
+                        slot.style.borderColor = '#fff';
+                        slot.style.boxShadow = '0 0 10px rgba(255,255,255,0.5)';
+                    }
                     slot.onclick = () => this.game.selectCombatTarget(i);
                 }
             } else {
@@ -300,12 +304,12 @@ export class UIManager {
         const rng = Math.max(h?.range || 0, w?.range || 0);
 
         if (!h) {
-            summary.innerHTML = '<span style="color: #ff5a59;">！請先從手牌中點選一名英雄</span>';
+            summary.innerHTML = '<span style="color: #ff5a59;">👉 請先點選一名英雄</span>';
         } else {
             summary.innerHTML = `
                 💥 已就緒：<strong>${h.name}</strong> ${w ? '+ ' + w.name : ''}<br>
                 火力：${atk} | 射程：${rng}<br>
-                目標：${targetDistance ? `距離 ${targetDistance}` : '<span style="color:var(--color-warning)">請選怪物目標</span>'}
+                目標：${targetDistance ? `<span style="color:var(--color-success)">距離 ${targetDistance} 怪物已鎖定</span>` : '<span style="color:var(--color-warning)">⚠️ 請點選要攻擊的怪物</span>'}
             `;
         }
 

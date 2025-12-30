@@ -220,11 +220,12 @@ class GuardiansDefenceGame {
     nextPhase() {
         if (this.state !== GameState.VILLAGE) return;
         this.state = GameState.COMBAT;
-        this.addLog('進入戰鬥階段', 'info');
+        this.addLog('進入戰鬥階段：請點選英雄與目標進行攻擊', 'info');
         this.combat = { heroHandIndex: null, weaponHandIndex: null, targetDistance: null };
+
         if (this.lane.length === 0) {
-            this.addLog('無敵軍蹤跡，準備進軍', 'info');
-            setTimeout(() => this.monsterAdvance(), 800);
+            this.addLog('前方無敵軍，直接進軍', 'info');
+            setTimeout(() => this.monsterAdvance(), 600);
         } else {
             this.updateUI();
         }
@@ -232,63 +233,86 @@ class GuardiansDefenceGame {
 
     selectCombatHero(idx) {
         if (this.state !== GameState.COMBAT) return;
-        this.combat.heroHandIndex = (this.combat.heroHandIndex === idx) ? null : idx;
+        // 如果點選已選中的，則取消
+        if (this.combat.heroHandIndex === idx) this.combat.heroHandIndex = null;
+        else this.combat.heroHandIndex = idx;
         this.updateUI();
     }
 
     selectCombatWeapon(idx) {
         if (this.state !== GameState.COMBAT) return;
-        this.combat.weaponHandIndex = (this.combat.weaponHandIndex === idx) ? null : idx;
+        if (this.combat.weaponHandIndex === idx) this.combat.weaponHandIndex = null;
+        else this.combat.weaponHandIndex = idx;
         this.updateUI();
     }
 
     selectCombatTarget(dist) {
         if (this.state !== GameState.COMBAT) return;
-        this.combat.targetDistance = (this.combat.targetDistance === dist) ? null : dist;
+        if (this.combat.targetDistance === dist) this.combat.targetDistance = null;
+        else this.combat.targetDistance = dist;
         this.updateUI();
     }
 
     performAttack() {
+        if (this.state !== GameState.COMBAT) return;
         const { heroHandIndex: hIdx, weaponHandIndex: wIdx, targetDistance: dist } = this.combat;
-        if (hIdx === null || !dist) return;
+
+        if (hIdx === null) return this.addLog('請先點選一名英雄！', 'danger');
+        if (!dist) return this.addLog('請點選目標怪物（1~5 槽位）！', 'danger');
 
         const hero = this.hand[hIdx];
         const weapon = (wIdx !== null) ? this.hand[wIdx] : null;
-
-        // 檢核
-        if (weapon && hero.carry < weapon.weight) return this.addLog('！負重不足', 'danger');
-        const rng = Math.max(hero.range, weapon?.range || 0);
-        if (dist > rng) return this.addLog('！射程不足', 'danger');
-
-        const atk = hero.attack + (weapon?.attack || 0);
         const target = this.lane.find(m => m.distance === dist);
 
-        this.addLog(`⚔️ ${hero.name} 發動攻擊，造成 ${atk} 傷害`, 'info');
+        if (!target) return this.addLog('目標位置已無怪物', 'danger');
+
+        // 規則檢核
+        const carry = hero.carry || 0;
+        const weight = weapon ? (weapon.weight || 0) : 0;
+        if (weapon && carry < weight) return this.addLog(`！負重不足 (需求 ${weight}, 剩餘 ${carry})`, 'danger');
+
+        const range = Math.max(hero.range || 0, weapon ? (weapon.range || 0) : 0);
+        if (dist > range) return this.addLog(`！射程不足 (目標距離 ${dist}, 最大射程 ${range})`, 'danger');
+
+        const atk = (hero.attack || 0) + (weapon ? (weapon.attack || 0) : 0);
+
+        this.addLog(`⚔️ ${hero.name} 攻擊 ${target.name}，造成 ${atk} 傷害`, 'info');
         target.hp -= atk;
         this.ui.showDamage(dist, atk);
 
-        // 消耗
-        const idxs = [hIdx];
-        if (wIdx !== null && wIdx !== hIdx) idxs.push(wIdx);
-        idxs.sort((a, b) => b - a).forEach(i => this.discard.push(this.hand.splice(i, 1)[0]));
+        // 消耗卡牌（先記錄要移除的索引）
+        const toRemove = [hIdx];
+        if (wIdx !== null && wIdx !== hIdx) toRemove.push(wIdx);
 
+        // 依照索引由大到小移除，避免索引位移
+        toRemove.sort((a, b) => b - a).forEach(i => {
+            const card = this.hand[i];
+            this.discard.push(card);
+            this.hand.splice(i, 1);
+        });
+
+        // 擊殺判定
         if (target.hp <= 0) this.killMonster(target);
 
+        // 重設選擇
         this.combat = { heroHandIndex: null, weaponHandIndex: null, targetDistance: null };
         this.updateUI();
     }
 
     skipCombat() {
-        this.addLog('戰鬥補給結束，怪物正在逼近', 'info');
-        setTimeout(() => this.monsterAdvance(), 500);
+        if (this.state !== GameState.COMBAT) return;
+        this.addLog('戰鬥補給結束，怪物正在進逼！', 'info');
+        this.monsterAdvance();
     }
 
     killMonster(m) {
-        this.lane = this.lane.filter(mon => mon !== m);
-        this.currentXP += m.xp;
-        this.crystals += m.crystal;
-        this.totalScore += m.score;
-        this.addLog(`✨ 擊殺 ${m.name}！獲取 ${m.xp} XP / ${m.crystal} 結晶`, 'success');
+        const idx = this.lane.indexOf(m);
+        if (idx > -1) this.lane.splice(idx, 1);
+
+        this.currentXP += (m.xp || 0);
+        this.crystals += (m.crystal || 0);
+        this.totalScore += (m.score || 0);
+        this.addLog(`✨ 擊退 ${m.name}！獲得 ${m.xp} XP / ${m.crystal} 結晶`, 'success');
     }
 
     monsterAdvance() {
@@ -296,23 +320,36 @@ class GuardiansDefenceGame {
         this.updateUI();
 
         setTimeout(() => {
+            this.addLog('敵軍開始向村莊全速推進...', 'info');
+
+            // 全員前進
             this.lane.forEach(m => m.distance--);
-            const entry = this.lane.filter(m => m.distance <= 0);
-            entry.forEach(m => {
-                this.villageHP -= m.damage;
-                this.addLog(`⚠️ 敵襲！${m.name} 衝入村莊，造成 ${m.damage} 損害`, 'danger');
-            });
-            this.lane = this.lane.filter(m => m.distance > 0);
+            this.updateUI();
 
-            // 生成新怪物
-            const tier = Math.min(3, Math.ceil(this.turn / 7));
-            const pool = CARDPOOL.monsters.filter(m => m.tier <= tier);
-            const mData = pool[Math.floor(Math.random() * pool.length)];
-            this.lane.push({ ...mData, distance: 5 });
+            setTimeout(() => {
+                // 結算衝入村莊的怪物
+                const atGate = this.lane.filter(m => m.distance <= 0);
+                if (atGate.length > 0) {
+                    atGate.forEach(m => {
+                        this.villageHP -= m.damage;
+                        this.addLog(`⚠️ 敵襲！${m.name} 衝入村莊，造成 ${m.damage} 損害`, 'danger');
+                    });
+                    this.lane = this.lane.filter(m => m.distance > 0);
+                }
 
-            if (this.villageHP <= 0) this.gameOver();
-            else this.endTurn();
-        }, 500);
+                // 生成本回合的新怪物
+                this.spawnInitialMonster();
+                this.addLog('遠方傳來新的腳步聲...', 'info');
+
+                this.updateUI();
+
+                if (this.villageHP <= 0) {
+                    this.gameOver();
+                } else {
+                    setTimeout(() => this.endTurn(), 600);
+                }
+            }, 600);
+        }, 600);
     }
 
     endTurn() {
