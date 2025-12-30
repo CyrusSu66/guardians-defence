@@ -5,26 +5,28 @@
 
 export const CARDPOOL = {
     heroes: [
-        { id: 'hero_warrior_lv1', name: '戰士(Lv1)', class: 'Warrior', attack: 2, range: 1, carry: 4, xpToUpgrade: 3, upgradeToId: 'hero_warrior_lv2', desc: '近戰硬打型' },
-        { id: 'hero_warrior_lv2', name: '戰士(Lv2)', class: 'Warrior', attack: 3, range: 1, carry: 5, xpToUpgrade: 5, upgradeToId: 'hero_warrior_lv3', desc: '更強的近戰戰士' },
-        { id: 'hero_warrior_lv3', name: '戰士(Lv3)', class: 'Warrior', attack: 4, range: 1, carry: 6, desc: '終極近戰戰士' },
-        { id: 'hero_ranger_lv1', name: '射手(Lv1)', class: 'Ranger', attack: 1, range: 3, carry: 3, xpToUpgrade: 3, upgradeToId: 'hero_ranger_lv2', desc: '遠程精準射手' },
-        { id: 'hero_ranger_lv2', name: '射手(Lv2)', class: 'Ranger', attack: 2, range: 4, carry: 3, xpToUpgrade: 5, upgradeToId: 'hero_ranger_lv3', desc: '更遠的射程' },
-        { id: 'hero_ranger_lv3', name: '射手(Lv3)', class: 'Ranger', attack: 3, range: 5, carry: 3, desc: '終極遠程狙擊' },
-        { id: 'hero_mage_lv1', name: '法師(Lv1)', class: 'Mage', attack: 1, range: 4, carry: 2, xpToUpgrade: 3, upgradeToId: 'hero_mage_lv2', desc: '魔法遠距法師' },
-        { id: 'hero_mage_lv2', name: '法師(Lv2)', class: 'Mage', attack: 2, range: 4, carry: 2, xpToUpgrade: 5, upgradeToId: 'hero_mage_lv3', desc: '更強的魔法威力' },
-        { id: 'hero_mage_lv3', name: '法師(Lv3)', class: 'Mage', attack: 3, range: 5, carry: 2, desc: '終極魔法大師' },
-        { id: 'hero_rogue_lv1', name: '盜賊(Lv1)', class: 'Rogue', attack: 1, range: 2, carry: 3, passiveGold: 1, xpToUpgrade: 3, upgradeToId: 'hero_rogue_lv2', desc: '金流型盜賊' },
-        { id: 'hero_rogue_lv2', name: '盜賊(Lv2)', class: 'Rogue', attack: 2, range: 2, carry: 3, passiveGold: 2, xpToUpgrade: 5, upgradeToId: 'hero_rogue_lv3', desc: '更強的金流掌控' },
-        { id: 'hero_rogue_lv3', name: '盜賊(Lv3)', class: 'Rogue', attack: 2, range: 3, carry: 3, passiveGold: 3, desc: '終極金流掌控者' },
-        { id: 'hero_magic_sword', name: '魔法戰士', class: 'Warrior', attack: 4, range: 1, carry: 6, desc: '鍛造出的強力戰士' }
+        { id: 'hero_peasant_lv1', name: '農民', class: 'Peasant', attack: 1, range: 1, carry: 2, xpToUpgrade: 3, upgradeToId: 'hero_warrior_lv1', desc: '平凡的農夫，渴望成為勇者' },
+        { id: 'hero_warrior_lv1', name: '戰士(Lv1)', class: 'Warrior', attack: 2, range: 1, carry: 4, xpToUpgrade: 4, upgradeToId: 'hero_warrior_lv2', desc: '正式受訓的戰士' },
+        { id: 'hero_warrior_lv2', name: '戰士(Lv2)', class: 'Warrior', attack: 3, range: 1, carry: 5, xpToUpgrade: 6, upgradeToId: 'hero_warrior_lv3', desc: '身經百戰的精銳' },
+        { id: 'hero_warrior_lv3', name: '戰士(Lv3)', class: 'Warrior', attack: 5, range: 1, carry: 6, desc: '防線的傳說英雄' },
+        { id: 'hero_ranger_lv1', name: '射手(Lv1)', class: 'Ranger', attack: 1, range: 3, carry: 3, xpToUpgrade: 4, upgradeToId: 'hero_ranger_lv2', desc: '巡邏隊的新手' },
+        { id: 'hero_ranger_lv2', name: '射手(Lv2)', class: 'Ranger', attack: 2, range: 4, carry: 3, xpToUpgrade: 6, upgradeToId: 'hero_ranger_lv3', desc: '精準的森林獵人' },
+        { id: 'hero_ranger_lv3', name: '射手(Lv3)', class: 'Ranger', attack: 4, range: 5, carry: 3, desc: '百步穿楊的神射手' },
+        { id: 'hero_mage_lv1', name: '法師(Lv1)', class: 'Mage', attack: 1, range: 4, carry: 2, xpToUpgrade: 4, upgradeToId: 'hero_mage_lv2', desc: '魔導學徒' },
+        { id: 'hero_mage_lv2', name: '法師(Lv2)', class: 'Mage', attack: 2, range: 5, carry: 2, xpToUpgrade: 6, upgradeToId: 'hero_mage_lv3', desc: '正式魔法師' },
+        { id: 'hero_mage_lv3', name: '法師(Lv3)', class: 'Mage', attack: 4, range: 6, carry: 2, desc: '禁術大導師' },
+        { id: 'hero_rogue_lv1', name: '盜賊(Lv1)', class: 'Rogue', attack: 1, range: 2, carry: 3, passiveGold: 1, xpToUpgrade: 4, upgradeToId: 'hero_rogue_lv2', desc: '敏捷的拾荒者' },
+        { id: 'hero_rogue_lv2', name: '盜賊(Lv2)', class: 'Rogue', attack: 2, range: 2, carry: 3, passiveGold: 2, xpToUpgrade: 6, upgradeToId: 'hero_rogue_lv3', desc: '專業的冒險家' },
+        { id: 'hero_rogue_lv3', name: '盜賊(Lv3)', class: 'Rogue', attack: 3, range: 3, carry: 3, passiveGold: 4, desc: '黑市金庫管理者' },
+        { id: 'hero_magic_sword', name: '魔法戰士', class: 'Warrior', attack: 5, range: 2, carry: 6, desc: '鍛造與附魔的究極結晶' }
     ],
     weapons: [
+        { id: 'weapon_stick', name: '木棍', attack: 1, range: 0, weight: 1, desc: '路邊撿來的樹枝' },
         { id: 'weapon_iron_sword', name: '鐵劍', attack: 2, range: 1, weight: 3, desc: '堅固的鐵劍' },
         { id: 'weapon_wooden_bow', name: '木弓', attack: 2, range: 3, weight: 2, desc: '輕巧的弓' },
-        { id: 'weapon_fire_staff', name: '火焰法杖', attack: 2, range: 4, weight: 1, desc: '炎熱的法杖' },
-        { id: 'weapon_dagger', name: '匕首', attack: 1, range: 1, weight: 1, desc: '輕快的匕首' },
-        { id: 'weapon_magic_blade', name: '魔法劍', attack: 4, range: 1, weight: 3, desc: '蘊含魔力的利刃' }
+        { id: 'weapon_fire_staff', name: '火焰法杖', attack: 3, range: 5, weight: 2, desc: '炎熱的魔力核心' },
+        { id: 'weapon_dagger', name: '匕首', attack: 1, range: 1, weight: 0, desc: '幾乎不占重量的防身武器' },
+        { id: 'weapon_magic_blade', name: '魔法劍', attack: 5, range: 2, weight: 3, desc: '蘊含古老魔力的利刃' }
     ],
     economy: [
         { id: 'eco_copper_coin', name: '銅幣', coin: 1, desc: '基礎貨幣 +1' },

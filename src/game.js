@@ -59,10 +59,11 @@ class GuardiansDefenceGame {
     startNewGame() {
         this.init();
 
-        // 起始牌組
+        // 起始牌組: 5銅幣, 3農民, 2木棍 (修正設定)
         const startingIds = [
-            'eco_copper_coin', 'eco_copper_coin', 'eco_copper_coin',
-            'eco_silver_coin', 'hero_warrior_lv1', 'spell_draw_1'
+            'eco_copper_coin', 'eco_copper_coin', 'eco_copper_coin', 'eco_copper_coin', 'eco_copper_coin',
+            'hero_peasant_lv1', 'hero_peasant_lv1', 'hero_peasant_lv1',
+            'weapon_stick', 'weapon_stick'
         ];
         this.deck = startingIds.map(id => this.getCardById(id));
         this.shuffle(this.deck);
