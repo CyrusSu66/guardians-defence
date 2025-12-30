@@ -45,6 +45,10 @@ export class UIManager {
         document.getElementById('deckCount').textContent = g.deck.length;
         document.getElementById('discardCount').textContent = g.discard.length;
 
+        // 版號
+        const vEl = document.getElementById('buildVersion');
+        if (vEl) vEl.textContent = `Build: ${g.version}`;
+
         const stateLabels = {
             [GameState.DRAW]: '資源補給中',
             [GameState.VILLAGE]: '村莊整備',

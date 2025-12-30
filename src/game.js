@@ -8,8 +8,17 @@ import { UIManager } from './ui.js';
 
 class GuardiansDefenceGame {
     constructor() {
+        this.version = "v1.1.251230B"; // 版號：日期 + 編號
         this.ui = new UIManager(this);
         this.init();
+        this.setupErrorHandler();
+    }
+
+    setupErrorHandler() {
+        window.onerror = (msg, url, line) => {
+            this.addLog(`[ERROR] ${msg} (Line ${line})`, 'danger');
+            console.error(msg, url, line);
+        };
     }
 
     init() {
@@ -317,39 +326,34 @@ class GuardiansDefenceGame {
 
     monsterAdvance() {
         this.state = GameState.MONSTER_ADVANCE;
+        this.addLog('怪物開始進軍...', 'info');
         this.updateUI();
 
+        // 簡化流程，避免過多嵌套定時器導致鎖死
         setTimeout(() => {
-            this.addLog('敵軍開始向村莊全速推進...', 'info');
-
-            // 全員前進
+            // 怪物移動
             this.lane.forEach(m => m.distance--);
+
+            // 判定進入村莊
+            const entry = this.lane.filter(m => m.distance <= 0);
+            entry.forEach(m => {
+                this.villageHP -= (m.damage || 1);
+                this.addLog(`⚠️ 敵襲！${m.name} 衝入村莊，造成 ${m.damage} 損害`, 'danger');
+            });
+            this.lane = this.lane.filter(m => m.distance > 0);
+
+            // 生成下一波
+            this.spawnInitialMonster();
+
             this.updateUI();
 
-            setTimeout(() => {
-                // 結算衝入村莊的怪物
-                const atGate = this.lane.filter(m => m.distance <= 0);
-                if (atGate.length > 0) {
-                    atGate.forEach(m => {
-                        this.villageHP -= m.damage;
-                        this.addLog(`⚠️ 敵襲！${m.name} 衝入村莊，造成 ${m.damage} 損害`, 'danger');
-                    });
-                    this.lane = this.lane.filter(m => m.distance > 0);
-                }
-
-                // 生成本回合的新怪物
-                this.spawnInitialMonster();
-                this.addLog('遠方傳來新的腳步聲...', 'info');
-
-                this.updateUI();
-
-                if (this.villageHP <= 0) {
-                    this.gameOver();
-                } else {
-                    setTimeout(() => this.endTurn(), 600);
-                }
-            }, 600);
-        }, 600);
+            if (this.villageHP <= 0) {
+                this.gameOver();
+            } else {
+                this.addLog('防線重新整補中...', 'info');
+                setTimeout(() => this.endTurn(), 800);
+            }
+        }, 800);
     }
 
     endTurn() {
