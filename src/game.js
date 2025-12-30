@@ -301,7 +301,7 @@ class GuardiansDefenceGame {
 
     skipCombat() {
         if (this.state !== GameState.COMBAT) return;
-        this.addLog('戰鬥補給結束，怪物正在進逼！', 'info');
+        this.addLog('戰鬥結束，怪物正在進逼！', 'info');
         this.monsterAdvance();
     }
 
