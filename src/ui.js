@@ -226,7 +226,7 @@ export class UIManager {
     renderMarket() {
         const grid = document.getElementById('marketGrid');
         grid.innerHTML = '';
-        MARKET_CARDS.early.forEach(item => {
+        this.game.marketItems.forEach(item => {
             const card = this.game.getCardById(item.id);
             const disabled = this.game.currentGold < item.cost;
             const el = document.createElement('div');
@@ -239,6 +239,10 @@ export class UIManager {
             el.onclick = () => { if (!disabled) this.game.buyCard(item.id, item.cost); };
             grid.appendChild(el);
         });
+
+        if (this.game.marketItems.length === 0) {
+            grid.innerHTML = '<div style="color:#555; text-align:center; padding: 20px; grid-column: 1/-1;">市場目前空無一物</div>';
+        }
     }
 
     renderTraining() {

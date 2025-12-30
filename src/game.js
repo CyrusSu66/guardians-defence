@@ -8,7 +8,7 @@ import { UIManager } from './ui.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v1.1.251230C"; // 修正 initialization race condition
+        this.version = "v1.1.251230E"; // 實作怪物分階
         this.ui = new UIManager(this);
         this.init();
         this.setupErrorHandler();
@@ -38,6 +38,7 @@ class GuardiansDefenceGame {
         this.playedCards = [];
         this.combat = null;
         this.log = [];
+        this.marketItems = []; // 當前市場商品
     }
 
     getCardById(cardId) {
@@ -72,14 +73,35 @@ class GuardiansDefenceGame {
         this.spawnInitialMonster();
 
         this.addLog('守護者系統已連線，戰役開始！', 'success');
+        this.refreshMarket(); // 初始市場
         this.nextTurn();
     }
 
     spawnInitialMonster() {
-        const tier = 1;
-        const pool = CARDPOOL.monsters.filter(m => m.tier <= tier);
+        // 分階邏輯：1-7回 Tier 1, 8-14回 Tier 1~2, 15回起 Tier 1~3
+        const turn = this.turn || 1;
+        let maxTier = 1;
+        if (turn >= 15) maxTier = 3;
+        else if (turn >= 8) maxTier = 2;
+
+        // 隨機抽組該階級以下的怪物
+        const pool = CARDPOOL.monsters.filter(m => m.tier <= maxTier);
+        if (pool.length === 0) return;
+
         const mData = pool[Math.floor(Math.random() * pool.length)];
-        this.lane.push({ ...mData, distance: 5 });
+        // 賦予更豐富的動態屬性，例如隨難度微調 HP
+        const hpMultiplier = 1 + Math.floor(turn / 20) * 0.2;
+        const hp = Math.ceil(mData.hp * hpMultiplier);
+
+        const spawned = {
+            ...mData,
+            hp: hp,
+            maxHp: hp,
+            distance: 5
+        };
+
+        this.lane.push(spawned);
+        return spawned;
     }
 
     nextTurn() {
@@ -97,6 +119,12 @@ class GuardiansDefenceGame {
         setTimeout(() => {
             this.state = GameState.VILLAGE;
             this.addLog('進入村莊整備階段', 'info');
+
+            // 每 3 回合刷新一次市場，或提供刷新按鈕？先設定為自動刷新
+            if (this.turn % 3 === 1) {
+                this.refreshMarket();
+            }
+
             this.updateUI();
         }, 300);
     }
@@ -193,12 +221,46 @@ class GuardiansDefenceGame {
     }
 
     // 市場與升級
+    refreshMarket() {
+        // 從 CARDPOOL 中隨機抽取卡片
+        // 規則：2 英雄, 2 武器, 1 經濟, 1 道具/法術
+        const newMarket = [];
+
+        const categories = {
+            heroes: { pool: CARDPOOL.heroes.filter(h => h.id !== 'hero_peasant_lv1' && !h.id.includes('lv3')), count: 2 },
+            weapons: { pool: CARDPOOL.weapons.filter(w => w.id !== 'weapon_stick'), count: 2 },
+            economy: { pool: CARDPOOL.economy, count: 1 },
+            spells: { pool: [...CARDPOOL.spells, ...CARDPOOL.items.filter(i => i.usage === 'village')], count: 1 }
+        };
+
+        for (const key in categories) {
+            const { pool, count } = categories[key];
+            const shuffled = [...pool].sort(() => 0.5 - Math.random());
+            const selected = shuffled.slice(0, count).map(card => {
+                // 設定預設價格 (未來可從資料庫讀取)
+                let cost = 3;
+                if (card.type === 'Hero') cost = 4;
+                if (card.type === 'Weapon') cost = 5;
+                if (card.coin > 1) cost = 3;
+                return { id: card.id, name: card.name, cost };
+            });
+            newMarket.push(...selected);
+        }
+
+        this.marketItems = newMarket;
+        this.addLog('市場物資已更新', 'info');
+    }
+
     buyCard(cardId, cost) {
         if (this.currentGold < cost) return;
         this.currentGold -= cost;
         const card = this.getCardById(cardId);
         this.discard.push({ ...card });
         this.addLog(`徵募成功：「${card.name}」加入牌庫`, 'success');
+
+        // 買完後該位置移除或補空？這裡暫定買完就消失
+        this.marketItems = this.marketItems.filter(item => !(item.id === cardId && item.cost === cost));
+
         this.updateUI();
     }
 
