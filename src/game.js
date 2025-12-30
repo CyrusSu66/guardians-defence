@@ -58,8 +58,18 @@ class GuardiansDefenceGame {
         this.deck = startingIds.map(id => this.getCardById(id));
         this.shuffle(this.deck);
 
+        // 第 1 步：生成第一隻怪物 (修正 Bug 4)
+        this.spawnInitialMonster();
+
         this.addLog('守護者系統已連線，戰役開始！', 'success');
         this.nextTurn();
+    }
+
+    spawnInitialMonster() {
+        const tier = 1;
+        const pool = CARDPOOL.monsters.filter(m => m.tier <= tier);
+        const mData = pool[Math.floor(Math.random() * pool.length)];
+        this.lane.push({ ...mData, distance: 5 });
     }
 
     nextTurn() {
@@ -325,6 +335,11 @@ class GuardiansDefenceGame {
         this.log.unshift({ message: msg, type });
         if (this.log.length > 20) this.log.pop();
         this.updateUI();
+    }
+
+    // UI 代理方法 (修正 Bug 1)
+    showDeckModal(type) {
+        this.ui.showDeckModal(type);
     }
 
     updateUI() {

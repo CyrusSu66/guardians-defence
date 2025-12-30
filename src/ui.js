@@ -116,8 +116,14 @@ export class UIManager {
                     if (card.coin || card.xp) this.game.toggleCardSelection(idx);
                     else if (card.usage === 'village') this.game.playVillageSpell(idx);
                 } else if (this.game.state === GameState.COMBAT) {
-                    if (card.type === 'Hero') this.game.selectCombatHero(idx);
-                    if (card.type === 'Weapon') this.game.selectCombatWeapon(idx);
+                    if (card.type === 'Hero') {
+                        this.game.selectCombatHero(idx);
+                        this.updateCombatSummary(); // 強制更新摘要
+                    }
+                    if (card.type === 'Weapon') {
+                        this.game.selectCombatWeapon(idx);
+                        this.updateCombatSummary(); // 強制更新摘要
+                    }
                     if (card.usage === 'combat') this.game.playCombatSpell(idx);
                 }
             };
