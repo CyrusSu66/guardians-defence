@@ -8,7 +8,7 @@ import { UIManager } from './ui.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v1.1.251230B"; // 版號：日期 + 編號
+        this.version = "v1.1.251230C"; // 修正 initialization race condition
         this.ui = new UIManager(this);
         this.init();
         this.setupErrorHandler();
@@ -228,9 +228,12 @@ class GuardiansDefenceGame {
     // 戰鬥邏輯
     nextPhase() {
         if (this.state !== GameState.VILLAGE) return;
-        this.state = GameState.COMBAT;
-        this.addLog('進入戰鬥階段：請點選英雄與目標進行攻擊', 'info');
+
+        // 重要：必須先初始化對象，再切換狀態，避免 updateUI 被日誌觸發時抓到 null
         this.combat = { heroHandIndex: null, weaponHandIndex: null, targetDistance: null };
+        this.state = GameState.COMBAT;
+
+        this.addLog('進入戰鬥階段：請點選英雄與目標進行攻擊', 'info');
 
         if (this.lane.length === 0) {
             this.addLog('前方無敵軍，直接進軍', 'info');
@@ -241,7 +244,7 @@ class GuardiansDefenceGame {
     }
 
     selectCombatHero(idx) {
-        if (this.state !== GameState.COMBAT) return;
+        if (this.state !== GameState.COMBAT || !this.combat) return;
         // 如果點選已選中的，則取消
         if (this.combat.heroHandIndex === idx) this.combat.heroHandIndex = null;
         else this.combat.heroHandIndex = idx;
@@ -249,14 +252,14 @@ class GuardiansDefenceGame {
     }
 
     selectCombatWeapon(idx) {
-        if (this.state !== GameState.COMBAT) return;
+        if (this.state !== GameState.COMBAT || !this.combat) return;
         if (this.combat.weaponHandIndex === idx) this.combat.weaponHandIndex = null;
         else this.combat.weaponHandIndex = idx;
         this.updateUI();
     }
 
     selectCombatTarget(dist) {
-        if (this.state !== GameState.COMBAT) return;
+        if (this.state !== GameState.COMBAT || !this.combat) return;
         if (this.combat.targetDistance === dist) this.combat.targetDistance = null;
         else this.combat.targetDistance = dist;
         this.updateUI();

@@ -299,11 +299,12 @@ export class UIManager {
 
     updateCombatSummary() {
         const summary = document.getElementById('combatSummary');
-        if (this.game.state !== GameState.COMBAT) return;
+        if (!summary) return;
+        if (this.game.state !== GameState.COMBAT || !this.game.combat) return;
 
         const { heroHandIndex, weaponHandIndex, targetDistance } = this.game.combat;
-        const h = heroHandIndex !== null ? this.game.hand[heroHandIndex] : null;
-        const w = weaponHandIndex !== null ? this.game.hand[weaponHandIndex] : null;
+        const h = (heroHandIndex !== null && this.game.hand[heroHandIndex]) ? this.game.hand[heroHandIndex] : null;
+        const w = (weaponHandIndex !== null && this.game.hand[weaponHandIndex]) ? this.game.hand[weaponHandIndex] : null;
         const atk = (h?.attack || 0) + (w?.attack || 0);
         const rng = Math.max(h?.range || 0, w?.range || 0);
 
