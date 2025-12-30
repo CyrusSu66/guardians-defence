@@ -82,6 +82,7 @@ class GuardiansDefenceGame {
         this.state = GameState.DRAW;
         this.addLog(`【第 ${this.turn} 回合】`, 'info');
         this.drawCards(6);
+        this.updateUI(); // 確保抽牌後立刻顯示
 
         setTimeout(() => {
             this.state = GameState.VILLAGE;

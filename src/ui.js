@@ -75,7 +75,34 @@ export class UIManager {
         this.renderTraining();
         this.renderCrafting();
         this.renderLog();
+        this.renderCombatHeroList(); // 修正 Bug 2
         this.updateCombatSummary();
+    }
+
+    renderCombatHeroList() {
+        const container = document.getElementById('combatHeroList');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (this.game.state !== GameState.COMBAT) return;
+
+        this.game.hand.forEach((card, idx) => {
+            if (card.type !== 'Hero') return;
+
+            const el = document.createElement('div');
+            el.className = 'card mini';
+            if (this.game.combat && this.game.combat.heroHandIndex === idx) el.classList.add('selected');
+
+            el.innerHTML = `
+                <div class="card-name" style="font-size:10px;">${card.name}</div>
+                <div class="card-value" style="font-size:10px;">${card.attack}ATK</div>
+            `;
+            el.onclick = () => {
+                this.game.selectCombatHero(idx);
+                this.updateCombatSummary();
+            };
+            container.appendChild(el);
+        });
     }
 
     renderHand() {
