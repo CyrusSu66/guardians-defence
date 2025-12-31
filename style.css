@@ -778,4 +778,17 @@ h1 {
         width: calc(50% - 10px);
         margin-right: 10px;
     }
+}/* v3.3 技能標籤 */
+.skill-tag {
+    display: inline-block;
+    font-size: 9px;
+    padding: 1px 4px;
+    border-radius: 3px;
+    margin-right: 4px;
+    margin-top: 4px;
+    font-weight: bold;
 }
+.skill-tag.village { background: rgba(100, 200, 255, 0.2); color: #64c8ff; border: 1px solid rgba(100, 200, 255, 0.3); }
+.skill-tag.dungeon { background: rgba(100, 255, 100, 0.2); color: #64ff64; border: 1px solid rgba(100, 255, 100, 0.3); }
+.skill-tag.battle { background: rgba(255, 100, 100, 0.2); color: #ff6464; border: 1px solid rgba(255, 100, 100, 0.3); }
+.skill-tag.victory { background: rgba(255, 215, 0, 0.2); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.3); }

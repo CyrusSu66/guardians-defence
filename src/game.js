@@ -251,16 +251,29 @@ class GuardiansDefenceGame {
         this.finishAction();
     }
 
-    triggerCardEffect(effectKey) {
+    triggerCardEffect(effectKey, sourceName = '未知來源') {
+        if (!effectKey) return;
+
         if (effectKey === 'destroy_disease') {
-            // 從手牌、棄牌或牌庫移除疾病？通常是手牌或棄牌
             const dIdx = this.hand.findIndex(c => c.id === 'spec_disease');
             if (dIdx !== -1) {
                 this.hand.splice(dIdx, 1);
-                this.addLog('✨ 效果觸發：已移除手牌中的疾病卡。', 'success');
+                this.addLog(`✨ ${sourceName}：已移除手牌中的疾病卡。`, 'success');
             } else {
-                this.addLog('✨ 效果觸發：未發現可移除的疾病。', 'info');
+                this.addLog(`✨ ${sourceName}：未發現可移除的疾病。`, 'info');
             }
+        } else if (effectKey === 'draw_1') {
+            this.addLog(`✨ ${sourceName}：觸發抽牌效果。`, 'success');
+            this.drawCards(1);
+        } else if (effectKey === 'draw_2') {
+            this.addLog(`✨ ${sourceName}：激發潛能，抽 2 張牌！`, 'success');
+            this.drawCards(2);
+        } else if (effectKey === 'gain_1xp') {
+            this.currentXP += 1;
+            this.addLog(`✨ ${sourceName}：戰鬥經驗增加 1 XP。`, 'success');
+        } else if (effectKey === 'buy_light') {
+            this.addLog(`✨ ${sourceName}：戰勝獲得補給，本回合可額外購買光源道具（未實作連動）。`, 'info');
+            // 此處可擴充為增加購買次數或開啟特定折扣
         }
     }
 
@@ -285,7 +298,15 @@ class GuardiansDefenceGame {
         this.state = GameState.COMBAT;
         this.currentAction = 'DUNGEON';
         this.combat = { selectedHeroIdx: null, selectedWeaponIdx: null, targetRank: null };
-        this.addLog('進入地城！您可以多次分配英雄進攻，直到點擊結束。', 'info');
+        this.addLog('進入地城！正在發動英雄野外技能...', 'info');
+
+        // v3.3：掃描手牌中的地城技能 (onDungeon)
+        this.hand.forEach(card => {
+            if (card.abilities && card.abilities.onDungeon) {
+                this.triggerCardEffect(card.abilities.onDungeon, card.name);
+            }
+        });
+
         this.updateUI();
     }
 
@@ -392,16 +413,18 @@ class GuardiansDefenceGame {
         const lightReq = this.combat.targetRank + auras.lightReqMod;
         const lightPenalty = Math.max(0, lightReq - totalLight) * 2;
 
-        let physAtk = hero.hero.attack + (weapon ? weapon.equipment.attack : 0) + auras.atkMod;
-        let magAtk = hero.hero.magicAttack + (weapon ? weapon.equipment.magicAttack : 0);
+        let { physAtk, magAtk, bonuses } = this.calculateHeroCombatStats(hero, weapon, monster, lightPenalty);
 
-        if (monster.abilities && monster.abilities.battle === 'phys_immune') physAtk = 0;
-        if (monster.abilities && monster.abilities.battle === 'magic_only') physAtk = 0;
-
-        let finalAtk = Math.max(0, physAtk - lightPenalty) + magAtk;
+        let finalAtk = physAtk + magAtk;
 
         if (finalAtk >= monster.monster.hp) {
             this.addLog(`✨ 擊斃 ${monster.name}！`, 'success');
+
+            // v3.3：戰勝效果觸發 (onVictory)
+            if (hero.abilities && hero.abilities.onVictory) {
+                this.triggerCardEffect(hero.abilities.onVictory, hero.name);
+            }
+
             this.currentXP += monster.monster.xpGain;
             this.totalScore += (monster.vp || 0);
             this.dungeonHall[`rank${this.combat.targetRank}`] = null;
@@ -410,7 +433,6 @@ class GuardiansDefenceGame {
             const toDiscard = [hIdx];
             if (wIdx !== null) toDiscard.push(wIdx);
             toDiscard.sort((a, b) => b - a).forEach(i => this.discard.push(this.hand.splice(i, 1)[0]));
-
             if (monster.hasThunderstone) {
                 this.addLog('🏆 您奪得了雷霆之石，防線獲得最終勝利！', 'success');
                 this.gameOver();
@@ -420,8 +442,56 @@ class GuardiansDefenceGame {
             }
         } else {
             this.addLog(`❌ 戰力不足 (${finalAtk}/${monster.monster.hp})，攻擊無效！`, 'danger');
+            if (bonuses.length > 0) this.addLog(`戰鬥細節：${bonuses.join(', ')}`, 'info');
             this.updateUI();
         }
+    }
+
+    // v3.3：計算英雄詳細戰鬥數值
+    calculateHeroCombatStats(hero, weapon, monster, lightPenalty) {
+        const auras = this.getActiveAuras();
+        let physAtk = hero.hero.attack + (weapon ? weapon.equipment.attack : 0) + auras.atkMod;
+        let magAtk = hero.hero.magicAttack + (weapon ? weapon.equipment.magicAttack : 0);
+        let bonuses = [];
+
+        // 1. 條件加成 (onBattle / 其他規則)
+        if (hero.abilities && hero.abilities.onBattle) {
+            const effect = hero.abilities.onBattle;
+
+            // 矮人加成：若有裝備，額外 Attack+1
+            if (hero.hero.series === 'Dwarf' && weapon) {
+                physAtk += 1;
+                bonuses.push('矮人武裝: +1 Atk');
+            }
+
+            // 塞維恩補償：光照不足時，每多一光源攻擊力 +1
+            if (effect === 'light_compensation' && lightPenalty > 0) {
+                let currentLight = 0;
+                this.hand.forEach(c => currentLight += (c.light || 0));
+                if (currentLight > 0) {
+                    physAtk += currentLight;
+                    bonuses.push(`騎士信仰(光照補償): +${currentLight} Atk`);
+                }
+            }
+        }
+
+        // 2. 怪物免疫處理
+        if (monster && monster.abilities) {
+            if (monster.abilities.battle === 'phys_immune') {
+                physAtk = 0;
+                bonuses.push('物理免疫: Atk 歸零');
+            }
+            if (monster.abilities.battle === 'magic_only') {
+                physAtk = 0;
+                bonuses.push('魔法限定: 物理 Atk 無效');
+            }
+        }
+
+        // 3. 光照懲罰
+        physAtk = Math.max(0, physAtk - lightPenalty);
+        if (lightPenalty > 0) bonuses.push(`光照懲罰: -${lightPenalty} Atk`);
+
+        return { physAtk, magAtk, bonuses };
     }
 
     // --- 地城推進 ---

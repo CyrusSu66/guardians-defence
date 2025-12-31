@@ -152,14 +152,22 @@ export class UIManager {
     }
 
     getStatsHtml(card) {
+        let stats = '';
         if (card.type === 'Hero') {
-            return `<div class="card-stats">⚔️ ${card.hero.attack} | ⚡ ${card.hero.magicAttack} | 💪 ${card.hero.strength}</div>`;
+            stats = `<div class="card-stats">⚔️ ${card.hero.attack} | ⚡ ${card.hero.magicAttack} | 💪 ${card.hero.strength}</div>`;
+            // v3.3 技能標籤
+            if (card.abilities) {
+                if (card.abilities.onVillage) stats += `<div class="skill-tag village">🏠 村莊</div>`;
+                if (card.abilities.onDungeon) stats += `<div class="skill-tag dungeon">🌲 地城</div>`;
+                if (card.abilities.onBattle) stats += `<div class="skill-tag battle">⚔️ 戰鬥</div>`;
+                if (card.abilities.onVictory) stats += `<div class="skill-tag victory">🏆 戰勝</div>`;
+            }
         } else if (card.type === 'Weapon') {
-            return `<div class="card-stats">⚔️ ${card.equipment.attack} | ⚡ ${card.equipment.magicAttack} | ⚖️ ${card.equipment.weight}</div>`;
+            stats = `<div class="card-stats">⚔️ ${card.equipment.attack} | ⚡ ${card.equipment.magicAttack} | ⚖️ ${card.equipment.weight}</div>`;
         } else if (card.goldValue) {
-            return `<div class="card-stats">💰 +${card.goldValue}</div>`;
+            stats = `<div class="card-stats">💰 +${card.goldValue}</div>`;
         }
-        return '';
+        return stats;
     }
 
     renderDungeonRanks() {
@@ -315,11 +323,30 @@ export class UIManager {
             summary.innerHTML = '<span style="color: #ff5a59;">👉 請選擇英雄</span>';
             return;
         }
-        const baseAtk = hero.hero.attack + (weapon ? weapon.equipment.attack : 0);
+
+        // v3.3：使用精確計算邏輯顯示加成
+        let totalLight = 0;
+        this.game.hand.forEach(c => totalLight += (c.light || 0));
+        const auras = this.game.getActiveAuras();
+        const lightReq = targetRank + auras.lightReqMod;
+        const lightPenalty = Math.max(0, lightReq - totalLight) * 2;
+
+        const { physAtk, magAtk, bonuses } = this.game.calculateHeroCombatStats(hero, weapon, monster, lightPenalty);
+        const totalAtk = physAtk + magAtk;
+
         summary.innerHTML = `
-            <strong>已選：</strong> ${hero.name} ${weapon ? ' + ' + weapon.name : ''}<br>
-            預估戰力：${baseAtk} | 負重：${hero.hero.strength}/${weapon ? weapon.equipment.weight : 0}<br>
-            目標：${monster ? monster.name : '（未選目標）'}
+            <div style="border-bottom: 1px solid #444; padding-bottom: 5px; margin-bottom: 5px;">
+                <strong>已選：</strong> ${hero.name} ${weapon ? ' + ' + weapon.name : ''}
+            </div>
+            <div style="font-size: 15px; color: var(--color-primary); font-weight: bold;">
+                預估總戰力：${totalAtk}
+            </div>
+            <div style="font-size: 11px; color: #888; margin-top: 5px; line-height: 1.4;">
+                ${bonuses.length > 0 ? '🔹 ' + bonuses.join('<br>🔹 ') : '（無額外修正）'}
+            </div>
+            <div style="margin-top: 5px; font-weight: bold;">
+                目標：${monster ? monster.name + ' (HP: ' + monster.monster.hp + ')' : '<span style="color:#ff5a59;">（未選目標）</span>'}
+            </div>
         `;
         const btn = document.getElementById('combatAttackBtn');
         if (btn) btn.disabled = !hero || !targetRank;

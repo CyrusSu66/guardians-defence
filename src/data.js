@@ -53,9 +53,16 @@ export const CARDPOOL = {
         {
             id: 'hero_sevin_lv2', name: '塞維恩騎士', type: 'Hero', subTypes: ['Fighter'],
             cost: 7, vp: 2, goldValue: 0, light: 1,
-            desc: '受封的騎士。光源不足時提供力道',
+            desc: '【戰鬥】光照不足時，每多一光源攻擊力 +1',
             hero: { level: 2, series: 'Sevin', attack: 3, magicAttack: 0, strength: 5, xpToUpgrade: 6, upgradeToId: 'hero_sevin_lv3' },
             abilities: { onBattle: 'light_compensation' }
+        },
+        {
+            id: 'hero_sevin_lv3', name: '塞維恩君主', type: 'Hero', subTypes: ['Fighter'],
+            cost: 10, vp: 3, goldValue: 0, light: 2,
+            desc: '【戰鬥】光照不足時 Magic+2；戰勝可額外購買光源。',
+            hero: { level: 3, series: 'Sevin', attack: 3, magicAttack: 0, strength: 6, xpToUpgrade: 0 },
+            abilities: { onBattle: 'light_compensation_lv3', onVictory: 'buy_light' }
         },
         {
             id: 'hero_amazon_lv1', name: '亞馬遜弓箭手', type: 'Hero', subTypes: ['Archer'],
@@ -64,10 +71,31 @@ export const CARDPOOL = {
             hero: { level: 1, series: 'Amazon', attack: 1, magicAttack: 0, strength: 3, xpToUpgrade: 4, upgradeToId: 'hero_amazon_lv2' }
         },
         {
+            id: 'hero_amazon_lv2', name: '亞馬遜女獵人', type: 'Hero', subTypes: ['Archer'],
+            cost: 7, vp: 2, goldValue: 0, light: 0,
+            desc: '【地城】進入時抽 1 張牌。',
+            hero: { level: 2, series: 'Amazon', attack: 2, magicAttack: 0, strength: 4, xpToUpgrade: 6, upgradeToId: 'hero_amazon_lv3' },
+            abilities: { onDungeon: 'draw_1' }
+        },
+        {
+            id: 'hero_amazon_lv3', name: '亞馬遜女王', type: 'Hero', subTypes: ['Archer'],
+            cost: 10, vp: 3, goldValue: 0, light: 0,
+            desc: '【地城】進入時抽 2 張牌；戰勝得 1 XP。',
+            hero: { level: 3, series: 'Amazon', attack: 3, magicAttack: 0, strength: 5, xpToUpgrade: 0 },
+            abilities: { onDungeon: 'draw_2', onVictory: 'gain_1xp' }
+        },
+        {
             id: 'hero_elf_lv1', name: '精靈術士', type: 'Hero', subTypes: ['Wizard'],
             cost: 4, vp: 1, goldValue: 0, light: 0,
             desc: '操縱自然魔力的精靈',
             hero: { level: 1, series: 'Elf', attack: 0, magicAttack: 1, strength: 2, xpToUpgrade: 4, upgradeToId: 'hero_elf_lv2' }
+        },
+        {
+            id: 'hero_elf_lv2', name: '精靈巫師', type: 'Hero', subTypes: ['Wizard'],
+            cost: 7, vp: 2, goldValue: 0, light: 0,
+            desc: '【地城】進入時抽 1 張牌。',
+            hero: { level: 2, series: 'Elf', attack: 0, magicAttack: 2, strength: 3, xpToUpgrade: 6, upgradeToId: 'hero_elf_lv3' },
+            abilities: { onDungeon: 'draw_1' }
         },
         {
             id: 'hero_dwarf_lv1', name: '矮人守護者', type: 'Hero', subTypes: ['Fighter'],
@@ -79,7 +107,14 @@ export const CARDPOOL = {
             id: 'hero_loric_lv1', name: '羅域盜賊', type: 'Hero', subTypes: ['Thief'],
             cost: 4, vp: 1, goldValue: 0, light: 0,
             desc: '擅長在陰影中襲取的盜賊',
-            hero: { level: 1, series: 'Loric', attack: 2, magicAttack: 0, strength: 3, xpToUpgrade: 4 }
+            hero: { level: 1, series: 'Loric', attack: 2, magicAttack: 0, strength: 3, xpToUpgrade: 4, upgradeToId: 'hero_loric_lv2' }
+        },
+        {
+            id: 'hero_grail_lv1', name: '聖杯探求者', type: 'Hero', subTypes: ['Cleric'],
+            cost: 4, vp: 1, goldValue: 0, light: 0,
+            desc: '【村莊】摧毀一張疾病卡。',
+            hero: { level: 1, series: 'Chail', attack: 0, magicAttack: 1, strength: 3, xpToUpgrade: 4 },
+            abilities: { onVillage: 'destroy_disease' }
         }
     ],
 
