@@ -189,6 +189,11 @@ export class UIManager {
             stats = `<div class="card-stats">🪙 +${card.goldValue}</div>`;
         }
 
+        // v3.7: 增加照明屬性顯示 (💡)
+        if (card.light > 0) {
+            stats += `<div class="card-stats" style="color:#ffeb3b;">💡 +${card.light}</div>`;
+        }
+
         // v3.4 底部資訊
         let footer = '<div class="card-footer-info">';
         if (isMarket) {
@@ -263,6 +268,9 @@ export class UIManager {
         }
         if (card.goldValue) {
             statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">提供金錢</div><div class="tooltip-stat-value" style="color:#ffd700;">🪙 ${card.goldValue}</div></div>`;
+        }
+        if (card.light) {
+            statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">照明點數</div><div class="tooltip-stat-value" style="color:#ffeb3b;">💡 ${card.light}</div></div>`;
         }
         document.getElementById('ttStats').innerHTML = statsHtml;
         document.getElementById('ttLore').innerText = card.lore || "此卡片尚未被歷史記載。";
@@ -417,38 +425,61 @@ export class UIManager {
     updateCombatSummary() {
         const summary = document.getElementById('combatSummary');
         if (!summary || this.game.state !== GameState.COMBAT) return;
+
         const { selectedHeroIdx, selectedWeaponIdx, targetRank } = this.game.combat;
         const hero = this.game.hand[selectedHeroIdx];
         const weapon = this.game.hand[selectedWeaponIdx];
         const monster = targetRank ? this.game.dungeonHall[`rank${targetRank}`] : null;
 
+        // v3.7.1：不論是否選取英雄，進入戰鬥階段即統計手牌總照明
+        let totalLight = 0;
+        this.game.hand.forEach(c => totalLight += (c.light || 0));
+        this.game.playedCards.forEach(c => totalLight += (c.light || 0)); // 計入已啟用的光源
+
+        const auras = this.game.getActiveAuras();
+        const lightReq = targetRank ? (targetRank + auras.lightReqMod) : 0;
+        const lightPenalty = targetRank ? Math.max(0, lightReq - totalLight) * 2 : 0;
+
+        // 計算區 HTML (即時統計)
+        const calcGridHtml = `
+            <div class="combat-calc-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; margin-bottom: 12px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 6px; border: 1px solid #444;">
+                <div style="color: #ffeb3b;">💡 手牌總照明: ${totalLight}</div>
+                <div style="color: #00e5ff;">🕯️ 地城需求: ${targetRank ? lightReq : '(未選目標)'}</div>
+                <div style="grid-column: 1/-1; padding-top: 5px; border-top: 1px solid #333; color: ${lightPenalty > 0 ? '#ff5a59' : '#4caf50'}; font-weight: bold;">
+                    ⚖️ 當前照明影響: -${lightPenalty} 戰力 (x2 懲罰)
+                </div>
+            </div>
+        `;
+
         if (!hero) {
-            summary.innerHTML = '<span style="color: #ff5a59;">👉 請選擇英雄</span>';
+            summary.innerHTML = `
+                ${calcGridHtml}
+                <div style="text-align: center; color: #ff5a59; padding: 10px; border: 1px dashed #ff5a59; border-radius: 4px;">
+                    👉 請從下方手牌選取英雄與武器
+                </div>
+            `;
             return;
         }
 
-        // v3.3：使用精確計算邏輯顯示加成
-        let totalLight = 0;
-        this.game.hand.forEach(c => totalLight += (c.light || 0));
-        const auras = this.game.getActiveAuras();
-        const lightReq = targetRank + auras.lightReqMod;
-        const lightPenalty = Math.max(0, lightReq - totalLight) * 2;
-
-        const { physAtk, magAtk, bonuses } = this.game.calculateHeroCombatStats(hero, weapon, monster, lightPenalty);
-        const totalAtk = physAtk + magAtk;
+        const results = this.game.calculateHeroCombatStats(hero, weapon, monster, lightPenalty, totalLight, lightReq);
+        const { finalAtk, bonuses } = results;
 
         summary.innerHTML = `
-            <div style="border-bottom: 1px solid #444; padding-bottom: 5px; margin-bottom: 5px;">
-                <strong>已選：</strong> ${hero.name} ${weapon ? ' + ' + weapon.name : ''}
+            ${calcGridHtml}
+            <div style="border-bottom: 1px solid #444; padding-bottom: 5px; margin-bottom: 8px;">
+                <strong>當前出戰：</strong> ${hero.name} ${weapon ? ' + ' + weapon.name : ''}
             </div>
-            <div style="font-size: 15px; color: var(--color-primary); font-weight: bold;">
-                預估造成傷害：${totalAtk}
+
+            <div style="font-size: 18px; color: var(--color-primary); font-weight: bold; text-align: center; background: rgba(0,255,136,0.1); padding: 8px; border-radius: 4px; border: 1px solid rgba(0,255,136,0.3); box-shadow: 0 0 10px rgba(0,255,136,0.1);">
+                💪 預估總傷害：${finalAtk}
             </div>
-            <div style="font-size: 11px; color: #888; margin-top: 5px; line-height: 1.4;">
-                ${bonuses.length > 0 ? '🔹 ' + bonuses.join('<br>🔹 ') : '（無額外修正）'}
+
+            <div style="font-size: 11px; color: #aaa; margin-top: 10px; line-height: 1.4; max-height: 60px; overflow-y: auto; padding-left: 5px; border-left: 2px solid #555;">
+                ${bonuses.length > 0 ? '🔹 ' + bonuses.join('<br>🔹 ') : '（無其他特殊修正）'}
             </div>
-            <div style="margin-top: 5px; font-weight: bold;">
-                目標：${monster ? monster.name + ' (剩餘HP: ' + monster.currentHP + ')' : '<span style="color:#ff5a59;">（未選目標）</span>'}
+
+            <div style="margin-top: 10px; font-weight: bold; border-top: 1px solid #444; padding-top: 8px;">
+                🎯 目標：${monster ? monster.name + ' (❤️ ' + monster.currentHP + ' HP)' : '<span style="color:#ff5a59;">（未選取目標）</span>'}
             </div>
         `;
         const btn = document.getElementById('combatAttackBtn');

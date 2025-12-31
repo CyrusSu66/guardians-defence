@@ -39,7 +39,7 @@ export class CombatEngine {
         const lightReq = g.combat.targetRank + auras.lightReqMod;
         const lightPenalty = Math.max(0, lightReq - totalLight) * 2;
 
-        let { physAtk, magAtk, bonuses } = this.calculateStats(hero, weapon, monster, lightPenalty);
+        let { physAtk, magAtk, bonuses } = this.calculateStats(hero, weapon, monster, lightPenalty, totalLight, lightReq);
         let finalAtk = physAtk + magAtk;
 
         if (finalAtk <= 0) {
@@ -83,7 +83,7 @@ export class CombatEngine {
     /**
      * 計算英雄與武器組合的詳細戰鬥數值
      */
-    calculateStats(hero, weapon, monster, lightPenalty) {
+    calculateStats(hero, weapon, monster, lightPenalty, totalLight = 0, lightReq = 0) {
         const auras = this.getActiveAuras();
         let physAtk = hero.hero.attack + (weapon ? weapon.equipment.attack : 0) + auras.atkMod;
         let magAtk = hero.hero.magicAttack + (weapon ? weapon.equipment.magicAttack : 0);
@@ -101,8 +101,10 @@ export class CombatEngine {
 
             // Sevin 騎士光照補償 (當前版本維持)
             if (effect === 'light_compensation' && lightPenalty > 0) {
+                // v3.7: 統一由傳入參數或掃描獲取，這裡為了封裝統一掃描一次
                 let currentLight = 0;
                 this.game.hand.forEach(c => currentLight += (c.light || 0));
+                this.game.playedCards.forEach(c => currentLight += (c.light || 0));
                 if (currentLight > 0) {
                     physAtk += currentLight;
                     bonuses.push(`騎士信仰(光照補償): +${currentLight} Atk`);
@@ -127,7 +129,15 @@ export class CombatEngine {
         totalAtk = Math.max(0, totalAtk - lightPenalty);
         if (lightPenalty > 0) bonuses.push(`光照懲罰: -${lightPenalty} Atk`);
 
-        return { physAtk: Math.max(0, physAtk - lightPenalty), magAtk: Math.max(0, magAtk - (lightPenalty > physAtk ? lightPenalty - physAtk : 0)), bonuses, finalAtk: totalAtk };
+        return {
+            physAtk: Math.max(0, physAtk - lightPenalty),
+            magAtk: Math.max(0, magAtk - (lightPenalty > physAtk ? lightPenalty - physAtk : 0)),
+            bonuses,
+            finalAtk: totalAtk,
+            totalLight, // v3.7
+            lightReq,    // v3.7
+            lightPenalty // v3.7
+        };
     }
 
     /**

@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.6.1(01-01-02:45)"; // 數值修正與極致模組化
+        this.version = "v3.7(01-01-02:50)"; // 照明顯化與戰鬥校準
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);
@@ -137,8 +137,8 @@ class GuardiansDefenceGame {
 
     // 戰鬥相關
     getActiveAuras() { return this.combatEngine.getActiveAuras(); }
-    calculateHeroCombatStats(hero, weapon, monster, lightPenalty) {
-        return this.combatEngine.calculateStats(hero, weapon, monster, lightPenalty);
+    calculateHeroCombatStats(hero, weapon, monster, lightPenalty, totalLight = 0, lightReq = 0) {
+        return this.combatEngine.calculateStats(hero, weapon, monster, lightPenalty, totalLight, lightReq);
     }
     performCombat() { this.combatEngine.perform(); }
     selectCombatTarget(rank) {
