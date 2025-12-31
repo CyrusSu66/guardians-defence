@@ -8,7 +8,7 @@ import { UIManager } from './ui.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.4(01-01-01:15)"; // 英雄技能引擎啟動
+        this.version = "v3.5(01-01-01:40)"; // 戰鬥重構：接力打怪與亮度彙整
         this.ui = new UIManager(this);
         this.init();
         this.setupErrorHandler();
@@ -312,11 +312,12 @@ class GuardiansDefenceGame {
         this.updateUI();
     }
 
+    // v3.5：進入地城時自動更新手牌亮度總值
     enterDungeonAction() {
         this.state = GameState.COMBAT;
         this.currentAction = 'DUNGEON';
         this.combat = { selectedHeroIdx: null, selectedWeaponIdx: null, targetRank: null };
-        this.addLog('進入地城！正在發動英雄野外技能...', 'info');
+        this.addLog('進入地城！正在準備戰鬥...', 'info');
 
         // v3.3：掃描手牌中的地城技能 (onDungeon)
         this.hand.forEach(card => {
@@ -426,16 +427,26 @@ class GuardiansDefenceGame {
             return this.addLog(`❌ 負重不足！${hero.name} 無法使用 ${weapon.name}`, 'danger');
         }
 
+        // v3.5：亮度偵測優化 - 自動彙整手牌所有亮度提供者
         let totalLight = 0;
         this.hand.forEach(c => totalLight += (c.light || 0));
+        this.playedCards.forEach(c => totalLight += (c.light || 0)); // 已啟用的也算
+
         const lightReq = this.combat.targetRank + auras.lightReqMod;
         const lightPenalty = Math.max(0, lightReq - totalLight) * 2;
 
         let { physAtk, magAtk, bonuses } = this.calculateHeroCombatStats(hero, weapon, monster, lightPenalty);
-
         let finalAtk = physAtk + magAtk;
 
-        if (finalAtk >= monster.monster.hp) {
+        if (finalAtk <= 0) {
+            return this.addLog(`❌ 攻擊力不足以造成傷害 (最終 Atk: ${finalAtk})。`, 'warning');
+        }
+
+        // v3.5：扣除怪物血量 (接力打怪)
+        monster.currentHP -= finalAtk;
+        this.addLog(`⚔️ ${hero.name}${weapon ? ' 持 ' + weapon.name : ''} 對 ${monster.name} 造成 ${finalAtk} 點傷害！`, 'info');
+
+        if (monster.currentHP <= 0) {
             this.addLog(`✨ 擊斃 ${monster.name}！`, 'success');
 
             // v3.3：戰勝效果觸發 (onVictory)
@@ -447,22 +458,22 @@ class GuardiansDefenceGame {
             this.totalScore += (monster.vp || 0);
             this.dungeonHall[`rank${this.combat.targetRank}`] = null;
 
-            // 消耗卡片
-            const toDiscard = [hIdx];
-            if (wIdx !== null) toDiscard.push(wIdx);
-            toDiscard.sort((a, b) => b - a).forEach(i => this.discard.push(this.hand.splice(i, 1)[0]));
             if (monster.hasThunderstone) {
                 this.addLog('🏆 您奪得了雷霆之石，防線獲得最終勝利！', 'success');
                 this.gameOver();
-            } else {
-                this.combat = { selectedHeroIdx: null, selectedWeaponIdx: null, targetRank: null };
-                this.updateUI();
+                return;
             }
         } else {
-            this.addLog(`❌ 戰力不足 (${finalAtk}/${monster.monster.hp})，攻擊無效！`, 'danger');
-            if (bonuses.length > 0) this.addLog(`戰鬥細節：${bonuses.join(', ')}`, 'info');
-            this.updateUI();
+            this.addLog(`🛡️ ${monster.name} 剩餘 HP: ${monster.currentHP}/${monster.monster.hp}`, 'warning');
         }
+
+        // 消耗卡片 (無論是否擊斃都消耗本次參與的英雄)
+        const toDiscard = [hIdx];
+        if (wIdx !== null) toDiscard.push(wIdx);
+        toDiscard.sort((a, b) => b - a).forEach(i => this.discard.push(this.hand.splice(i, 1)[0]));
+
+        this.combat = { selectedHeroIdx: null, selectedWeaponIdx: null, targetRank: this.combat.targetRank };
+        this.updateUI();
     }
 
     // v3.3：計算英雄詳細戰鬥數值
@@ -515,10 +526,16 @@ class GuardiansDefenceGame {
     // --- 地城推進 ---
 
     spawnNextMonster() {
-        if (this.monsterDeck.length > 0) {
-            const m = this.monsterDeck.pop();
-            this.dungeonHall.rank3 = m;
-            this.processBreachEffect(m);
+        if (this.monsterDeck.length === 0) return;
+        const monster = this.monsterDeck.pop();
+        monster.currentHP = monster.monster.hp; // v3.5：初始化當前血量
+
+        if (!this.dungeonHall.rank3) this.dungeonHall.rank3 = monster;
+        else if (!this.dungeonHall.rank2) this.dungeonHall.rank2 = monster;
+        else if (!this.dungeonHall.rank1) this.dungeonHall.rank1 = monster;
+        else {
+            this.monsterDeck.push(monster); // 放回牌庫
+            this.addLog('⚠️ 地城已滿，怪物暫時無法進入。', 'warning');
         }
     }
 

@@ -20,7 +20,7 @@ export const CARDPOOL = {
             id: 'basic_regular_army', name: '正規軍', type: 'Hero', subTypes: ['Fighter'],
             cost: 2, vp: 0, goldValue: 0, light: 0,
             desc: '基本步兵單位。可花費 1 XP 晉升為 1 級英雄。',
-            hero: { level: 0, series: 'Regular', attack: 0, magicAttack: 0, strength: 2, xpToUpgrade: 1 },
+            hero: { level: 0, series: 'Regular', attack: 1, magicAttack: 0, strength: 2, xpToUpgrade: 1 },
             abilities: { onDungeon: 'synergy_spear_draw' }
         },
         {

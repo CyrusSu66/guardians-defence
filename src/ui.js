@@ -231,10 +231,18 @@ export class UIManager {
         let desc = card.description || '（無特殊效果說明）';
         if (card.abilities) {
             desc += '<div style="margin-top:10px; border-top:1px solid #444; padding-top:10px;"><strong>特殊能力：</strong><br>';
-            if (card.abilities.onVillage) desc += `🏠 於村莊：${card.abilities.onVillage}<br>`;
-            if (card.abilities.onDungeon) desc += `🌲 入地城：${card.abilities.onDungeon}<br>`;
-            if (card.abilities.onBattle) desc += `⚔️ 戰鬥中：${card.abilities.onBattle}<br>`;
-            if (card.abilities.onVictory) desc += `🏆 戰勝後：${card.abilities.onVictory}<br>`;
+
+            // v3.5：定義未實作或開發中的關鍵字
+            const isIncomplete = (text) => text.includes('開發中') || text.includes('待實作');
+            const getStyledSkill = (icon, label, text) => {
+                const style = isIncomplete(text) ? 'color: #ff5a59; font-weight: bold;' : '';
+                return `<span style="${style}">${icon} ${label}：${text}</span><br>`;
+            };
+
+            if (card.abilities.onVillage) desc += getStyledSkill('🏠', '於村莊', card.abilities.onVillage);
+            if (card.abilities.onDungeon) desc += getStyledSkill('🌲', '入地城', card.abilities.onDungeon);
+            if (card.abilities.onBattle) desc += getStyledSkill('⚔️', '戰鬥中', card.abilities.onBattle);
+            if (card.abilities.onVictory) desc += getStyledSkill('🏆', '戰勝後', card.abilities.onVictory);
             desc += '</div>';
         }
         document.getElementById('ttDescription').innerHTML = desc;
@@ -274,10 +282,15 @@ export class UIManager {
             if (monster) {
                 el.classList.add('occupied');
                 if (monster.hasThunderstone) el.classList.add('boss-marked');
+
+                // v3.5：顯示動態 HP
+                const hpPercent = (monster.currentHP / monster.monster.hp) * 100;
+                const hpColor = hpPercent > 50 ? '#4caf50' : (hpPercent > 25 ? '#ff9800' : '#f44336');
+
                 el.innerHTML = `
                     <div class="rank-label">Rank ${rank} (💡 ${lightPenalty})</div>
                     <div class="monster-name">${monster.name}</div>
-                    <div class="monster-hp">❤️ HP: ${monster.monster.hp}</div>
+                    <div class="monster-hp" style="color: ${hpColor}; font-weight: bold;">❤️ HP: ${monster.currentHP}/${monster.monster.hp}</div>
                     <div class="monster-reward">XP: ${monster.monster.xpGain}</div>
                 `;
                 if (this.game.state === GameState.COMBAT) {
@@ -429,13 +442,13 @@ export class UIManager {
                 <strong>已選：</strong> ${hero.name} ${weapon ? ' + ' + weapon.name : ''}
             </div>
             <div style="font-size: 15px; color: var(--color-primary); font-weight: bold;">
-                預估總戰力：${totalAtk}
+                預估造成傷害：${totalAtk}
             </div>
             <div style="font-size: 11px; color: #888; margin-top: 5px; line-height: 1.4;">
                 ${bonuses.length > 0 ? '🔹 ' + bonuses.join('<br>🔹 ') : '（無額外修正）'}
             </div>
             <div style="margin-top: 5px; font-weight: bold;">
-                目標：${monster ? monster.name + ' (HP: ' + monster.monster.hp + ')' : '<span style="color:#ff5a59;">（未選目標）</span>'}
+                目標：${monster ? monster.name + ' (剩餘HP: ' + monster.currentHP + ')' : '<span style="color:#ff5a59;">（未選目標）</span>'}
             </div>
         `;
         const btn = document.getElementById('combatAttackBtn');
