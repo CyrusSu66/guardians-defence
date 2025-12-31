@@ -20,23 +20,37 @@ export class CardEngine {
     }
 
     /**
-     * 初始化怪物牌庫 (含 Boss 與雷霆之石)
+     * 創建怪物牌庫 (v3.11：每族群 10 張卡，隨機雷霆之石)
      */
     createMonsterDeck() {
-        const pool = CARDPOOL.monsters;
-        const t1 = this.game.shuffleArray(pool.filter(m => m.monster.tier === 1));
-        const t2 = this.game.shuffleArray(pool.filter(m => m.monster.tier === 2));
-        const t3 = this.game.shuffleArray(pool.filter(m => m.monster.tier === 3));
-        const s1 = t1.slice(0, 10);
-        const s2 = t2.slice(0, 10);
-        const s3 = t3.slice(0, 10);
+        const groups = ['Vermin', 'Undead', 'Darkness', 'Ancient'];
+        let deck = [];
 
-        const bossIdx = Math.floor(Math.random() * s3.length);
-        s3[bossIdx].hasThunderstone = true;
-        s3[bossIdx].monster.hp += 3;
-        s3[bossIdx].name += " ⚡";
+        groups.forEach(groupName => {
+            // Assuming CARDPOOL.monsters is the source for all monsters
+            const groupMonsters = CARDPOOL.monsters.filter(m => m.monster.subTypes.includes(groupName));
+            groupMonsters.forEach(template => {
+                // Assuming 'count' property exists on monster templates, default to 1 if not
+                for (let i = 0; i < (template.monster.count || 1); i++) {
+                    // Deep copy the template and assign a unique ID
+                    const newMonster = JSON.parse(JSON.stringify(template));
+                    newMonster.id = `${template.id}_${i}`;
+                    deck.push(newMonster);
+                }
+            });
+        });
 
-        return [...s1, ...s2, ...s3].reverse();
+        // Shuffle the entire deck
+        deck = this.game.shuffleArray(deck); // Assuming game.shuffleArray is the correct method
+
+        // 雷霆之石邏輯：牌庫最底層 10 張隨機選一張
+        if (deck.length >= 10) {
+            const last10Index = deck.length - 10 + Math.floor(Math.random() * 10);
+            deck[last10Index].hasThunderstone = true;
+            console.log(`[CardEngine] 雷霆之石已埋藏於索引 ${last10Index} (${deck[last10Index].name})`);
+        }
+
+        return deck;
     }
 
     /**

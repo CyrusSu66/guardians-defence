@@ -422,6 +422,89 @@ export class UIManager {
         });
     }
 
+    renderDungeonRanks() {
+        const container = document.getElementById('dungeonRankSlots');
+        if (!container) return;
+        container.innerHTML = '';
+        [1, 2, 3].forEach(rank => {
+            const el = document.createElement('div');
+            el.className = 'lane-slot dungeon-rank';
+            const monster = this.game.dungeonHall[`rank${rank}`];
+            const lightPenalty = -rank; // This is the base penalty, not the final one.
+            if (!monster) {
+                el.innerHTML = `<div class="rank-label">Rank ${rank}</div><div class="empty-slot">空</div>`;
+            } else {
+                const isSelected = this.game.combat && this.game.combat.targetRank === rank;
+                const tsMarker = monster.hasThunderstone ? '<div class="thunderstone-badge">💠</div>' : '';
+                // v3.5：顯示動態 HP
+                const hpPercent = (monster.currentHP / monster.monster.hp) * 100;
+                const hpColor = hpPercent > 50 ? '#4caf50' : (hpPercent > 25 ? '#ff9800' : '#f44336');
+
+                el.classList.add('occupied');
+                if (monster.hasThunderstone) el.classList.add('boss-marked');
+
+                el.innerHTML = `
+                    <div class="rank-label">Rank ${rank} (💡 ${lightPenalty})</div>
+                    ${tsMarker}
+                    <div class="monster-name">${monster.name}</div>
+                    <div class="monster-hp" style="color: ${hpColor}; font-weight: bold;">❤️ HP: ${monster.currentHP}/${monster.monster.hp}</div>
+                    <div class="monster-reward">XP: ${monster.monster.xpGain}</div>
+                    <div class="monster-detail-btn" onclick="event.stopPropagation(); window.game.ui.showMonsterDetail('${monster.id.includes('_') ? monster.id.split('_')[0] : monster.id}')">ⓘ 詳情</div>
+                `;
+                if (this.game.state === GameState.COMBAT) {
+                    el.style.cursor = 'pointer';
+                    if (isSelected) el.classList.add('target-locked');
+                    el.onclick = () => this.game.selectCombatTarget(rank);
+                }
+            }
+            container.appendChild(el);
+        });
+        this.renderMonsterDeckInspector(); // v3.11
+    }
+
+    /**
+     * 怪物牌庫監查器 (v3.11 Debug Tool)
+     */
+    renderMonsterDeckInspector() {
+        const container = document.getElementById('debugDeckInspector');
+        if (!container) return;
+
+        const deck = this.game.monsterDeck;
+        container.innerHTML = `
+            <div style="font-size: 11px; color: #888; margin-top: 10px; border-top: 1px dashed #444; padding-top: 10px;">
+                🔎 [DEBUG] 怪物牌庫餘量: ${deck.length} | 
+                <span style="color:#00e5ff; cursor:pointer;" onclick="this.nextElementSibling.style.display = (this.nextElementSibling.style.display==='none'?'block':'none')">顯示列表</span>
+                <div style="display:none; max-height: 100px; overflow-y: auto; background: rgba(0,0,0,0.5); padding: 5px; margin-top: 5px;">
+                    ${deck.map((m, i) => `<div style="${m.hasThunderstone ? 'color:#00e5ff; font-weight:bold;' : ''}">${deck.length - i}. ${m.name}${m.hasThunderstone ? ' 💠' : ''}</div>`).reverse().join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * 顯示怪物詳細資訊 Tooltip (v3.10)
+     */
+    showMonsterDetail(monsterId) {
+        const monster = this.game.getCardPoolItem(monsterId);
+        if (!monster) return;
+
+        const overlay = document.getElementById('cardTooltipOverlay'); // Changed to cardTooltipOverlay for consistency
+        if (!overlay) return;
+
+        document.getElementById('ttType').innerText = `怪物 - ${monster.subTypes.join('/')}`;
+        document.getElementById('ttTitle').innerText = monster.name; // Changed ttName to ttTitle for consistency
+        document.getElementById('ttDescription').innerHTML = `<span style="color:#ff5a59;">[突進傷害: ${monster.monster.breachDamage || 1}]</span><br>${monster.description}`; // Changed ttDesc to ttDescription and desc to description
+
+        let statsHtml = `
+            <div class="tooltip-stat-item"><div class="tooltip-stat-label">原始血量</div><div class="tooltip-stat-value">❤️ ${monster.monster.hp}</div></div>
+            <div class="tooltip-stat-item"><div class="tooltip-stat-label">擊敗獎勵</div><div class="tooltip-stat-value">✨ ${monster.monster.xpGain} XP</div></div>
+        `;
+        document.getElementById('ttStats').innerHTML = statsHtml;
+        document.getElementById('ttLore').innerText = monster.lore || "此怪物的來歷充滿謎團。";
+
+        overlay.classList.add('active'); // Changed to add 'active' class for consistency
+    }
+
     updateCombatSummary() {
         const summary = document.getElementById('combatSummary');
         if (!summary || this.game.state !== GameState.COMBAT) return;
@@ -435,14 +518,15 @@ export class UIManager {
         this.game.hand.forEach(c => totalLight += (c.light || 0));
         this.game.playedCards.forEach(c => totalLight += (c.light || 0));
 
-        // v3.10：固定照明需求，不再受調度影響
-        const lightReq = targetRank ? targetRank : 0;
+        // v3.11：恢復受限照明修正
+        const auras = this.game.calculateHeroCombatStats(hero || { hero: { attack: 0, magicAttack: 0 } }, null, null, 0).auras || { lightReqMod: 0 };
+        const lightReq = targetRank ? (targetRank + (auras.lightReqMod || 0)) : 0;
         const lightPenalty = targetRank ? Math.max(0, lightReq - totalLight) * 2 : 0;
 
         const calcGridHtml = `
             <div class="combat-calc-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; margin-bottom: 12px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 6px; border: 1px solid #444;">
                 <div style="color: #ffeb3b;">💡 手牌總照明: ${totalLight}</div>
-                <div style="color: #00e5ff;">🕯️ 地城需求: ${targetRank ? lightReq : '(未選目標)'}</div>
+                <div style="color: #00e5ff;">🕯️ 地城需求: ${targetRank ? lightReq : '(未選目標)'}${auras.lightReqMod > 0 ? ` (+${auras.lightReqMod})` : ''}</div>
                 <div style="grid-column: 1/-1; padding-top: 5px; border-top: 1px solid #333; color: ${lightPenalty > 0 ? '#ff5a59' : '#4caf50'}; font-weight: bold;">
                     ⚖️ 當前照明影響: -${lightPenalty} 戰力 (x2 懲罰)
                 </div>

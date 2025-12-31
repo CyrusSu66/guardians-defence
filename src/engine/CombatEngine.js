@@ -19,12 +19,20 @@ export class CombatEngine {
 
         const hIdx = g.combat.selectedHeroIdx;
         const wIdx = g.combat.selectedWeaponIdx;
+
+        const auras = this.getActiveAuras();
+        // v3.5：亮度偵測優化 - 自動彙整手牌所有亮度提供者
+        let totalLight = 0;
+        g.hand.forEach(c => totalLight += (c.light || 0));
+        g.playedCards.forEach(c => totalLight += (c.light || 0));
+
+        const lightReq = g.combat.targetRank + auras.lightReqMod; // v3.11: 恢復修正值
+        const lightPenalty = Math.max(0, lightReq - totalLight) * 2;
         const hero = g.hand[hIdx];
         const weapon = g.hand[wIdx];
 
         if (!hero) return g.addLog('請至少選擇一名英雄。', 'danger');
 
-        const auras = this.getActiveAuras();
         let heroStr = hero.hero.strength + auras.strMod;
 
         if (weapon && heroStr < weapon.equipment.weight) {
@@ -81,13 +89,16 @@ export class CombatEngine {
     }
 
     /**
-     * 計算英雄與武器組合的詳細戰鬥數值 (v3.9 校準)
+     * 計算英雄與武器組合的詳細戰鬥數值 (v3.11 校準)
      */
     calculateStats(hero, weapon, monster, lightPenalty, totalLight = 0, lightReq = 0) {
         const auras = this.getActiveAuras();
         let physAtk = hero.hero.attack + (weapon ? weapon.equipment.attack : 0) + auras.atkMod;
         let magAtk = hero.hero.magicAttack + (weapon ? weapon.equipment.magicAttack : 0);
         let bonuses = [];
+
+        // 包含環境效果描述
+        auras.auraSources.forEach(s => bonuses.push(`環境影響: ${s}`));
 
         // 1. 記錄原始數值
         const rawPhys = physAtk;
@@ -144,7 +155,8 @@ export class CombatEngine {
             finalAtk: finalAtk,
             totalLight,
             lightReq,
-            lightPenalty
+            lightPenalty,
+            auras // v3.11
         };
     }
 
