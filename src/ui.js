@@ -449,9 +449,9 @@ export class UIManager {
                     ${tsMarker}
                     <div class="monster-name" style="font-weight: bold;">${monster.name}</div>
                     <div class="monster-hp" style="color: ${hpColor}; font-weight: bold;">❤️ HP: ${monster.currentHP}/${monster.monster.hp}</div>
-                    <div style="font-size: 10px; color: #ff5a59; margin-top: 2px;">⚔️ 逃脫傷害: ${monster.monster.breachDamage || 1}</div>
-                    <div style="font-size: 10px; color: #4caf50;">✨ 擊敗獎勵: ${monster.monster.xpGain} XP</div>
-                    <div class="monster-info-btn" style="margin-top: 5px; background: rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 8px; cursor: pointer; border: 1px solid #666; font-size: 10px; display: inline-block; pointer-events: auto;" onclick="event.stopPropagation(); window.ui.showMonsterDetail('${monster.id.includes('_') ? monster.id.split('_')[0] : monster.id}')">ⓘ 查看詳情</div>
+                    <div style="font-size: 11px; color: #ff5a59; margin-top: 4px; font-weight: bold; background: rgba(255,90,89,0.1); padding: 2px 5px; border-radius: 4px; display: inline-block;">⚔️ 村莊傷害: ${monster.monster.breachDamage || 1}</div>
+                    <div style="font-size: 10px; color: #4caf50; margin-top: 2px;">✨ 擊敗獎勵: ${monster.monster.xpGain} XP</div>
+                    <div class="monster-info-btn" style="margin-top: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; padding: 3px 10px; cursor: pointer; border: 1px solid #777; font-size: 11px; display: inline-block; pointer-events: auto !important;" onclick="event.stopPropagation(); (window.ui || window.game.ui).showMonsterDetail('${monster.id.includes('_') ? monster.id.split('_')[0] : monster.id}')">ⓘ 查看詳情</div>
                 `;
                 if (this.game.state === GameState.COMBAT) {
                     el.style.cursor = 'pointer';
