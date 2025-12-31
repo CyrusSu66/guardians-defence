@@ -81,7 +81,7 @@ export class CombatEngine {
     }
 
     /**
-     * 計算英雄與武器組合的詳細戰鬥數值
+     * 計算英雄與武器組合的詳細戰鬥數值 (v3.9 校準)
      */
     calculateStats(hero, weapon, monster, lightPenalty, totalLight = 0, lightReq = 0) {
         const auras = this.getActiveAuras();
@@ -89,19 +89,18 @@ export class CombatEngine {
         let magAtk = hero.hero.magicAttack + (weapon ? weapon.equipment.magicAttack : 0);
         let bonuses = [];
 
-        // 英雄戰鬥技能
+        // 1. 記錄原始數值
+        const rawPhys = physAtk;
+        const rawMag = magAtk;
+
+        // 2. 英雄戰鬥技能加成
         if (hero.abilities && hero.abilities.onBattle) {
             const effect = hero.abilities.onBattle;
-
-            // Dwarf 系列加成
             if (hero.hero.series === 'Dwarf' && weapon) {
                 physAtk += 1;
                 bonuses.push('矮人武裝: +1 Atk');
             }
-
-            // Sevin 騎士光照補償 (當前版本維持)
             if (effect === 'light_compensation' && lightPenalty > 0) {
-                // v3.7: 統一由傳入參數或掃描獲取，這裡為了封裝統一掃描一次
                 let currentLight = 0;
                 this.game.hand.forEach(c => currentLight += (c.light || 0));
                 this.game.playedCards.forEach(c => currentLight += (c.light || 0));
@@ -112,33 +111,40 @@ export class CombatEngine {
             }
         }
 
-        // 怪物戰鬥防禦技能
+        // 3. 處理怪物免疫 (Immunity)
+        let filteredPhys = physAtk;
+        let filteredMag = magAtk;
+
         if (monster && monster.abilities) {
             if (monster.abilities.battle === 'phys_immune') {
-                physAtk = 0;
-                bonuses.push('物理免疫: Atk 歸零');
-            }
-            if (monster.abilities.battle === 'magic_only') {
-                physAtk = 1; // 物理僅剩 1 點墊底
-                bonuses.push('魔法限定: 物理 Atk 無效');
+                filteredPhys = 0;
+                bonuses.push('物理免疫: 物理傷害歸零');
+            } else if (monster.abilities.battle === 'magic_only') {
+                filteredPhys = 0; // v3.9修正：原本為 1，現在歸零
+                bonuses.push('魔法限定: 物理傷害歸零');
             }
         }
 
-        // 3. 照明懲罰 (v3.6：套用於總戰力，以符合火球術等魔法道具受光照影響的設定)
-        let totalAtk = physAtk + magAtk;
-        totalAtk = Math.max(0, totalAtk - lightPenalty);
-        if (lightPenalty > 0) bonuses.push(`光照懲罰: -${lightPenalty} Atk`);
+        // 4. 計算照明懲罰
+        // 照明調整值 = Math.max(0, 地城需求 - 手牌總照明)
+        // 最終照明懲罰 = 照明調整值 * 2
+        // 已由參數 lightPenalty 傳入 (此參數在 Game.js 中計算為 (Req - Sum)*2)
+
+        let prePenaltyTotal = filteredPhys + filteredMag;
+        let finalAtk = Math.max(0, prePenaltyTotal - lightPenalty);
+
+        if (lightPenalty > 0) bonuses.push(`照明懲罰: -${lightPenalty} 戰力`);
 
         return {
-            physAtk: Math.max(0, physAtk - lightPenalty),
-            magAtk: Math.max(0, magAtk - (lightPenalty > physAtk ? lightPenalty - physAtk : 0)),
-            rawPhysAtk: physAtk, // v3.8
-            rawMagAtk: magAtk,   // v3.8
+            physAtk: filteredPhys,
+            magAtk: filteredMag,
+            rawPhysAtk: physAtk,
+            rawMagAtk: magAtk,
             bonuses,
-            finalAtk: totalAtk,
-            totalLight, // v3.7
-            lightReq,    // v3.7
-            lightPenalty // v3.7
+            finalAtk: finalAtk,
+            totalLight,
+            lightReq,
+            lightPenalty
         };
     }
 
