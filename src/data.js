@@ -158,7 +158,8 @@ export const CARDPOOL = {
         {
             id: 'item_antidote', name: '解毒劑', type: 'Item', subTypes: ['Potion'],
             cost: 3, vp: 0, goldValue: 1, light: 0,
-            desc: '移除疾病並抽 1 張牌'
+            desc: '【使用】移除疾病並抽 1 張牌',
+            abilities: { onVillage: 'destroy_disease' }
         }
     ],
     special: [

@@ -1,6 +1,6 @@
 /**
- * 《守護者防線：雷霆遺產》UI 渲染模組 (v3.1)
- * 實作規則：手動流程控制、分區市集、休息銷毀 UI。
+ * 《守護者防線：雷霆遺產》UI 渲染模組 (v3.1.1)
+ * 實作規則：分區市集渲染、手動啟用卡片顯示、點擊啟用切換。
  */
 
 import { GameState } from './data.js';
@@ -33,7 +33,7 @@ export class UIManager {
         if (tabContent) tabContent.classList.add('active');
     }
 
-    updateUI(options = {}) {
+    updateUI() {
         const g = this.game;
         this.setText('villageHP', g.villageHP);
         document.getElementById('villageHP')?.classList.toggle('danger', g.villageHP <= 5);
@@ -54,7 +54,7 @@ export class UIManager {
         };
         this.setText('gameState', stateLabels[g.state] || '通訊中斷');
 
-        // 面板顯示邏輯 (v3.1)
+        // 面板顯示邏輯
         this.show('startGameBtn', g.state === GameState.IDLE);
         this.show('gameStepButtons', g.state !== GameState.IDLE);
         this.show('actionSelectPanel', g.state === GameState.VILLAGE && g.currentAction === null);
@@ -69,7 +69,8 @@ export class UIManager {
             if (btn) btn.disabled = !isWaitingForAction;
         });
 
-        this.renderHand(options);
+        this.renderHand();
+        this.renderPlayedCards(); // v3.1.1 已啟用卡片
         this.renderDungeonRanks();
         this.renderMarket();
         this.renderTraining();
@@ -77,7 +78,7 @@ export class UIManager {
         this.updateCombatSummary();
     }
 
-    renderHand(options = {}) {
+    renderHand() {
         const container = document.getElementById('handDisplay');
         if (!container) return;
         container.innerHTML = '';
@@ -85,42 +86,67 @@ export class UIManager {
         this.game.hand.forEach((card, idx) => {
             const el = document.createElement('div');
             el.className = 'card';
-            let infoText = '';
-            if (card.type === 'Hero') {
-                infoText = `<div class="card-stats">⚔️ ${card.hero.attack} | ⚡ ${card.hero.magicAttack} | 💪 ${card.hero.strength}</div>`;
-            } else if (card.type === 'Weapon') {
-                infoText = `<div class="card-stats">⚔️ ${card.equipment.attack} | ⚡ ${card.equipment.magicAttack} | ⚖️ ${card.equipment.weight}</div>`;
-            } else if (card.goldValue) {
-                infoText = `<div class="card-stats">💰 +${card.goldValue}</div>`;
-            }
+
+            // 點擊提示
+            let clickHint = '';
+            if (this.game.currentAction === 'VILLAGE') clickHint = '<div class="card-hint">[啟用資源]</div>';
+            else if (this.game.currentAction === 'REST' && !this.game.hasDestroyed) clickHint = '<div class="card-hint danger">[點擊銷毀]</div>';
 
             el.innerHTML = `
                 <div class="card-type-tag">${card.type}</div>
                 <div class="card-name">${card.name}</div>
-                ${infoText}
+                ${this.getStatsHtml(card)}
                 <div class="card-desc">${card.desc || ''}</div>
+                ${clickHint}
             `;
 
             if (this.game.combat && (this.game.combat.selectedHeroIdx === idx || this.game.combat.selectedWeaponIdx === idx)) {
                 el.classList.add('selected');
             }
 
-            // v3.1 休息銷毀點擊
-            if (this.game.currentAction === 'REST') {
-                el.style.border = '1px dashed #ff5a59';
-                el.innerHTML += `<div style="text-align:center; color:#ff5a59; font-size:10px; margin-top:5px;">[點擊銷毀]</div>`;
-                el.onclick = () => this.game.destroyCard(card.id);
-            } else {
-                el.onclick = () => {
-                    if (this.game.state === GameState.COMBAT) {
-                        if (card.type === 'Hero') this.game.combat.selectedHeroIdx = idx;
-                        else if (card.type === 'Weapon') this.game.combat.selectedWeaponIdx = idx;
-                        this.updateUI();
-                    }
-                };
-            }
+            el.onclick = () => {
+                if (this.game.currentAction === 'VILLAGE' || this.game.currentAction === 'REST') {
+                    this.game.playCard(idx);
+                } else if (this.game.state === GameState.COMBAT) {
+                    if (card.type === 'Hero') this.game.combat.selectedHeroIdx = idx;
+                    else if (card.type === 'Weapon') this.game.combat.selectedWeaponIdx = idx;
+                    this.updateUI();
+                }
+            };
             container.appendChild(el);
         });
+    }
+
+    renderPlayedCards() {
+        const container = document.getElementById('playedCardsDisplay');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (this.game.playedCards.length === 0) {
+            container.innerHTML = '<div style="color:#666; font-size:12px; width:100%; text-align:center;">--- 尚未啟動手牌 (放置區) ---</div>';
+            return;
+        }
+
+        this.game.playedCards.forEach(card => {
+            const el = document.createElement('div');
+            el.className = 'card small active';
+            el.innerHTML = `
+                <div class="card-name" style="font-size:11px;">${card.name}</div>
+                <div class="card-stats" style="font-size:10px;">✅ 已啟用</div>
+            `;
+            container.appendChild(el);
+        });
+    }
+
+    getStatsHtml(card) {
+        if (card.type === 'Hero') {
+            return `<div class="card-stats">⚔️ ${card.hero.attack} | ⚡ ${card.hero.magicAttack} | 💪 ${card.hero.strength}</div>`;
+        } else if (card.type === 'Weapon') {
+            return `<div class="card-stats">⚔️ ${card.equipment.attack} | ⚡ ${card.equipment.magicAttack} | ⚖️ ${card.equipment.weight}</div>`;
+        } else if (card.goldValue) {
+            return `<div class="card-stats">💰 +${card.goldValue}</div>`;
+        }
+        return '';
     }
 
     renderDungeonRanks() {
@@ -160,29 +186,31 @@ export class UIManager {
         const m = this.game.marketItems;
         if (!m || !m.heroes) return;
 
-        // 渲染英雄、道具、基礎
         const sections = [
-            { label: '--- 等級 1 英雄 ---', cards: m.heroes },
-            { label: '--- 法術與物資 ---', cards: m.items },
+            { label: '--- 等級 1 英雄 (Random 4) ---', cards: m.heroes },
+            { label: '--- 魔法法術 (Random 4) ---', cards: m.spells },
+            { label: '--- 冒險道具 (Random 4) ---', cards: m.items },
             { label: '--- 常備軍需 ---', cards: m.basics }
         ];
 
         sections.forEach(sec => {
             const header = document.createElement('div');
-            header.style = 'grid-column: 1/-1; padding: 10px; color: #888; font-size: 12px; text-align: center;';
+            header.className = 'market-section-header';
             header.textContent = sec.label;
             grid.appendChild(header);
 
             sec.cards.forEach(card => {
                 const canAfford = this.game.currentGold >= card.cost;
                 const el = document.createElement('div');
-                el.className = `market-item ${canAfford ? '' : 'disabled'}`;
+                el.className = `market-item ${canAfford ? '' : 'disabled'} ${this.game.hasBought ? 'bought' : ''}`;
                 el.innerHTML = `
                     <div class="market-item-name">${card.name}</div>
                     <div class="market-item-cost">💰 ${card.cost}</div>
                     <div class="market-item-desc">${card.desc || ''}</div>
                 `;
-                el.onclick = () => { if (canAfford) this.game.buyCard(card.id, card.cost); };
+                el.onclick = () => {
+                    if (canAfford && !this.game.hasBought) this.game.buyCard(card.id, card.cost);
+                };
                 grid.appendChild(el);
             });
         });
@@ -194,7 +222,7 @@ export class UIManager {
         container.innerHTML = '';
         const upgradable = this.game.hand.filter(c => c.type === 'Hero' && c.hero.upgradeToId);
         if (upgradable.length === 0) {
-            container.innerHTML = '<div class="empty-msg">手牌中目前無可晉升的英雄</div>';
+            container.innerHTML = '<div class="empty-msg">手動啟用前，請保留英雄在手中以進行訓練</div>';
             return;
         }
         upgradable.forEach(h => {

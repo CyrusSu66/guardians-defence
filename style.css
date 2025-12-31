@@ -331,10 +331,36 @@ h1 {
 }
 
 .card-desc {
+    font-size: 11px;
+    color: #bbb;
+    line-height: 1.4;
+    margin-top: 5px;
+}
+
+.card-hint {
+    margin-top: 8px;
     font-size: 10px;
-    color: #aaa;
-    line-height: 1.3;
-    margin-top: auto;
+    color: var(--color-success);
+    text-align: center;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card-hint.danger {
+    color: #ff5a59;
+}
+
+.card.small {
+    width: 100px;
+    height: auto;
+    padding: 8px;
+    min-height: unset;
+    border-color: rgba(0, 255, 100, 0.3);
+}
+
+.card.small.active {
+    box-shadow: 0 0 10px rgba(0, 255, 100, 0.2);
 }
 
 .card:hover {

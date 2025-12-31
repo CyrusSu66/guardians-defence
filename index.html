@@ -13,7 +13,7 @@
 
 <body>
     <div class="game-container">
-        <h1>⚔️ 守護者防線 Guardians Defence v3.0</h1>
+        <h1>⚔️ 守護者防線 Guardians Defence v3.1.1</h1>
 
         <!-- 日誌與狀態頂部區域 -->
         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
@@ -118,6 +118,10 @@
                         </div>
                     </div>
                     <div class="hand-area">
+                        <!-- v3.1.1 已啟用的卡片區 (桌面上) -->
+                        <div id="playedCardsDisplay"
+                            style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; min-height: 40px; padding: 10px; background: rgba(0,255,100,0.05); border-radius: 8px; border: 1px dashed rgba(0,255,100,0.2);">
+                        </div>
                         <div class="hand-cards" id="handDisplay"></div>
                         <!-- 確認區域 -->
                         <div id="confirmationArea"
@@ -151,7 +155,9 @@
                     </div>
                     <!-- v3.1 新增：村莊結束按鈕 -->
                     <div id="villageFinishControl"
-                        style="margin-top: 10px; display: none; justify-content: flex-end; padding: 0 10px;">
+                        style="margin-top: 10px; display: none; justify-content: space-between; align-items: center; padding: 0 10px;">
+                        <button class="btn btn-secondary" style="background: #444; font-size: 11px;"
+                            onclick="window.game.activateAllResources()">💰 啟用所有資源卡</button>
                         <button class="btn btn-primary" style="background: var(--color-success);"
                             onclick="window.game.finishAction()">結束村莊行動 (推移地城)</button>
                     </div>
