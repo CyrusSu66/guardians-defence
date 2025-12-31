@@ -473,6 +473,10 @@ export class UIManager {
             <div style="font-size: 18px; color: var(--color-primary); font-weight: bold; text-align: center; background: rgba(0,255,136,0.1); padding: 8px; border-radius: 4px; border: 1px solid rgba(0,255,136,0.3); box-shadow: 0 0 10px rgba(0,255,136,0.1);">
                 💪 預估總傷害：${finalAtk}
             </div>
+            
+            <div style="font-size: 10px; color: #888; text-align: center; margin-top: 4px; font-family: monospace;">
+                算式: (⚔️ ${results.rawPhysAtk} + ⚡ ${results.rawMagAtk}) - ⚖️ ${results.lightPenalty} = ${finalAtk}
+            </div>
 
             <div style="font-size: 11px; color: #aaa; margin-top: 10px; line-height: 1.4; max-height: 60px; overflow-y: auto; padding-left: 5px; border-left: 2px solid #555;">
                 ${bonuses.length > 0 ? '🔹 ' + bonuses.join('<br>🔹 ') : '（無其他特殊修正）'}

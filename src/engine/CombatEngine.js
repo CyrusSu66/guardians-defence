@@ -132,6 +132,8 @@ export class CombatEngine {
         return {
             physAtk: Math.max(0, physAtk - lightPenalty),
             magAtk: Math.max(0, magAtk - (lightPenalty > physAtk ? lightPenalty - physAtk : 0)),
+            rawPhysAtk: physAtk, // v3.8
+            rawMagAtk: magAtk,   // v3.8
             bonuses,
             finalAtk: totalAtk,
             totalLight, // v3.7

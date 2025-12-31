@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.7(01-01-02:50)"; // 照明顯化與戰鬥校準
+        this.version = "v3.8(01-01-03:15)"; // 市集規範與算式透明化
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);
@@ -105,11 +105,6 @@ class GuardiansDefenceGame {
 
         this.addLog(`【第 ${this.turn} 回合】開始`, 'info');
         this.drawCards(6);
-
-        if (this.turn % 3 === 0) {
-            this.refreshMarket();
-            this.addLog('市集貨源已更新！', 'success');
-        }
 
         setTimeout(() => {
             this.state = GameState.VILLAGE;
