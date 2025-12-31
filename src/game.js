@@ -50,6 +50,8 @@ class GuardiansDefenceGame {
     // --- 遊戲初始化 ---
 
     startNewGame() {
+        console.log("DEBUG: startNewGame initiated");
+        this.addLog('正在初始系統資源...', 'info');
         this.init();
         const startingIds = [
             'basic_regular_army', 'basic_regular_army', 'basic_regular_army',
@@ -58,15 +60,31 @@ class GuardiansDefenceGame {
             'basic_spear', 'basic_spear',
             'basic_rations', 'basic_rations'
         ];
-        this.deck = startingIds.map(id => this.getCardPoolItem(id));
-        this.shuffle(this.deck);
 
-        this.createMonsterDeck();
-        this.spawnNextMonster();
+        try {
+            this.addLog('正在佈署初始牌堆...', 'info');
+            this.deck = startingIds.map(id => this.getCardPoolItem(id));
+            if (this.deck.includes(null)) throw new Error("部分初始卡片遺失");
+            this.shuffle(this.deck);
 
-        this.addLog('守護者防線 v3.1.1 核心重裝上陣！', 'success');
-        this.refreshMarket();
-        this.nextTurn();
+            this.addLog('正在生成怪物巢穴...', 'info');
+            this.createMonsterDeck();
+
+            this.addLog('正在偵測地城前線...', 'info');
+            this.spawnNextMonster();
+
+            this.addLog('守護者防線 v3.3 核心重裝上陣！', 'success');
+
+            this.addLog('正在重整市集物資...', 'info');
+            this.refreshMarket();
+
+            this.addLog('系統就緒，首輪抽牌...', 'success');
+            this.nextTurn();
+            console.log("DEBUG: startNewGame completed");
+        } catch (e) {
+            console.error(e);
+            this.addLog(`❌ 啟動失敗: ${e.message}`, 'danger');
+        }
     }
 
     getCardPoolItem(id) {

@@ -216,15 +216,7 @@
         </div>
     </div>
 
-    <div class="modal" id="deckViewModal">
-        <div class="modal-content">
-            <h2 id="deckViewTitle" style="color: var(--color-primary);"></h2>
-            <div id="deckViewList"
-                style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px;"></div>
-            <button class="btn" style="margin-top: 30px; background: #444; color: white; width: 100%;"
-                onclick="document.getElementById('deckViewModal').classList.remove('active')">關閉通訊</button>
-        </div>
-    </div>
+    <!-- v3.1.3 牌庫查看 Modal -->
 
     <div id="buildVersion" class="version-badge">Build: Loading...</div>
     <!-- v3.1.3 牌庫查看 Modal -->
@@ -240,6 +232,9 @@
             </div>
         </div>
     </div>
+
+    <!-- v3.3 遊戲邏輯載入 -->
+    <script type="module" src="src/game.js"></script>
 </body>
 
 </html>
