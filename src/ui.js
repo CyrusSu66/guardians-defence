@@ -8,6 +8,7 @@ import { GameState } from './data.js';
 export class UIManager {
     constructor(game) {
         this.game = game;
+        window.ui = this; // v3.12: 確保全局可用，支援地城卡片點擊
         this.setupEventListeners();
     }
 
@@ -174,7 +175,7 @@ export class UIManager {
     getStatsHtml(card, isMarket = false) {
         let stats = '';
         if (card.type === 'Hero') {
-            stats = `<div class="card-stats">⚔️ ${card.hero.attack} | ⚡ ${card.hero.magicAttack} | 💪 ${card.hero.strength}</div>`;
+            stats = `<div class="card-stats">⚔️ ${card.hero.attack} | 🪄 ${card.hero.magicAttack} | 💪 ${card.hero.strength}</div>`;
             if (card.abilities) {
                 stats += '<div style="display:flex; gap:2px; margin-top:3px;">';
                 if (card.abilities.onVillage) stats += `<div class="skill-tag village">🏠</div>`;
@@ -184,7 +185,7 @@ export class UIManager {
                 stats += '</div>';
             }
         } else if (card.type === 'Weapon') {
-            stats = `<div class="card-stats">⚔️ ${card.equipment.attack} | ⚡ ${card.equipment.magicAttack} | ⚖️ ${card.equipment.weight}</div>`;
+            stats = `<div class="card-stats">⚔️ ${card.equipment.attack} | 🪄 ${card.equipment.magicAttack} | ⚖️ ${card.equipment.weight}</div>`;
         } else if (card.goldValue) {
             stats = `<div class="card-stats">🪙 +${card.goldValue}</div>`;
         }
@@ -256,7 +257,7 @@ export class UIManager {
         let statsHtml = '';
         if (card.hero) {
             statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">攻擊力</div><div class="tooltip-stat-value">⚔️ ${card.hero.attack}</div></div>`;
-            statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">魔攻力</div><div class="tooltip-stat-value">⚡ ${card.hero.magicAttack}</div></div>`;
+            statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">魔攻力</div><div class="tooltip-stat-value">🪄 ${card.hero.magicAttack}</div></div>`;
             statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">力量</div><div class="tooltip-stat-value">💪 ${card.hero.strength}</div></div>`;
         } else if (card.equipment) {
             statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">攻擊力</div><div class="tooltip-stat-value">⚔️ ${card.equipment.attack}</div></div>`;
@@ -577,7 +578,7 @@ export class UIManager {
             </div>
             
             <div style="font-size: 11px; color: #888; text-align: center; margin-top: 6px; font-family: monospace; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 4px;">
-                <div>解析: (⚔️ ${physAtk} + ⚡ ${magAtk}) - ⚖️ ${lightPenalty} = ${finalAtk}</div>
+                <div>解析: (⚔️ ${physAtk} + 🪄 ${magAtk}) - ⚖️ ${lightPenalty} = ${finalAtk}</div>
                 <div style="font-size: 9px; opacity: 0.7; margin-top: 2px;">
                     照明微調: (Req ${lightReq} - Lgt ${totalLight}) = ${adj} (Penalty x2)
                 </div>
