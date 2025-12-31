@@ -9,7 +9,7 @@ export class CombatEngine {
     }
 
     /**
-     * 執行一次戰鬥進攻 (英雄+武器 對 怪物)
+     * 執行一次戰鬥進攻 (英雄+武器 對 怪物) (v3.11)
      */
     perform() {
         const g = this.game;
@@ -19,53 +19,44 @@ export class CombatEngine {
 
         const hIdx = g.combat.selectedHeroIdx;
         const wIdx = g.combat.selectedWeaponIdx;
-
-        const auras = this.getActiveAuras();
-        // v3.5：亮度偵測優化 - 自動彙整手牌所有亮度提供者
-        let totalLight = 0;
-        g.hand.forEach(c => totalLight += (c.light || 0));
-        g.playedCards.forEach(c => totalLight += (c.light || 0));
-
-        const lightReq = g.combat.targetRank + auras.lightReqMod; // v3.11: 恢復修正值
-        const lightPenalty = Math.max(0, lightReq - totalLight) * 2;
         const hero = g.hand[hIdx];
         const weapon = g.hand[wIdx];
 
         if (!hero) return g.addLog('請至少選擇一名英雄。', 'danger');
 
-        let heroStr = hero.hero.strength + auras.strMod;
+        const auras = this.getActiveAuras();
 
+        // 1. 負重檢查
+        let heroStr = hero.hero.strength + (auras.strMod || 0);
         if (weapon && heroStr < weapon.equipment.weight) {
             return g.addLog(`❌ 負重不足！${hero.name} 無法使用 ${weapon.name}`, 'danger');
         }
 
-        // v3.5：亮度偵測優化 - 自動彙整手牌所有亮度提供者
+        // 2. 統計總照明
         let totalLight = 0;
         g.hand.forEach(c => totalLight += (c.light || 0));
         g.playedCards.forEach(c => totalLight += (c.light || 0));
 
-        const lightReq = g.combat.targetRank + auras.lightReqMod;
+        // 3. 計算地城需求與懲罰
+        const lightReq = g.combat.targetRank + (auras.lightReqMod || 0);
         const lightPenalty = Math.max(0, lightReq - totalLight) * 2;
 
-        let { physAtk, magAtk, bonuses } = this.calculateStats(hero, weapon, monster, lightPenalty, totalLight, lightReq);
-        let finalAtk = physAtk + magAtk;
+        // 4. 計算詳情
+        let { physAtk, magAtk, bonuses, finalAtk } = this.calculateStats(hero, weapon, monster, lightPenalty, totalLight, lightReq);
 
         if (finalAtk <= 0) {
-            return g.addLog(`❌ 攻擊力不足以造成傷害 (最終 Atk: ${finalAtk})。`, 'warning');
+            return g.addLog(`❌ 攻擊力不足以造成傷害 (最終傷害: ${finalAtk})。`, 'warning');
         }
 
-        // 扣除怪物血量 (接力打怪)
+        // 5. 扣除怪物血量
         monster.currentHP -= finalAtk;
         g.addLog(`⚔️ ${hero.name}${weapon ? ' 持 ' + weapon.name : ''} 對 ${monster.name} 造成 ${finalAtk} 點傷害！`, 'info');
 
         if (monster.currentHP <= 0) {
             g.addLog(`✨ 擊斃 ${monster.name}！`, 'success');
-
-            // 戰勝效果觸發 (onVictory)
             if (hero.abilities && hero.abilities.onVictory) {
                 g.triggerCardEffect(hero.abilities.onVictory, hero.name);
             }
-
             g.currentXP += monster.monster.xpGain;
             g.totalScore += (monster.vp || 0);
             g.dungeonHall[`rank${g.combat.targetRank}`] = null;
@@ -79,7 +70,7 @@ export class CombatEngine {
             g.addLog(`🛡️ ${monster.name} 剩餘 HP: ${monster.currentHP}/${monster.monster.hp}`, 'warning');
         }
 
-        // 消耗卡片
+        // 6. 消耗卡片
         const toDiscard = [hIdx];
         if (wIdx !== null) toDiscard.push(wIdx);
         toDiscard.sort((a, b) => b - a).forEach(i => g.discard.push(g.hand.splice(i, 1)[0]));
@@ -161,19 +152,33 @@ export class CombatEngine {
     }
 
     /**
-     * 掃描當前地城中的所有 Aura (環境效果)
+     * 掃描當前地城中的所有 Aura (環境效果) (v3.11)
      */
     getActiveAuras() {
-        const auras = { strMod: 0, atkMod: 0, lightReqMod: 0 };
+        const sources = {
+            atkMod: 0,
+            lightReqMod: 0,
+            strMod: 0,
+            auraSources: []
+        };
         const g = this.game;
 
         [g.dungeonHall.rank1, g.dungeonHall.rank2, g.dungeonHall.rank3].forEach(m => {
             if (!m || !m.abilities || !m.abilities.aura) return;
             const effect = m.abilities.aura;
-            if (effect === 'str_minus_1') auras.strMod -= 1;
-            if (effect === 'atk_minus_1') auras.atkMod -= 1;
-            if (effect === 'light_req_plus_2') auras.lightReqMod += 2;
+            if (effect === 'atk_minus_1') {
+                sources.atkMod -= 1;
+                sources.auraSources.push(`[${m.name}] 英雄戰力-1`);
+            }
+            if (effect === 'str_minus_1') {
+                sources.strMod -= 1;
+                sources.auraSources.push(`[${m.name}] 力量需求+1`);
+            }
+            if (effect === 'light_req_plus_1') {
+                sources.lightReqMod = 1; // v3.11: 最高 +1
+                sources.auraSources.push(`[${m.name}] 照明需求+1`);
+            }
         });
-        return auras;
+        return sources;
     }
 }

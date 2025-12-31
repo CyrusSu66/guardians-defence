@@ -488,12 +488,12 @@ export class UIManager {
         const monster = this.game.getCardPoolItem(monsterId);
         if (!monster) return;
 
-        const overlay = document.getElementById('cardTooltipOverlay'); // Changed to cardTooltipOverlay for consistency
+        const overlay = document.getElementById('cardTooltipOverlay');
         if (!overlay) return;
 
         document.getElementById('ttType').innerText = `怪物 - ${monster.subTypes.join('/')}`;
-        document.getElementById('ttTitle').innerText = monster.name; // Changed ttName to ttTitle for consistency
-        document.getElementById('ttDescription').innerHTML = `<span style="color:#ff5a59;">[突進傷害: ${monster.monster.breachDamage || 1}]</span><br>${monster.description}`; // Changed ttDesc to ttDescription and desc to description
+        document.getElementById('ttTitle').innerText = monster.name;
+        document.getElementById('ttDescription').innerHTML = `<span style="color:#ff5a59;">[突進傷害: ${monster.monster.breachDamage || 1}]</span><br>${monster.desc || monster.description}`;
 
         let statsHtml = `
             <div class="tooltip-stat-item"><div class="tooltip-stat-label">原始血量</div><div class="tooltip-stat-value">❤️ ${monster.monster.hp}</div></div>
