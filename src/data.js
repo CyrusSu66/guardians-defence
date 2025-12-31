@@ -19,8 +19,8 @@ export const CARDPOOL = {
         {
             id: 'basic_regular_army', name: '正規軍', type: 'Hero', subTypes: ['Fighter'],
             cost: 2, vp: 0, goldValue: 0, light: 0,
-            desc: '【地城】若裝備「長矛」，則額外抽 1 張牌',
-            hero: { level: 1, series: 'Regular', attack: 0, magicAttack: 0, strength: 2, xpToUpgrade: 0 },
+            desc: '基本步兵單位。可花費 1 XP 晉升為 1 級英雄。',
+            hero: { level: 0, series: 'Regular', attack: 0, magicAttack: 0, strength: 2, xpToUpgrade: 1 },
             abilities: { onDungeon: 'synergy_spear_draw' }
         },
         {
@@ -68,6 +68,18 @@ export const CARDPOOL = {
             cost: 4, vp: 1, goldValue: 0, light: 0,
             desc: '操縱自然魔力的精靈',
             hero: { level: 1, series: 'Elf', attack: 0, magicAttack: 1, strength: 2, xpToUpgrade: 4, upgradeToId: 'hero_elf_lv2' }
+        },
+        {
+            id: 'hero_dwarf_lv1', name: '矮人守護者', type: 'Hero', subTypes: ['Fighter'],
+            cost: 4, vp: 1, goldValue: 0, light: 0,
+            desc: '【能力】若有裝備，額外 Attack+1',
+            hero: { level: 1, series: 'Dwarf', attack: 2, magicAttack: 0, strength: 5, xpToUpgrade: 4 }
+        },
+        {
+            id: 'hero_loric_lv1', name: '羅域盜賊', type: 'Hero', subTypes: ['Thief'],
+            cost: 4, vp: 1, goldValue: 0, light: 0,
+            desc: '擅長在陰影中襲取的盜賊',
+            hero: { level: 1, series: 'Loric', attack: 2, magicAttack: 0, strength: 3, xpToUpgrade: 4 }
         }
     ],
 

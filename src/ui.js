@@ -232,22 +232,63 @@ export class UIManager {
         const container = document.getElementById('trainingHeroes');
         if (!container) return;
         container.innerHTML = '';
-        const upgradable = this.game.hand.filter(c => c.type === 'Hero' && c.hero.upgradeToId);
-        if (upgradable.length === 0) {
-            container.innerHTML = '<div class="empty-msg">手動啟用前，請保留英雄在手中以進行訓練</div>';
-            return;
+
+        // 1. 正規軍轉職 (v3.2)
+        const regulars = this.game.hand.map((c, i) => ({ card: c, idx: i })).filter(x => x.card.id === 'basic_regular_army');
+        if (regulars.length > 0) {
+            const promoSection = document.createElement('div');
+            promoSection.className = 'training-promo-section';
+            promoSection.innerHTML = `<h4>🛡 正規軍轉職 (需 1 XP)</h4>`;
+
+            regulars.forEach(reg => {
+                const regEl = document.createElement('div');
+                regEl.className = 'training-promo-item';
+                regEl.innerHTML = `<div><strong>正規軍 (#${reg.idx + 1})</strong> 可轉職為：</div>`;
+
+                const btnGroup = document.createElement('div');
+                btnGroup.style.display = 'flex';
+                btnGroup.style.gap = '5px';
+                btnGroup.style.marginTop = '5px';
+
+                this.game.marketItems.heroes.forEach(marketHero => {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn btn-primary small';
+                    btn.style.fontSize = '10px';
+                    btn.style.padding = '5px';
+                    btn.textContent = marketHero.name;
+                    btn.disabled = this.game.currentXP < 1;
+                    btn.onclick = () => this.game.promoteRegularArmy(reg.idx, marketHero.id);
+                    btnGroup.appendChild(btn);
+                });
+                regEl.appendChild(btnGroup);
+                promoSection.appendChild(regEl);
+            });
+            container.appendChild(promoSection);
         }
-        upgradable.forEach(h => {
-            const canAfford = this.game.currentXP >= h.hero.xpToUpgrade;
-            const el = document.createElement('div');
-            el.className = 'training-hero-item';
-            el.innerHTML = `
-                <div class="hero-info"><strong>${h.name}</strong> ➔ 需 ${h.hero.xpToUpgrade} XP</div>
-                <button class="btn btn-primary" ${canAfford ? '' : 'disabled'} 
-                    onclick="window.game.upgradeHero('${h.id}')">升級</button>
-            `;
-            container.appendChild(el);
-        });
+
+        // 2. 英雄升級
+        const upgradable = this.game.hand.filter(c => c.type === 'Hero' && c.hero && c.hero.upgradeToId);
+        if (upgradable.length > 0) {
+            const upgradeHeader = document.createElement('div');
+            upgradeHeader.innerHTML = `<h4 style="margin-top:15px;">🌟 英雄晉階</h4>`;
+            container.appendChild(upgradeHeader);
+
+            upgradable.forEach(h => {
+                const canAfford = this.game.currentXP >= h.hero.xpToUpgrade;
+                const el = document.createElement('div');
+                el.className = 'training-hero-item';
+                el.innerHTML = `
+                    <div class="hero-info"><strong>${h.name}</strong> ➔ 需 ${h.hero.xpToUpgrade} XP</div>
+                    <button class="btn btn-primary" ${canAfford ? '' : 'disabled'} 
+                        onclick="window.game.upgradeHero('${h.id}')">升級</button>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        if (regulars.length === 0 && upgradable.length === 0) {
+            container.innerHTML = '<div class="empty-msg">手牌中無可訓練或轉職的單位</div>';
+        }
     }
 
     renderLog() {

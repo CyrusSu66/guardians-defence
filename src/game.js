@@ -333,12 +333,30 @@ class GuardiansDefenceGame {
     upgradeHero(cardId) {
         const idx = this.hand.findIndex(c => c.id === cardId);
         const hero = this.hand[idx];
-        if (!hero || !hero.hero.upgradeToId || this.currentXP < hero.hero.xpToUpgrade) return;
+        if (!hero || !hero.hero || !hero.hero.upgradeToId || this.currentXP < hero.hero.xpToUpgrade) return;
         this.currentXP -= hero.hero.xpToUpgrade;
         const nextLv = this.getCardPoolItem(hero.hero.upgradeToId);
         this.hand.splice(idx, 1);
         this.discard.push(nextLv);
         this.addLog(`英雄升級：${hero.name} ➔ ${nextLv.name}`, 'success');
+        this.updateUI();
+    }
+
+    // v3.2 轉職機制：正規軍 -> 1 級英雄
+    promoteRegularArmy(handIdx, marketHeroId) {
+        const card = this.hand[handIdx];
+        if (!card || card.id !== 'basic_regular_army' || this.currentXP < 1) return;
+
+        // 查找市集中是否有該英雄
+        const marketHero = this.marketItems.heroes.find(h => h.id === marketHeroId);
+        if (!marketHero) return this.addLog('市集中無此英雄可供轉職。', 'warning');
+
+        this.currentXP -= 1;
+        this.hand.splice(handIdx, 1); // 銷毀手上的正規軍
+        const newHero = this.getCardPoolItem(marketHeroId);
+        this.discard.push(newHero);
+
+        this.addLog(`✨ 轉職成功！正規軍 ➔ ${newHero.name} (花費 1 XP)`, 'success');
         this.updateUI();
     }
 
