@@ -8,7 +8,7 @@ import { UIManager } from './ui.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v2.1.251231B"; // 實作怪物效果時機、棄牌與負重系統
+        this.version = "v3.0.251231C"; // 重大改版：怪物效果引擎與規則重構
         this.ui = new UIManager(this);
         this.init();
         this.setupErrorHandler();
