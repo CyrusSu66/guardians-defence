@@ -44,6 +44,7 @@ class GuardiansDefenceGame {
         this.currentAction = null; // null, 'VILLAGE', 'REST', 'DUNGEON'
         this.hasBought = false;    // 本回合是否已購買
         this.hasDestroyed = false; // 本回合休息是否已銷毀
+        this.selectedDestroyIdx = null; // v3.1.3 新增：休息時預備銷毀的索引
     }
 
     // --- 遊戲初始化 ---
@@ -100,6 +101,7 @@ class GuardiansDefenceGame {
         this.currentAction = null;
         this.hasBought = false;
         this.hasDestroyed = false;
+        this.selectedDestroyIdx = null;
         this.state = GameState.DRAW;
 
         this.addLog(`【第 ${this.turn} 回合】開始`, 'info');
@@ -218,14 +220,35 @@ class GuardiansDefenceGame {
             this.updateUI();
         }
 
-        // 在休息階段，點擊卡片以銷毀
+        // 在休息階段，點擊卡片以「預備」銷毀
         else if (this.currentAction === 'REST') {
-            if (this.hasDestroyed) return this.addLog('休息階段僅限銷毀一張卡片。', 'warning');
-            const removed = this.hand.splice(idx, 1)[0];
-            this.hasDestroyed = true;
-            this.addLog(`🔥 已銷毀卡片：「${removed.name}」。`, 'warning');
+            if (this.hasDestroyed) return this.addLog('本回合休息已執行過銷毀。', 'warning');
+
+            // 如果點擊已選中的，則取消選取
+            if (this.selectedDestroyIdx === idx) {
+                this.selectedDestroyIdx = null;
+            } else {
+                this.selectedDestroyIdx = idx;
+                const card = this.hand[idx];
+                this.addLog(`已選取「${card.name}」，點擊下方確認按鈕以執行銷毀。`, 'info');
+            }
             this.updateUI();
         }
+    }
+
+    // 執行休息銷毀並結束回合
+    confirmRestAndDestroy() {
+        if (this.currentAction !== 'REST') return;
+
+        if (this.selectedDestroyIdx !== null) {
+            const removed = this.hand.splice(this.selectedDestroyIdx, 1)[0];
+            this.hasDestroyed = true;
+            this.selectedDestroyIdx = null;
+            this.addLog(`🔥 已銷毀卡片：「${removed.name}」，休息行動結束。`, 'warning');
+        } else {
+            this.addLog('直接結束休息行動，未銷毀任何卡片。', 'info');
+        }
+        this.finishAction();
     }
 
     triggerCardEffect(effectKey) {
@@ -278,17 +301,19 @@ class GuardiansDefenceGame {
 
     refreshMarket() {
         const basics = JSON.parse(JSON.stringify(CARDPOOL.basic));
-        // v3.1.1：明確 4 英雄 + 4 道具/武器 + 4 法術
+        // v3.1.3：精確 4 英雄 + 4 隨機道具/裝備/法術 + 4 基礎
         const heroes = this.shuffleArray(CARDPOOL.heroes.filter(h => h.hero.level === 1)).slice(0, 4);
-        const equipPool = [...(CARDPOOL.items || []), ...(CARDPOOL.weapons || [])];
-        const items = this.shuffleArray(equipPool).slice(0, 4);
-        const spells = this.shuffleArray(CARDPOOL.spells || []).slice(0, 4);
+        const randomPool = [
+            ...(CARDPOOL.items || []),
+            ...(CARDPOOL.weapons || []),
+            ...(CARDPOOL.spells || [])
+        ];
+        const items = this.shuffleArray(randomPool).slice(0, 4);
 
         this.marketItems = {
-            basics: basics,
+            basics: basics.slice(0, 4),
             heroes: heroes,
-            items: items,
-            spells: spells
+            items: items
         };
         this.updateUI();
     }
@@ -425,7 +450,20 @@ class GuardiansDefenceGame {
         this.updateUI();
     }
 
-    // --- 工具 ---
+    // --- 工具與查看功能 ---
+
+    showDeckModal(type) {
+        if (!this.ui) return;
+        const list = type === 'deck' ? [...this.deck] : [...this.discard];
+        const title = type === 'deck' ? '查看牌庫 (隨機順序)' : '查看棄牌堆';
+
+        // 如果是查看牌庫，應以此顯示玩家知道的內容，為了公平性我們可以做一次隨機展示或按字母排名
+        if (type === 'deck') {
+            this.shuffle(list); // 不影響實際牌庫，僅展示
+        }
+
+        this.ui.renderDeckView(title, list);
+    }
 
     shuffleArray(array) {
         const a = [...array];

@@ -62,6 +62,13 @@ export class UIManager {
         this.show('restPanel', g.currentAction === 'REST');
         this.show('villageFinishControl', g.currentAction === 'VILLAGE');
 
+        // 更新休息按鈕文字 (v3.1.3)
+        const btnRestConfirm = document.querySelector('#restPanel .btn-secondary');
+        if (btnRestConfirm) {
+            btnRestConfirm.textContent = g.selectedDestroyIdx !== null ? '銷毀並結束行動' : '直接完成休息';
+            btnRestConfirm.onclick = () => this.game.confirmRestAndDestroy();
+        }
+
         // 核心行動按鈕狀態
         const isWaitingForAction = g.state === GameState.VILLAGE && g.currentAction === null;
         ['btnVisitVillage', 'btnRest', 'btnEnterDungeon'].forEach(id => {
@@ -102,6 +109,12 @@ export class UIManager {
 
             if (this.game.combat && (this.game.combat.selectedHeroIdx === idx || this.game.combat.selectedWeaponIdx === idx)) {
                 el.classList.add('selected');
+            }
+
+            // v3.1.3 休息選中標記
+            if (this.game.currentAction === 'REST' && this.game.selectedDestroyIdx === idx) {
+                el.classList.add('selected');
+                el.style.border = '2px solid #ff5a59';
             }
 
             el.onclick = () => {
@@ -188,9 +201,8 @@ export class UIManager {
 
         const sections = [
             { label: '--- 等級 1 英雄 (Random 4) ---', cards: m.heroes },
-            { label: '--- 魔法法術 (Random 4) ---', cards: m.spells },
-            { label: '--- 冒險道具 (Random 4) ---', cards: m.items },
-            { label: '--- 常備軍需 ---', cards: m.basics }
+            { label: '--- 隨機道具與裝備 (Random 4) ---', cards: m.items },
+            { label: '--- 常備基礎軍需 ---', cards: m.basics }
         ];
 
         sections.forEach(sec => {
@@ -270,6 +282,33 @@ export class UIManager {
         `;
         const btn = document.getElementById('combatAttackBtn');
         if (btn) btn.disabled = !hero || !targetRank;
+    }
+
+    // --- 查看功能 ---
+    renderDeckView(title, list) {
+        const modal = document.getElementById('deckViewModal');
+        const titleEl = document.getElementById('deckViewTitle');
+        const listEl = document.getElementById('deckViewList');
+        if (!modal || !titleEl || !listEl) return;
+
+        titleEl.textContent = title;
+        listEl.innerHTML = '';
+
+        if (list.length === 0) {
+            listEl.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #888;">此區域目前無任何卡片</div>';
+        } else {
+            list.forEach(card => {
+                const el = document.createElement('div');
+                el.className = 'card small';
+                el.innerHTML = `
+                    <div class="card-type-tag" style="font-size: 8px;">${card.type}</div>
+                    <div class="card-name" style="font-size: 11px;">${card.name}</div>
+                    <div class="card-desc" style="font-size: 9px;">${card.desc || ''}</div>
+                `;
+                listEl.appendChild(el);
+            });
+        }
+        modal.classList.add('active');
     }
 
     setText(id, text) {

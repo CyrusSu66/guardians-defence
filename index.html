@@ -50,6 +50,21 @@
                     <div class="status-label">累計經驗 (XP)</div>
                     <div class="status-value" id="currentXP">0</div>
                 </div>
+                <!-- v3.1.3 可點擊查看的牌庫資訊 -->
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <div class="stat-card"
+                        style="flex: 1; cursor: pointer; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 4px; text-align: center;"
+                        onclick="window.game.showDeckModal('deck')">
+                        <div class="stat-label" style="font-size: 10px; color: #888;">牌庫</div>
+                        <div class="stat-value" id="deckCount" style="font-size: 14px; font-weight: bold;">0</div>
+                    </div>
+                    <div class="stat-card"
+                        style="flex: 1; cursor: pointer; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 4px; text-align: center;"
+                        onclick="window.game.showDeckModal('discard')">
+                        <div class="stat-label" style="font-size: 10px; color: #888;">棄牌</div>
+                        <div class="stat-value" id="discardCount" style="font-size: 14px; font-weight: bold;">0</div>
+                    </div>
+                </div>
                 <div class="status-item">
                     <div class="status-label">當前回合</div>
                     <div class="status-value" id="turnNumber">1</div>
@@ -216,7 +231,19 @@
     </div>
 
     <div id="buildVersion" class="version-badge">Build: Loading...</div>
-    <script type="module" src="src/game.js"></script>
+    <!-- v3.1.3 牌庫查看 Modal -->
+    <div id="deckViewModal" class="modal-overlay">
+        <div class="modal-content deck-view">
+            <h3 id="deckViewTitle"
+                style="color: var(--color-primary); border-bottom: 2px solid var(--color-primary); padding-bottom: 10px;">
+                查看牌庫</h3>
+            <div id="deckViewList" class="deck-view-grid"></div>
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn btn-primary"
+                    onclick="document.getElementById('deckViewModal').classList.remove('active')">關閉</button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
