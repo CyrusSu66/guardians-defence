@@ -431,16 +431,14 @@ export class UIManager {
         const weapon = this.game.hand[selectedWeaponIdx];
         const monster = targetRank ? this.game.dungeonHall[`rank${targetRank}`] : null;
 
-        // v3.7.1：不論是否選取英雄，進入戰鬥階段即統計手牌總照明
         let totalLight = 0;
         this.game.hand.forEach(c => totalLight += (c.light || 0));
-        this.game.playedCards.forEach(c => totalLight += (c.light || 0)); // 計入已啟用的光源
+        this.game.playedCards.forEach(c => totalLight += (c.light || 0));
 
-        const auras = this.game.getActiveAuras();
-        const lightReq = targetRank ? (targetRank + auras.lightReqMod) : 0;
+        // v3.10：固定照明需求，不再受調度影響
+        const lightReq = targetRank ? targetRank : 0;
         const lightPenalty = targetRank ? Math.max(0, lightReq - totalLight) * 2 : 0;
 
-        // 計算區 HTML (即時統計)
         const calcGridHtml = `
             <div class="combat-calc-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; margin-bottom: 12px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 6px; border: 1px solid #444;">
                 <div style="color: #ffeb3b;">💡 手牌總照明: ${totalLight}</div>
@@ -451,9 +449,27 @@ export class UIManager {
             </div>
         `;
 
+        // 彙整 Aura 資訊 (v3.10)
+        const activeAuras = [];
+        // 從地城中掃描所有怪物 Aura
+        for (let i = 1; i <= 3; i++) {
+            const m = this.game.dungeonHall[`rank${i}`];
+            if (m && m.abilities && m.abilities.aura) {
+                activeAuras.push({ name: m.name, desc: m.abilities.aura }); // Changed m.desc to m.abilities.aura
+            }
+        }
+
+        const auraListHtml = activeAuras.length > 0 ? `
+            <div style="font-size: 11px; background: rgba(255,100,0,0.1); border: 1px solid rgba(255,100,0,0.2); padding: 5px; border-radius: 4px; margin-bottom: 8px;">
+                <strong style="color: #ff9800;">⚠️ 當前環境效果 (Aura):</strong><br>
+                ${activeAuras.map(a => `<span style="color: #eee;">• [${a.name}] ${a.desc}</span>`).join('<br>')}
+            </div>
+        ` : '';
+
         if (!hero) {
             summary.innerHTML = `
                 ${calcGridHtml}
+                ${auraListHtml}
                 <div style="text-align: center; color: #ff5a59; padding: 10px; border: 1px dashed #ff5a59; border-radius: 4px;">
                     👉 請從下方手牌選取英雄與武器
                 </div>
@@ -467,6 +483,7 @@ export class UIManager {
 
         summary.innerHTML = `
             ${calcGridHtml}
+            ${auraListHtml}
             <div style="border-bottom: 1px solid #444; padding-bottom: 5px; margin-bottom: 8px;">
                 <strong>當前出戰：</strong> ${hero.name} ${weapon ? ' + ' + weapon.name : ''}
             </div>

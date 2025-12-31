@@ -124,56 +124,56 @@ export const CARDPOOL = {
             id: 'mon_rat', name: '腐化老鼠', type: 'Monster', subTypes: ['Vermin'],
             cost: 0, vp: 1, goldValue: 0, light: 0,
             desc: '【進場】獲得 1 張疾病卡',
-            monster: { tier: 1, hp: 3, xpGain: 1 },
+            monster: { tier: 1, hp: 3, xpGain: 1, breachDamage: 1 },
             abilities: { onBreach: 'gain_disease' }
         },
         {
             id: 'mon_centipede', name: '巨型蜈蚣', type: 'Monster', subTypes: ['Vermin'],
             cost: 0, vp: 1, goldValue: 0, light: 0,
             desc: '【進場】若無利刃，棄 1 張手牌',
-            monster: { tier: 2, hp: 5, xpGain: 1 },
+            monster: { tier: 2, hp: 5, xpGain: 1, breachDamage: 2 },
             abilities: { onBreach: 'discard_1' } // 簡化為直接棄牌
         },
         {
             id: 'mon_spider', name: '變異蜘蛛', type: 'Monster', subTypes: ['Vermin'],
             cost: 0, vp: 2, goldValue: 0, light: 0,
             desc: '【持續】所有英雄力量 -1',
-            monster: { tier: 3, hp: 7, xpGain: 2 },
+            monster: { tier: 3, hp: 7, xpGain: 2, breachDamage: 3 },
             abilities: { aura: 'str_minus_1' }
         },
         {
             id: 'mon_kobold_shaman', name: '狗頭人薩滿', type: 'Monster', subTypes: ['Humanoid'],
             cost: 0, vp: 1, goldValue: 0, light: 0,
             desc: '【進場】全體棄 1 張非戰鬥卡',
-            monster: { tier: 2, hp: 6, xpGain: 1 },
+            monster: { tier: 2, hp: 6, xpGain: 1, breachDamage: 2 },
             abilities: { onBreach: 'discard_magic_or_item' }
         },
         {
             id: 'mon_red_gel', name: '紅色凝膠獸', type: 'Monster', subTypes: ['Mire'],
             cost: 0, vp: 2, goldValue: 0, light: 0,
             desc: '【持續】所有英雄物理攻擊力 -1',
-            monster: { tier: 2, hp: 6, xpGain: 2 },
+            monster: { tier: 2, hp: 6, xpGain: 2, breachDamage: 2 },
             abilities: { aura: 'atk_minus_1' }
         },
         {
             id: 'mon_ghost', name: '幽鬼', type: 'Monster', subTypes: ['Undead'],
             cost: 0, vp: 1, goldValue: 0, light: 0,
             desc: '【戰鬥】物理攻擊無效',
-            monster: { tier: 1, hp: 3, xpGain: 1 },
+            monster: { tier: 1, hp: 3, xpGain: 1, breachDamage: 1 },
             abilities: { battle: 'phys_immune' }
         },
         {
             id: 'mon_black_dragon', name: '黑龍', type: 'Monster', subTypes: ['Dragon'],
             cost: 0, vp: 8, goldValue: 0, light: 4,
             desc: '【戰鬥】僅魔法攻擊有效',
-            monster: { tier: 3, hp: 10, xpGain: 4 },
+            monster: { tier: 3, hp: 10, xpGain: 4, breachDamage: 5 },
             abilities: { battle: 'magic_only' }
         },
         {
             id: 'mon_nightmare_knight', name: '夢魘騎士', type: 'Monster', subTypes: ['Doomsayer'],
             cost: 0, vp: 8, goldValue: 0, light: 0,
             desc: '【持續】光照需求增加 2 點',
-            monster: { tier: 3, hp: 10, xpGain: 4 },
+            monster: { tier: 3, hp: 10, xpGain: 4, breachDamage: 3 },
             abilities: { aura: 'light_req_plus_2' }
         }
     ],

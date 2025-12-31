@@ -43,7 +43,7 @@ export class DungeonEngine {
                 return g.gameOver();
             }
             g.addLog(`⚠️ ${escaped.name} 已逃出地城，村莊受損！`, 'danger');
-            g.villageHP -= 2;
+            g.villageHP -= (escaped.monster.breachDamage || 2);
         }
 
         // 推移
