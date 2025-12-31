@@ -8,12 +8,14 @@ import { UIManager } from './ui.js';
 import { CombatEngine } from './engine/CombatEngine.js';
 import { VillageEngine } from './engine/VillageEngine.js';
 import { DungeonEngine } from './engine/DungeonEngine.js';
+import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.6(01-01-02:15)"; // 模組化重構：邏輯拆分
+        this.version = "v3.6.1(01-01-02:45)"; // 數值修正與極致模組化
 
         // 初始化引擎
+        this.cardEngine = new CardEngine(this);
         this.combatEngine = new CombatEngine(this);
         this.villageEngine = new VillageEngine(this);
         this.dungeonEngine = new DungeonEngine(this);
@@ -76,40 +78,17 @@ class GuardiansDefenceGame {
             this.shuffle(this.deck);
 
             this.addLog('正在生成怪物巢穴...', 'info');
-            this.createMonsterDeck();
+            this.monsterDeck = this.cardEngine.createMonsterDeck();
 
             this.addLog('正在偵測地城前線...', 'info');
             this.spawnNextMonster();
 
-            this.addLog('守護者防線 v3.6 核心模組化啟動！', 'success');
+            this.addLog('守護者防線 v3.6.1 模組化引擎全面啟動！', 'success');
             this.refreshMarket();
             this.nextTurn();
         } catch (e) {
             this.addLog(`❌ 啟動失敗: ${e.message}`, 'danger');
         }
-    }
-
-    getCardPoolItem(id) {
-        for (const cat in CARDPOOL) {
-            const found = CARDPOOL[cat].find(c => c.id === id);
-            if (found) return JSON.parse(JSON.stringify(found));
-        }
-        return null;
-    }
-
-    createMonsterDeck() {
-        const pool = CARDPOOL.monsters;
-        const t1 = this.shuffleArray(pool.filter(m => m.monster.tier === 1));
-        const t2 = this.shuffleArray(pool.filter(m => m.monster.tier === 2));
-        const t3 = this.shuffleArray(pool.filter(m => m.monster.tier === 3));
-        const s1 = t1.slice(0, 10);
-        const s2 = t2.slice(0, 10);
-        const s3 = t3.slice(0, 10);
-        const bossIdx = Math.floor(Math.random() * s3.length);
-        s3[bossIdx].hasThunderstone = true;
-        s3[bossIdx].monster.hp += 3;
-        s3[bossIdx].name += " ⚡";
-        this.monsterDeck = [...s1, ...s2, ...s3].reverse();
     }
 
     // --- 流程控制器 ---
@@ -151,6 +130,10 @@ class GuardiansDefenceGame {
     }
 
     // --- 委派行為 (Delegation) ---
+
+    // 卡牌與市集相關
+    getCardPoolItem(id) { return this.cardEngine.getItem(id); }
+    refreshMarket() { this.marketItems = this.cardEngine.refreshMarket(); this.updateUI(); }
 
     // 戰鬥相關
     getActiveAuras() { return this.combatEngine.getActiveAuras(); }
@@ -264,24 +247,6 @@ class GuardiansDefenceGame {
         } else if (effectKey === 'buy_light') {
             this.addLog(`✨ ${sourceName}：戰勝獲得補給，本回合可額外購買光源道具（未實作連動）。`, 'info');
         }
-    }
-
-    refreshMarket() {
-        const basics = JSON.parse(JSON.stringify(CARDPOOL.basic));
-        const heroes = this.shuffleArray(CARDPOOL.heroes.filter(h => h.hero.level === 1)).slice(0, 4);
-        const randomPool = [
-            ...(CARDPOOL.items || []),
-            ...(CARDPOOL.weapons || []),
-            ...(CARDPOOL.spells || [])
-        ];
-        const items = this.shuffleArray(randomPool).slice(0, 4);
-
-        this.marketItems = {
-            basics: basics.slice(0, 4),
-            heroes: heroes,
-            items: items
-        };
-        this.updateUI();
     }
 
     // --- 實用工具 ---
