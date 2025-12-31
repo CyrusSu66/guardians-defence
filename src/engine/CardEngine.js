@@ -41,9 +41,10 @@ export class CardEngine {
 
         // 雷霆之石邏輯：埋藏於牌庫最底層的 10 張 (索引 0~9, 因為使用 pop())
         if (deck.length >= 10) {
-            const burialIndex = Math.floor(Math.random() * 10);
+            // v3.13: 為了絕對沈底，我們將其限制在索引 0~2 之間
+            const burialIndex = Math.floor(Math.random() * 3);
             deck[burialIndex].hasThunderstone = true;
-            console.log(`[CardEngine] 雷霆之石已埋藏於索引 ${burialIndex} (${deck[burialIndex].name})，將在最後被抽到。`);
+            console.log(`[CardEngine] 雷霆之石已埋藏於索引 ${burialIndex} (${deck[burialIndex].name})，將在最後被抽出。`);
         }
 
         return deck;

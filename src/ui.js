@@ -8,7 +8,7 @@ import { GameState } from './data.js';
 export class UIManager {
     constructor(game) {
         this.game = game;
-        window.ui = this; // v3.12: 確保全局可用，支援地城卡片點擊
+        window.ui = this; // 確保全局可用，支援地城卡片點擊
         this.setupEventListeners();
     }
 
@@ -447,10 +447,11 @@ export class UIManager {
                 el.innerHTML = `
                     <div class="rank-label">Rank ${rank} (💡 ${lightPenalty})</div>
                     ${tsMarker}
-                    <div class="monster-name">${monster.name}</div>
+                    <div class="monster-name" style="font-weight: bold;">${monster.name}</div>
                     <div class="monster-hp" style="color: ${hpColor}; font-weight: bold;">❤️ HP: ${monster.currentHP}/${monster.monster.hp}</div>
-                    <div class="monster-reward">XP: ${monster.monster.xpGain}</div>
-                    <div class="monster-detail-btn" onclick="event.stopPropagation(); window.game.ui.showMonsterDetail('${monster.id.includes('_') ? monster.id.split('_')[0] : monster.id}')">ⓘ 詳情</div>
+                    <div style="font-size: 10px; color: #ff5a59; margin-top: 2px;">⚔️ 逃脫傷害: ${monster.monster.breachDamage || 1}</div>
+                    <div style="font-size: 10px; color: #4caf50;">✨ 擊敗獎勵: ${monster.monster.xpGain} XP</div>
+                    <div class="monster-info-btn" style="margin-top: 5px; background: rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 8px; cursor: pointer; border: 1px solid #666; font-size: 10px; display: inline-block; pointer-events: auto;" onclick="event.stopPropagation(); window.ui.showMonsterDetail('${monster.id.includes('_') ? monster.id.split('_')[0] : monster.id}')">ⓘ 查看詳情</div>
                 `;
                 if (this.game.state === GameState.COMBAT) {
                     el.style.cursor = 'pointer';
@@ -472,11 +473,18 @@ export class UIManager {
 
         const deck = this.game.monsterDeck;
         container.innerHTML = `
-            <div style="font-size: 11px; color: #888; margin-top: 10px; border-top: 1px dashed #444; padding-top: 10px;">
-                🔎 [DEBUG] 怪物牌庫餘量: ${deck.length} | 
-                <span style="color:#00e5ff; cursor:pointer;" onclick="this.nextElementSibling.style.display = (this.nextElementSibling.style.display==='none'?'block':'none')">顯示列表</span>
-                <div style="display:none; max-height: 100px; overflow-y: auto; background: rgba(0,0,0,0.5); padding: 5px; margin-top: 5px;">
-                    ${deck.map((m, i) => `<div style="${m.hasThunderstone ? 'color:#00e5ff; font-weight:bold;' : ''}">${deck.length - i}. ${m.name}${m.hasThunderstone ? ' 💠' : ''}</div>`).reverse().join('')}
+            <div style="font-size: 11px; color: #aaa; margin-top: 15px; border: 1px dashed #555; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>🔎 [DEBUG] 怪物牌庫餘量: <strong>${deck.length}</strong></span>
+                    <span style="color:#00e5ff; cursor:pointer; text-decoration: underline;" onclick="const list = this.parentElement.nextElementSibling; list.style.display = (list.style.display==='none'?'block':'none')">顯示/隱藏清單</span>
+                </div>
+                <div style="display:none; max-height: 150px; overflow-y: auto; background: rgba(0,0,0,0.5); padding: 8px; margin-top: 8px; border-top: 1px solid #444; line-height: 1.6;">
+                    ${deck.map((m, i) => `
+                        <div style="display: flex; justify-content: space-between; ${m.hasThunderstone ? 'color:#00e5ff; font-weight:bold; background: rgba(0,229,255,0.1);' : ''}">
+                            <span>${deck.length - i}. ${m.name}${m.hasThunderstone ? ' 💠' : ''}</span>
+                            <span style="opacity: 0.5;">(HP: ${m.monster.hp}⚔️${m.monster.breachDamage})</span>
+                        </div>
+                    `).reverse().join('')}
                 </div>
             </div>
         `;

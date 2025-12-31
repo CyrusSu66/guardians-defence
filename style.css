@@ -684,7 +684,7 @@ h1 {
     display: none;
     align-items: center;
     justify-content: center;
-    z-index: 2000;
+    z-index: 3000;
     backdrop-filter: blur(5px);
 }
 
@@ -874,7 +874,7 @@ h1 {
     height: 100%;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(4px);
-    z-index: 2000;
+    z-index: 3000;
     display: none;
     align-items: center;
     justify-content: center;

@@ -121,22 +121,22 @@ export const CARDPOOL = {
     // --- 怪物群 (v3.11 重組：每族群 10 張卡，比例 4:3:3) ---
     monsters: [
         // --- 群落 1: Vermin (毒蟲) ---
-        { id: 'mon_rat', name: '腐化老鼠', type: 'Monster', subTypes: ['Vermin'], monster: { tier: 1, hp: 3, xpGain: 1, breachDamage: 1 }, desc: '【進場】獲得 1 張疾病卡', abilities: { onBreach: 'gain_disease' }, count: 4 },
+        { id: 'mon_rat', name: '腐化老鼠', type: 'Monster', subTypes: ['Vermin'], monster: { tier: 1, hp: 2, xpGain: 1, breachDamage: 1 }, desc: '【進場】獲得 1 張疾病卡', abilities: { onBreach: 'gain_disease' }, count: 4 },
         { id: 'mon_centipede', name: '巨型蜈蚣', type: 'Monster', subTypes: ['Vermin'], monster: { tier: 2, hp: 5, xpGain: 1, breachDamage: 2 }, desc: '【進場】隨機棄 1 張手牌', abilities: { onBreach: 'discard_1' }, count: 3 },
         { id: 'mon_spider', name: '變異蜘蛛', type: 'Monster', subTypes: ['Vermin'], monster: { tier: 3, hp: 7, xpGain: 2, breachDamage: 3 }, desc: '【持續】所有英雄力量 -1', abilities: { aura: 'str_minus_1' }, count: 3 },
 
         // --- 群落 2: Undead (不死者) ---
-        { id: 'mon_ghost', name: '幽鬼', type: 'Monster', subTypes: ['Undead'], monster: { tier: 1, hp: 3, xpGain: 1, breachDamage: 1 }, desc: '【戰鬥】物理攻擊無效', abilities: { battle: 'phys_immune' }, count: 4 },
+        { id: 'mon_ghost', name: '幽鬼', type: 'Monster', subTypes: ['Undead'], monster: { tier: 1, hp: 2, xpGain: 1, breachDamage: 1 }, desc: '【戰鬥】物理攻擊無效', abilities: { battle: 'phys_immune' }, count: 4 },
         { id: 'mon_skeleton', name: '骷髏戰士', type: 'Monster', subTypes: ['Undead'], monster: { tier: 2, hp: 6, xpGain: 2, breachDamage: 2 }, desc: '嘎吱作響的骸骨', count: 3 },
         { id: 'mon_wraith', name: '死靈', type: 'Monster', subTypes: ['Undead'], monster: { tier: 3, hp: 9, xpGain: 3, breachDamage: 3 }, desc: '【進場】棄 1 張能量或裝備卡', abilities: { onBreach: 'discard_magic_or_item' }, count: 3 },
 
         // --- 群落 3: Darkness (黑暗軍團) ---
-        { id: 'mon_shadow', name: '影魔', type: 'Monster', subTypes: ['Darkness'], monster: { tier: 1, hp: 4, xpGain: 1, breachDamage: 1 }, desc: '潛伏於陰影中的威脅', count: 4 },
+        { id: 'mon_shadow', name: '影魔', type: 'Monster', subTypes: ['Darkness'], monster: { tier: 1, hp: 3, xpGain: 1, breachDamage: 1 }, desc: '潛伏於陰影中的威脅', count: 4 },
         { id: 'mon_nightmare_knight', name: '夢魘騎士', type: 'Monster', subTypes: ['Darkness'], monster: { tier: 2, hp: 8, xpGain: 3, breachDamage: 3 }, desc: '【持續】地城照明需求 +1 (最高累計 1)', abilities: { aura: 'light_req_plus_1' }, count: 3 },
         { id: 'mon_harbinger', name: '末日使者', type: 'Monster', subTypes: ['Darkness'], monster: { tier: 3, hp: 12, xpGain: 5, breachDamage: 4 }, desc: '【持續】所有英雄戰力 -1', abilities: { aura: 'atk_minus_1' }, count: 3 },
 
         // --- 群落 4: Ancient (遠古遺蹟) ---
-        { id: 'mon_slime', name: '粘液怪', type: 'Monster', subTypes: ['Ancient', 'Mire'], monster: { tier: 1, hp: 4, xpGain: 1, breachDamage: 1 }, desc: '難以捉摸的液狀生物', count: 4 },
+        { id: 'mon_slime', name: '粘液怪', type: 'Monster', subTypes: ['Ancient', 'Mire'], monster: { tier: 1, hp: 3, xpGain: 1, breachDamage: 1 }, desc: '難以捉摸的液狀生物', count: 4 },
         { id: 'mon_young_dragon', name: '幼龍', type: 'Monster', subTypes: ['Ancient', 'Dragon'], monster: { tier: 2, hp: 7, xpGain: 3, breachDamage: 3 }, desc: '年幼但具備威脅的巨龍', count: 3 },
         { id: 'mon_black_dragon', name: '大黑龍', type: 'Monster', subTypes: ['Ancient', 'Dragon'], monster: { tier: 3, hp: 15, xpGain: 6, breachDamage: 5 }, desc: '【戰鬥】僅魔法攻擊有效', abilities: { battle: 'magic_only' }, count: 3 }
     ],
