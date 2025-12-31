@@ -8,7 +8,7 @@ import { UIManager } from './ui.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.1.1.260101"; // 流程與市集精細化重構
+        this.version = "v3.3(01-01-01:00)"; // 英雄技能引擎啟動
         this.ui = new UIManager(this);
         this.init();
         this.setupErrorHandler();

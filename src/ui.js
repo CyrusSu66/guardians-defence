@@ -17,11 +17,17 @@ export class UIManager {
             if (el) el.onclick = () => this.switchPlazaTab(tab);
         });
 
-        document.getElementById('startGameBtn').onclick = () => this.game.startNewGame();
+        const startBtn = document.getElementById('startGameBtn');
+        if (startBtn) startBtn.onclick = () => this.game.startNewGame();
+
         document.getElementById('btnVisitVillage').onclick = () => this.game.visitVillageAction();
         document.getElementById('btnRest').onclick = () => this.game.restAction();
         document.getElementById('btnEnterDungeon').onclick = () => this.game.enterDungeonAction();
         document.getElementById('combatAttackBtn').onclick = () => this.game.performCombat();
+
+        // v3.3: 偵測階段按鈕如果還在
+        const nextPhaseBtn = document.getElementById('nextPhaseBtn');
+        if (nextPhaseBtn) nextPhaseBtn.onclick = () => this.game.nextPhase ? this.game.nextPhase() : null;
     }
 
     switchPlazaTab(tabName) {
@@ -41,9 +47,16 @@ export class UIManager {
         this.setText('currentXP', g.currentXP);
         this.setText('turnNumber', g.turn);
         this.setText('plazaCoinDisplay', g.currentGold);
+
+        // v3.3: 修正計數器刷新 (全面同步)
         this.setText('deckCount', g.deck.length);
         this.setText('discardCount', g.discard.length);
-        this.setText('buildVersion', `Build: ${g.version}`);
+        this.setText('btnDeckCount', g.deck.length);
+        this.setText('btnDiscardCount', g.discard.length);
+
+        // v3.3: 版號直接更新到標題
+        const titleEl = document.getElementById('gameTitle');
+        if (titleEl) titleEl.innerText = `⚔️ 守護者防線 Guardians Defence ${g.version}`;
 
         const stateLabels = {
             [GameState.DRAW]: '🎲 抽牌與補給',
@@ -54,9 +67,11 @@ export class UIManager {
         };
         this.setText('gameState', stateLabels[g.state] || '通訊中斷');
 
-        // 面板顯示邏輯
-        this.show('startGameBtn', g.state === GameState.IDLE);
-        this.show('gameStepButtons', g.state !== GameState.IDLE);
+        // v3.3: 面板與啟動按鈕顯示邏輯
+        const isIdle = g.state === GameState.IDLE || g.state === GameState.GAME_OVER;
+        this.show('startGameBtn', isIdle);
+        this.show('headerActions', isIdle);
+
         this.show('actionSelectPanel', g.state === GameState.VILLAGE && g.currentAction === null);
         this.show('combatPanel', g.state === GameState.COMBAT);
         this.show('restPanel', g.currentAction === 'REST');
