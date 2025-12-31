@@ -39,7 +39,7 @@ export class CombatEngine {
 
         // 3. 計算地城需求與懲罰
         const lightReq = g.combat.targetRank + (auras.lightReqMod || 0);
-        const lightPenalty = Math.max(0, lightReq - totalLight) * 2;
+        const lightPenalty = Math.max(0, lightReq - totalLight) * 1;
 
         // 4. 計算詳情
         let { physAtk, magAtk, bonuses, finalAtk } = this.calculateStats(hero, weapon, monster, lightPenalty, totalLight, lightReq);

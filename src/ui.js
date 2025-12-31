@@ -449,10 +449,19 @@ export class UIManager {
                     ${tsMarker}
                     <div class="monster-name" style="font-weight: bold;">${monster.name}</div>
                     <div class="monster-hp" style="color: ${hpColor}; font-weight: bold;">❤️ HP: ${monster.currentHP}/${monster.monster.hp}</div>
-                    <div style="font-size: 11px; color: #ff5a59; margin-top: 4px; font-weight: bold; background: rgba(255,90,89,0.1); padding: 2px 5px; border-radius: 4px; display: inline-block;">⚔️ 村莊傷害: ${monster.monster.breachDamage || 1}</div>
-                    <div style="font-size: 10px; color: #4caf50; margin-top: 2px;">✨ 擊敗獎勵: ${monster.monster.xpGain} XP</div>
-                    <div class="monster-info-btn" style="margin-top: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; padding: 3px 10px; cursor: pointer; border: 1px solid #777; font-size: 11px; display: inline-block; pointer-events: auto !important;" onclick="event.stopPropagation(); (window.ui || window.game.ui).showMonsterDetail('${monster.id.includes('_') ? monster.id.split('_')[0] : monster.id}')">ⓘ 查看詳情</div>
+                    <div style="font-size: 11px; color: #ff5a59; margin-top: 4px; font-weight: bold; background: rgba(0,0,0,0.4); border: 1px solid #ff5a59; padding: 2px 8px; border-radius: 4px; display: inline-block;">⚠️ 村莊受損: ${monster.monster.breachDamage || 1}</div>
+                    <div style="font-size: 10px; color: #4caf50; margin-top: 2px;">✨ 獎勵: ${monster.monster.xpGain} XP</div>
+                    <div class="monster-info-btn" style="margin-top: 8px; background: #333; color: #fff; border-radius: 4px; padding: 4px 12px; cursor: pointer; border: 1px solid #555; font-size: 11px; display: inline-block; pointer-events: all !important;">ⓘ 點擊詳情</div>
                 `;
+
+                // v3.15: 程式化綁定，解決 onclick 字串轉義與 ID 匹配問題
+                const infoBtn = el.querySelector('.monster-info-btn');
+                if (infoBtn) {
+                    infoBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        this.showMonsterDetail(monster.id);
+                    };
+                }
                 if (this.game.state === GameState.COMBAT) {
                     el.style.cursor = 'pointer';
                     if (isSelected) el.classList.add('target-locked');
@@ -494,7 +503,9 @@ export class UIManager {
      * 顯示怪物詳細資訊 Tooltip (v3.10)
      */
     showMonsterDetail(monsterId) {
-        const monster = this.game.getCardPoolItem(monsterId);
+        // v3.15: 自動校準 ID (例如 mon_rat_0 -> mon_rat)
+        const templateId = monsterId.includes('_') ? monsterId.split('_')[0] : monsterId;
+        const monster = this.game.getCardPoolItem(templateId);
         if (!monster) return;
 
         const overlay = document.getElementById('cardTooltipOverlay');
