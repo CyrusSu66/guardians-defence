@@ -13,7 +13,7 @@
 
 <body>
     <div class="game-container">
-        <h1 id="gameTitle">⚔️ 守護者防線 Guardians Defence v3.3</h1>
+        <h1 id="gameTitle">⚔️ 守護者防線 Guardians Defence</h1>
 
         <!-- v3.3：啟動按鈕遷移至標題下 -->
         <div id="headerActions" style="text-align: center; margin-bottom: 20px;">
@@ -220,6 +220,27 @@
             <div style="text-align: right; margin-top: 20px;">
                 <button class="btn btn-primary"
                     onclick="document.getElementById('deckViewModal').classList.remove('active')">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- v3.4 卡牌詳情 Tooltip -->
+    <div id="cardTooltipOverlay" class="tooltip-overlay" onclick="this.classList.remove('active')">
+        <div class="tooltip-card" onclick="event.stopPropagation()">
+            <div class="tooltip-close"
+                onclick="document.getElementById('cardTooltipOverlay').classList.remove('active')">×</div>
+            <div class="tooltip-header">
+                <div class="tooltip-type" id="ttType">HERO</div>
+                <div class="tooltip-title" id="ttTitle">Card Name</div>
+            </div>
+            <div class="tooltip-body" id="ttDescription">
+                Card descriptions and skills go here...
+            </div>
+            <div class="tooltip-stats-grid" id="ttStats">
+                <!-- Dynamic stats items -->
+            </div>
+            <div style="margin-top: 20px; font-style: italic; color: #555; font-size: 11px;" id="ttLore">
+                Flavor text or lore...
             </div>
         </div>
     </div>
