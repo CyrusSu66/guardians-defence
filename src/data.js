@@ -196,9 +196,9 @@ export const CARDPOOL = {
     spells: [
         {
             id: 'spell_fireball', name: '火球', type: 'Spell', subTypes: ['Fire'],
-            cost: 5, vp: 0, goldValue: 1, light: 2,
-            desc: '強力的範圍魔法',
-            equipment: { attack: 0, magicAttack: 3, weight: 0 }
+            cost: 5, vp: 0, goldValue: 1, light: 1,
+            desc: '【地城】增加 1 點照明，對目標造成 2 點傷害（計算照明懲罰）',
+            equipment: { attack: 0, magicAttack: 2, weight: 0 }
         }
     ],
     items: [

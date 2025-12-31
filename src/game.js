@@ -1,14 +1,23 @@
 /**
- * 《守護者防線：雷霆遺產》核心邏輯 (v3.1.1)
- * 實作規則：手動啟用手牌效果、4+4+4 市集佈局、休息限額銷毀 (1張)、戰鬥持續性優化。
+ * 《守護者防線：雷霆遺產》核心控制器 (v3.6)
+ * 實作規則：架構重構為 Controller-Engine 模式，提升模組化程度。
  */
 
 import { CARDPOOL, GameState } from './data.js';
 import { UIManager } from './ui.js';
+import { CombatEngine } from './engine/CombatEngine.js';
+import { VillageEngine } from './engine/VillageEngine.js';
+import { DungeonEngine } from './engine/DungeonEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.5(01-01-01:40)"; // 戰鬥重構：接力打怪與亮度彙整
+        this.version = "v3.6(01-01-02:15)"; // 模組化重構：邏輯拆分
+
+        // 初始化引擎
+        this.combatEngine = new CombatEngine(this);
+        this.villageEngine = new VillageEngine(this);
+        this.dungeonEngine = new DungeonEngine(this);
+
         this.ui = new UIManager(this);
         this.init();
         this.setupErrorHandler();
@@ -32,7 +41,7 @@ class GuardiansDefenceGame {
         this.deck = [];
         this.hand = [];
         this.discard = [];
-        this.playedCards = []; // 本回合已啟用的卡片
+        this.playedCards = [];
 
         this.monsterDeck = [];
         this.dungeonHall = { rank1: null, rank2: null, rank3: null };
@@ -41,16 +50,15 @@ class GuardiansDefenceGame {
         this.log = [];
         this.combat = null;
 
-        this.currentAction = null; // null, 'VILLAGE', 'REST', 'DUNGEON'
-        this.hasBought = false;    // 本回合是否已購買
-        this.hasDestroyed = false; // 本回合休息是否已銷毀
-        this.selectedDestroyIdx = null; // v3.1.3 新增：休息時預備銷毀的索引
+        this.currentAction = null;
+        this.hasBought = false;
+        this.hasDestroyed = false;
+        this.selectedDestroyIdx = null;
     }
 
     // --- 遊戲初始化 ---
 
     startNewGame() {
-        console.log("DEBUG: startNewGame initiated");
         this.addLog('正在初始系統資源...', 'info');
         this.init();
         const startingIds = [
@@ -73,16 +81,10 @@ class GuardiansDefenceGame {
             this.addLog('正在偵測地城前線...', 'info');
             this.spawnNextMonster();
 
-            this.addLog('守護者防線 v3.3 核心重裝上陣！', 'success');
-
-            this.addLog('正在重整市集物資...', 'info');
+            this.addLog('守護者防線 v3.6 核心模組化啟動！', 'success');
             this.refreshMarket();
-
-            this.addLog('系統就緒，首輪抽牌...', 'success');
             this.nextTurn();
-            console.log("DEBUG: startNewGame completed");
         } catch (e) {
-            console.error(e);
             this.addLog(`❌ 啟動失敗: ${e.message}`, 'danger');
         }
     }
@@ -110,7 +112,7 @@ class GuardiansDefenceGame {
         this.monsterDeck = [...s1, ...s2, ...s3].reverse();
     }
 
-    // --- 核心流程 ---
+    // --- 流程控制器 ---
 
     nextTurn() {
         this.turn++;
@@ -125,7 +127,6 @@ class GuardiansDefenceGame {
         this.addLog(`【第 ${this.turn} 回合】開始`, 'info');
         this.drawCards(6);
 
-        // 每 3 回合刷新一次隨機市場 (v3.1)
         if (this.turn % 3 === 0) {
             this.refreshMarket();
             this.addLog('市集貨源已更新！', 'success');
@@ -149,33 +150,141 @@ class GuardiansDefenceGame {
         this.updateUI();
     }
 
-    // --- 怪物效果與傷害 ---
+    // --- 委派行為 (Delegation) ---
 
-    processBreachEffect(monster) {
-        if (!monster || !monster.abilities || !monster.abilities.onBreach) return;
-        this.addLog(`⚠️ ${monster.name} 的進場威壓！`, 'warning');
-        const effect = monster.abilities.onBreach;
-        if (effect === 'gain_disease') {
-            const disease = this.getCardPoolItem('spec_disease');
-            if (disease) this.discard.push(disease);
-        } else if (effect === 'discard_1') {
-            this.forcePlayerDiscard(1);
-        } else if (effect === 'discard_magic_or_item') {
-            this.forceTypeDiscard(['Spell', 'Item', 'Weapon'], 1);
+    // 戰鬥相關
+    getActiveAuras() { return this.combatEngine.getActiveAuras(); }
+    calculateHeroCombatStats(hero, weapon, monster, lightPenalty) {
+        return this.combatEngine.calculateStats(hero, weapon, monster, lightPenalty);
+    }
+    performCombat() { this.combatEngine.perform(); }
+    selectCombatTarget(rank) {
+        if (this.state !== GameState.COMBAT) return;
+        this.combat.targetRank = rank;
+        this.updateUI();
+    }
+
+    // 村莊相關
+    buyCard(cardId, cost) { this.villageEngine.buy(cardId, cost); }
+    upgradeHero(cardId) { this.villageEngine.upgrade(cardId); }
+    promoteRegularArmy(handIdx, marketHeroId) { this.villageEngine.promoteRegular(handIdx, marketHeroId); }
+    confirmRestAndDestroy() { this.villageEngine.confirmRest(); }
+    activateAllResources() { this.villageEngine.activateAllResources(); }
+
+    // 地城相關
+    spawnNextMonster() { this.dungeonEngine.spawn(); }
+    monsterAdvance() { this.dungeonEngine.advance(); }
+    processBreachEffect(monster) { this.dungeonEngine.processBreach(monster); }
+    endTurnWithAdvance() { this.monsterAdvance(); }
+
+    // --- 動作觸發 ---
+
+    visitVillageAction() {
+        this.state = GameState.VILLAGE;
+        this.currentAction = 'VILLAGE';
+        this.addLog('造訪村莊。請點擊手牌以啟用金幣與效果，產出總額後再進行一次購買。', 'info');
+        this.updateUI();
+    }
+
+    restAction() {
+        this.state = GameState.VILLAGE;
+        this.currentAction = 'REST';
+        this.currentXP += 1;
+        this.addLog('休息整補，獲得 1 XP。您可以點擊一張手牌進行銷毀。', 'success');
+        this.updateUI();
+    }
+
+    enterDungeonAction() {
+        this.state = GameState.COMBAT;
+        this.currentAction = 'DUNGEON';
+        this.combat = { selectedHeroIdx: null, selectedWeaponIdx: null, targetRank: null };
+        this.addLog('進入地城！正在準備戰鬥...', 'info');
+
+        this.hand.forEach(card => {
+            if (card.abilities && card.abilities.onDungeon) {
+                this.triggerCardEffect(card.abilities.onDungeon, card.name);
+            }
+        });
+        this.updateUI();
+    }
+
+    finishAction() {
+        this.addLog('行動確認，地城正在推移...', 'info');
+        this.playedCards.forEach(c => this.discard.push(c));
+        this.playedCards = [];
+        this.endTurnWithAdvance();
+    }
+
+    playCard(idx) {
+        const card = this.hand[idx];
+        if (!card) return;
+
+        if (this.currentAction === 'VILLAGE') {
+            const played = this.hand.splice(idx, 1)[0];
+            this.playedCards.push(played);
+            if (played.goldValue) {
+                this.currentGold += played.goldValue;
+                this.addLog(`啟動「${played.name}」，獲得 ${played.goldValue} 金幣。`, 'success');
+            }
+            if (played.abilities && played.abilities.onVillage) {
+                this.triggerCardEffect(played.abilities.onVillage);
+            }
+            this.updateUI();
+        } else if (this.currentAction === 'REST') {
+            if (this.hasDestroyed) return this.addLog('本回合休息已執行過銷毀。', 'warning');
+            if (this.selectedDestroyIdx === idx) {
+                this.selectedDestroyIdx = null;
+            } else {
+                this.selectedDestroyIdx = idx;
+                this.addLog(`已選取「${card.name}」，點擊下方確認按鈕以執行銷毀。`, 'info');
+            }
+            this.updateUI();
         }
     }
 
-    getActiveAuras() {
-        const auras = { strMod: 0, atkMod: 0, lightReqMod: 0 };
-        [this.dungeonHall.rank1, this.dungeonHall.rank2, this.dungeonHall.rank3].forEach(m => {
-            if (!m || !m.abilities || !m.abilities.aura) return;
-            const effect = m.abilities.aura;
-            if (effect === 'str_minus_1') auras.strMod -= 1;
-            if (effect === 'atk_minus_1') auras.atkMod -= 1;
-            if (effect === 'light_req_plus_2') auras.lightReqMod += 2;
-        });
-        return auras;
+    triggerCardEffect(effectKey, sourceName = '未知來源') {
+        if (!effectKey) return;
+        if (effectKey === 'destroy_disease') {
+            const dIdx = this.hand.findIndex(c => c.id === 'spec_disease');
+            if (dIdx !== -1) {
+                this.hand.splice(dIdx, 1);
+                this.addLog(`✨ ${sourceName}：已移除手牌中的疾病卡。`, 'success');
+            } else {
+                this.addLog(`✨ ${sourceName}：未發現可移除的疾病。`, 'info');
+            }
+        } else if (effectKey === 'draw_1') {
+            this.addLog(`✨ ${sourceName}：觸發抽牌效果。`, 'success');
+            this.drawCards(1);
+        } else if (effectKey === 'draw_2') {
+            this.addLog(`✨ ${sourceName}：激發潛能，抽 2 張牌！`, 'success');
+            this.drawCards(2);
+        } else if (effectKey === 'gain_1xp') {
+            this.currentXP += 1;
+            this.addLog(`✨ ${sourceName}：戰鬥經驗增加 1 XP。`, 'success');
+        } else if (effectKey === 'buy_light') {
+            this.addLog(`✨ ${sourceName}：戰勝獲得補給，本回合可額外購買光源道具（未實作連動）。`, 'info');
+        }
     }
+
+    refreshMarket() {
+        const basics = JSON.parse(JSON.stringify(CARDPOOL.basic));
+        const heroes = this.shuffleArray(CARDPOOL.heroes.filter(h => h.hero.level === 1)).slice(0, 4);
+        const randomPool = [
+            ...(CARDPOOL.items || []),
+            ...(CARDPOOL.weapons || []),
+            ...(CARDPOOL.spells || [])
+        ];
+        const items = this.shuffleArray(randomPool).slice(0, 4);
+
+        this.marketItems = {
+            basics: basics.slice(0, 4),
+            heroes: heroes,
+            items: items
+        };
+        this.updateUI();
+    }
+
+    // --- 實用工具 ---
 
     forcePlayerDiscard(count) {
         for (let i = 0; i < count; i++) {
@@ -201,390 +310,11 @@ class GuardiansDefenceGame {
         this.updateUI();
     }
 
-    // --- 手動卡片啟用 (v3.1.1 核心) ---
-
-    activateAllResources() {
-        if (this.currentAction !== 'VILLAGE') return;
-        let activatedCount = 0;
-        for (let i = this.hand.length - 1; i >= 0; i--) {
-            if (this.hand[i].goldValue > 0) {
-                this.playCard(i);
-                activatedCount++;
-            }
-        }
-        if (activatedCount > 0) this.addLog(`自動啟用了 ${activatedCount} 張資源卡。`, 'info');
-        this.updateUI();
-    }
-
-    playCard(idx) {
-        const card = this.hand[idx];
-        if (!card) return;
-
-        // 在村莊階段，點擊卡片以啟用資源與效果
-        if (this.currentAction === 'VILLAGE') {
-            const played = this.hand.splice(idx, 1)[0];
-            this.playedCards.push(played);
-
-            // 啟用金幣
-            if (played.goldValue) {
-                this.currentGold += played.goldValue;
-                this.addLog(`啟動「${played.name}」，獲得 ${played.goldValue} 金幣。`, 'success');
-            }
-
-            // 觸發村莊效果
-            if (played.abilities && played.abilities.onVillage) {
-                this.triggerCardEffect(played.abilities.onVillage);
-            }
-            this.updateUI();
-        }
-
-        // 在休息階段，點擊卡片以「預備」銷毀
-        else if (this.currentAction === 'REST') {
-            if (this.hasDestroyed) return this.addLog('本回合休息已執行過銷毀。', 'warning');
-
-            // 如果點擊已選中的，則取消選取
-            if (this.selectedDestroyIdx === idx) {
-                this.selectedDestroyIdx = null;
-            } else {
-                this.selectedDestroyIdx = idx;
-                const card = this.hand[idx];
-                this.addLog(`已選取「${card.name}」，點擊下方確認按鈕以執行銷毀。`, 'info');
-            }
-            this.updateUI();
-        }
-    }
-
-    // 執行休息銷毀並結束回合
-    confirmRestAndDestroy() {
-        if (this.currentAction !== 'REST') return;
-
-        if (this.selectedDestroyIdx !== null) {
-            const removed = this.hand.splice(this.selectedDestroyIdx, 1)[0];
-            this.hasDestroyed = true;
-            this.selectedDestroyIdx = null;
-            this.addLog(`🔥 已銷毀卡片：「${removed.name}」，休息行動結束。`, 'warning');
-        } else {
-            this.addLog('直接結束休息行動，未銷毀任何卡片。', 'info');
-        }
-        this.finishAction();
-    }
-
-    triggerCardEffect(effectKey, sourceName = '未知來源') {
-        if (!effectKey) return;
-
-        if (effectKey === 'destroy_disease') {
-            const dIdx = this.hand.findIndex(c => c.id === 'spec_disease');
-            if (dIdx !== -1) {
-                this.hand.splice(dIdx, 1);
-                this.addLog(`✨ ${sourceName}：已移除手牌中的疾病卡。`, 'success');
-            } else {
-                this.addLog(`✨ ${sourceName}：未發現可移除的疾病。`, 'info');
-            }
-        } else if (effectKey === 'draw_1') {
-            this.addLog(`✨ ${sourceName}：觸發抽牌效果。`, 'success');
-            this.drawCards(1);
-        } else if (effectKey === 'draw_2') {
-            this.addLog(`✨ ${sourceName}：激發潛能，抽 2 張牌！`, 'success');
-            this.drawCards(2);
-        } else if (effectKey === 'gain_1xp') {
-            this.currentXP += 1;
-            this.addLog(`✨ ${sourceName}：戰鬥經驗增加 1 XP。`, 'success');
-        } else if (effectKey === 'buy_light') {
-            this.addLog(`✨ ${sourceName}：戰勝獲得補給，本回合可額外購買光源道具（未實作連動）。`, 'info');
-            // 此處可擴充為增加購買次數或開啟特定折扣
-        }
-    }
-
-    // --- 行動選擇 ---
-
-    visitVillageAction() {
-        this.state = GameState.VILLAGE;
-        this.currentAction = 'VILLAGE';
-        this.addLog('造訪村莊。請點擊手牌以啟用金幣與效果，產出總額後再進行一次購買。', 'info');
-        this.updateUI();
-    }
-
-    restAction() {
-        this.state = GameState.VILLAGE;
-        this.currentAction = 'REST';
-        this.currentXP += 1;
-        this.addLog('休息整補，獲得 1 XP。您可以點擊一張手牌進行銷毀。', 'success');
-        this.updateUI();
-    }
-
-    // v3.5：進入地城時自動更新手牌亮度總值
-    enterDungeonAction() {
-        this.state = GameState.COMBAT;
-        this.currentAction = 'DUNGEON';
-        this.combat = { selectedHeroIdx: null, selectedWeaponIdx: null, targetRank: null };
-        this.addLog('進入地城！正在準備戰鬥...', 'info');
-
-        // v3.3：掃描手牌中的地城技能 (onDungeon)
-        this.hand.forEach(card => {
-            if (card.abilities && card.abilities.onDungeon) {
-                this.triggerCardEffect(card.abilities.onDungeon, card.name);
-            }
-        });
-
-        this.updateUI();
-    }
-
-    finishAction() {
-        this.addLog('行動確認，地城正在推移...', 'info');
-        // 清理已啟用的卡片
-        this.playedCards.forEach(c => this.discard.push(c));
-        this.playedCards = [];
-        this.endTurnWithAdvance();
-    }
-
-    // --- 市場、購買與升級 ---
-
-    refreshMarket() {
-        const basics = JSON.parse(JSON.stringify(CARDPOOL.basic));
-        // v3.1.3：精確 4 英雄 + 4 隨機道具/裝備/法術 + 4 基礎
-        const heroes = this.shuffleArray(CARDPOOL.heroes.filter(h => h.hero.level === 1)).slice(0, 4);
-        const randomPool = [
-            ...(CARDPOOL.items || []),
-            ...(CARDPOOL.weapons || []),
-            ...(CARDPOOL.spells || [])
-        ];
-        const items = this.shuffleArray(randomPool).slice(0, 4);
-
-        this.marketItems = {
-            basics: basics.slice(0, 4),
-            heroes: heroes,
-            items: items
-        };
-        this.updateUI();
-    }
-
-    buyCard(cardId, cost) {
-        if (this.currentGold < cost) return this.addLog('金幣不足！', 'danger');
-        if (this.hasBought) return this.addLog('造訪期間僅限執行一次購買。', 'warning');
-
-        this.currentGold -= cost;
-        this.hasBought = true;
-        const card = this.getCardPoolItem(cardId);
-        this.discard.push(card);
-        this.addLog(`購入「${card.name}」。`, 'success');
-        this.updateUI();
-    }
-
-    upgradeHero(cardId) {
-        const idx = this.hand.findIndex(c => c.id === cardId);
-        const hero = this.hand[idx];
-        if (!hero || !hero.hero || !hero.hero.upgradeToId || this.currentXP < hero.hero.xpToUpgrade) return;
-        this.currentXP -= hero.hero.xpToUpgrade;
-        const nextLv = this.getCardPoolItem(hero.hero.upgradeToId);
-        this.hand.splice(idx, 1);
-        this.discard.push(nextLv);
-        this.addLog(`英雄升級：${hero.name} ➔ ${nextLv.name}`, 'success');
-        this.updateUI();
-    }
-
-    // v3.2 轉職機制：正規軍 -> 1 級英雄
-    promoteRegularArmy(handIdx, marketHeroId) {
-        const card = this.hand[handIdx];
-        if (!card || card.id !== 'basic_regular_army' || this.currentXP < 1) return;
-
-        // 查找市集中是否有該英雄
-        const marketHero = this.marketItems.heroes.find(h => h.id === marketHeroId);
-        if (!marketHero) return this.addLog('市集中無此英雄可供轉職。', 'warning');
-
-        this.currentXP -= 1;
-        this.hand.splice(handIdx, 1); // 銷毀手上的正規軍
-        const newHero = this.getCardPoolItem(marketHeroId);
-        this.discard.push(newHero);
-
-        this.addLog(`✨ 轉職成功！正規軍 ➔ ${newHero.name} (花費 1 XP)`, 'success');
-        this.updateUI();
-    }
-
-    // --- 戰鬥系統 ---
-
-    selectCombatTarget(rank) {
-        if (this.state !== GameState.COMBAT) return;
-        this.combat.targetRank = rank;
-        this.updateUI();
-    }
-
-    performCombat() {
-        if (!this.combat.targetRank) return this.addLog('請選擇目標怪物。', 'danger');
-        const monster = this.dungeonHall[`rank${this.combat.targetRank}`];
-        if (!monster) return;
-
-        const hIdx = this.combat.selectedHeroIdx;
-        const wIdx = this.combat.selectedWeaponIdx;
-        const hero = this.hand[hIdx];
-        const weapon = this.hand[wIdx];
-
-        if (!hero) return this.addLog('請至少選擇一名英雄。', 'danger');
-
-        const auras = this.getActiveAuras();
-        let heroStr = hero.hero.strength + auras.strMod;
-
-        if (weapon && heroStr < weapon.equipment.weight) {
-            return this.addLog(`❌ 負重不足！${hero.name} 無法使用 ${weapon.name}`, 'danger');
-        }
-
-        // v3.5：亮度偵測優化 - 自動彙整手牌所有亮度提供者
-        let totalLight = 0;
-        this.hand.forEach(c => totalLight += (c.light || 0));
-        this.playedCards.forEach(c => totalLight += (c.light || 0)); // 已啟用的也算
-
-        const lightReq = this.combat.targetRank + auras.lightReqMod;
-        const lightPenalty = Math.max(0, lightReq - totalLight) * 2;
-
-        let { physAtk, magAtk, bonuses } = this.calculateHeroCombatStats(hero, weapon, monster, lightPenalty);
-        let finalAtk = physAtk + magAtk;
-
-        if (finalAtk <= 0) {
-            return this.addLog(`❌ 攻擊力不足以造成傷害 (最終 Atk: ${finalAtk})。`, 'warning');
-        }
-
-        // v3.5：扣除怪物血量 (接力打怪)
-        monster.currentHP -= finalAtk;
-        this.addLog(`⚔️ ${hero.name}${weapon ? ' 持 ' + weapon.name : ''} 對 ${monster.name} 造成 ${finalAtk} 點傷害！`, 'info');
-
-        if (monster.currentHP <= 0) {
-            this.addLog(`✨ 擊斃 ${monster.name}！`, 'success');
-
-            // v3.3：戰勝效果觸發 (onVictory)
-            if (hero.abilities && hero.abilities.onVictory) {
-                this.triggerCardEffect(hero.abilities.onVictory, hero.name);
-            }
-
-            this.currentXP += monster.monster.xpGain;
-            this.totalScore += (monster.vp || 0);
-            this.dungeonHall[`rank${this.combat.targetRank}`] = null;
-
-            if (monster.hasThunderstone) {
-                this.addLog('🏆 您奪得了雷霆之石，防線獲得最終勝利！', 'success');
-                this.gameOver();
-                return;
-            }
-        } else {
-            this.addLog(`🛡️ ${monster.name} 剩餘 HP: ${monster.currentHP}/${monster.monster.hp}`, 'warning');
-        }
-
-        // 消耗卡片 (無論是否擊斃都消耗本次參與的英雄)
-        const toDiscard = [hIdx];
-        if (wIdx !== null) toDiscard.push(wIdx);
-        toDiscard.sort((a, b) => b - a).forEach(i => this.discard.push(this.hand.splice(i, 1)[0]));
-
-        this.combat = { selectedHeroIdx: null, selectedWeaponIdx: null, targetRank: this.combat.targetRank };
-        this.updateUI();
-    }
-
-    // v3.3：計算英雄詳細戰鬥數值
-    calculateHeroCombatStats(hero, weapon, monster, lightPenalty) {
-        const auras = this.getActiveAuras();
-        let physAtk = hero.hero.attack + (weapon ? weapon.equipment.attack : 0) + auras.atkMod;
-        let magAtk = hero.hero.magicAttack + (weapon ? weapon.equipment.magicAttack : 0);
-        let bonuses = [];
-
-        // 1. 條件加成 (onBattle / 其他規則)
-        if (hero.abilities && hero.abilities.onBattle) {
-            const effect = hero.abilities.onBattle;
-
-            // 矮人加成：若有裝備，額外 Attack+1
-            if (hero.hero.series === 'Dwarf' && weapon) {
-                physAtk += 1;
-                bonuses.push('矮人武裝: +1 Atk');
-            }
-
-            // 塞維恩補償：光照不足時，每多一光源攻擊力 +1
-            if (effect === 'light_compensation' && lightPenalty > 0) {
-                let currentLight = 0;
-                this.hand.forEach(c => currentLight += (c.light || 0));
-                if (currentLight > 0) {
-                    physAtk += currentLight;
-                    bonuses.push(`騎士信仰(光照補償): +${currentLight} Atk`);
-                }
-            }
-        }
-
-        // 2. 怪物免疫處理
-        if (monster && monster.abilities) {
-            if (monster.abilities.battle === 'phys_immune') {
-                physAtk = 0;
-                bonuses.push('物理免疫: Atk 歸零');
-            }
-            if (monster.abilities.battle === 'magic_only') {
-                physAtk = 0;
-                bonuses.push('魔法限定: 物理 Atk 無效');
-            }
-        }
-
-        // 3. 光照懲罰
-        physAtk = Math.max(0, physAtk - lightPenalty);
-        if (lightPenalty > 0) bonuses.push(`光照懲罰: -${lightPenalty} Atk`);
-
-        return { physAtk, magAtk, bonuses };
-    }
-
-    // --- 地城推進 ---
-
-    spawnNextMonster() {
-        if (this.monsterDeck.length === 0) return;
-        const monster = this.monsterDeck.pop();
-        monster.currentHP = monster.monster.hp; // v3.5：初始化當前血量
-
-        if (!this.dungeonHall.rank3) this.dungeonHall.rank3 = monster;
-        else if (!this.dungeonHall.rank2) this.dungeonHall.rank2 = monster;
-        else if (!this.dungeonHall.rank1) this.dungeonHall.rank1 = monster;
-        else {
-            this.monsterDeck.push(monster); // 放回牌庫
-            this.addLog('⚠️ 地城已滿，怪物暫時無法進入。', 'warning');
-        }
-    }
-
-    endTurnWithAdvance() {
-        this.monsterAdvance();
-    }
-
-    monsterAdvance() {
-        this.state = GameState.MONSTER_ADVANCE;
-        if (this.dungeonHall.rank1) {
-            const escaped = this.dungeonHall.rank1;
-            if (escaped.hasThunderstone) return this.gameOver();
-            this.addLog(`⚠️ ${escaped.name} 已逃出地城，村莊受損！`, 'danger');
-            this.villageHP -= 2;
-        }
-
-        this.dungeonHall.rank1 = this.dungeonHall.rank2;
-        this.dungeonHall.rank2 = this.dungeonHall.rank3;
-        this.dungeonHall.rank3 = null;
-        this.spawnNextMonster();
-
-        this.updateUI();
-        if (this.villageHP <= 0) this.gameOver();
-        else {
-            setTimeout(() => {
-                this.hand.forEach(c => this.discard.push(c));
-                this.hand = [];
-                this.nextTurn();
-            }, 800);
-        }
-    }
-
-    gameOver() {
-        this.state = GameState.GAME_OVER;
-        this.updateUI();
-    }
-
-    // --- 工具與查看功能 ---
-
     showDeckModal(type) {
         if (!this.ui) return;
         const list = type === 'deck' ? [...this.deck] : [...this.discard];
         const title = type === 'deck' ? '查看牌庫 (隨機順序)' : '查看棄牌堆';
-
-        // 如果是查看牌庫，應以此顯示玩家知道的內容，為了公平性我們可以做一次隨機展示或按字母排名
-        if (type === 'deck') {
-            this.shuffle(list); // 不影響實際牌庫，僅展示
-        }
-
+        if (type === 'deck') this.shuffle(list);
         this.ui.renderDeckView(title, list);
     }
 
@@ -612,6 +342,11 @@ class GuardiansDefenceGame {
 
     updateUI() {
         if (this.ui) this.ui.updateUI();
+    }
+
+    gameOver() {
+        this.state = GameState.GAME_OVER;
+        this.updateUI();
     }
 }
 
