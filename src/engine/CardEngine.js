@@ -27,12 +27,9 @@ export class CardEngine {
         let deck = [];
 
         groups.forEach(groupName => {
-            // Assuming CARDPOOL.monsters is the source for all monsters
-            const groupMonsters = CARDPOOL.monsters.filter(m => m.monster.subTypes.includes(groupName));
+            const groupMonsters = CARDPOOL.monsters.filter(m => m.subTypes.includes(groupName));
             groupMonsters.forEach(template => {
-                // Assuming 'count' property exists on monster templates, default to 1 if not
-                for (let i = 0; i < (template.monster.count || 1); i++) {
-                    // Deep copy the template and assign a unique ID
+                for (let i = 0; i < (template.count || 1); i++) {
                     const newMonster = JSON.parse(JSON.stringify(template));
                     newMonster.id = `${template.id}_${i}`;
                     deck.push(newMonster);
@@ -40,8 +37,7 @@ export class CardEngine {
             });
         });
 
-        // Shuffle the entire deck
-        deck = this.game.shuffleArray(deck); // Assuming game.shuffleArray is the correct method
+        deck = this.game.shuffleArray(deck);
 
         // 雷霆之石邏輯：牌庫最底層 10 張隨機選一張
         if (deck.length >= 10) {

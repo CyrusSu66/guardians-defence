@@ -136,9 +136,9 @@ export const CARDPOOL = {
         { id: 'mon_harbinger', name: '末日使者', type: 'Monster', subTypes: ['Darkness'], monster: { tier: 3, hp: 12, xpGain: 5, breachDamage: 4 }, desc: '【持續】所有英雄戰力 -1', abilities: { aura: 'atk_minus_1' }, count: 3 },
 
         // --- 群落 4: Ancient (遠古遺蹟) ---
-        { id: 'mon_slime', name: '粘液怪', type: 'Monster', subTypes: ['Mire'], monster: { tier: 1, hp: 4, xpGain: 1, breachDamage: 1 }, desc: '難以捉摸的液狀生物', count: 4 },
-        { id: 'mon_young_dragon', name: '幼龍', type: 'Monster', subTypes: ['Dragon'], monster: { tier: 2, hp: 7, xpGain: 3, breachDamage: 3 }, desc: '年幼但具備威脅的巨龍', count: 3 },
-        { id: 'mon_black_dragon', name: '大黑龍', type: 'Monster', subTypes: ['Dragon'], monster: { tier: 3, hp: 15, xpGain: 6, breachDamage: 5 }, desc: '【戰鬥】僅魔法攻擊有效', abilities: { battle: 'magic_only' }, count: 3 }
+        { id: 'mon_slime', name: '粘液怪', type: 'Monster', subTypes: ['Ancient', 'Mire'], monster: { tier: 1, hp: 4, xpGain: 1, breachDamage: 1 }, desc: '難以捉摸的液狀生物', count: 4 },
+        { id: 'mon_young_dragon', name: '幼龍', type: 'Monster', subTypes: ['Ancient', 'Dragon'], monster: { tier: 2, hp: 7, xpGain: 3, breachDamage: 3 }, desc: '年幼但具備威脅的巨龍', count: 3 },
+        { id: 'mon_black_dragon', name: '大黑龍', type: 'Monster', subTypes: ['Ancient', 'Dragon'], monster: { tier: 3, hp: 15, xpGain: 6, breachDamage: 5 }, desc: '【戰鬥】僅魔法攻擊有效', abilities: { battle: 'magic_only' }, count: 3 }
     ],
 
     // --- 物品與裝備 ---
