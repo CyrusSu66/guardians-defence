@@ -71,14 +71,23 @@
                     </div>
                 </div>
 
-                <!-- 核心行動選擇區 -->
                 <div class="panel action-select-panel" id="actionSelectPanel">
                     <div class="panel-title">🚩 選擇本回合行動</div>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
-                        <button class="btn btn-primary" id="btnVisitVillage">🏪 造訪村莊 (結束回合)</button>
-                        <button class="btn btn-secondary" id="btnRest">💤 休息整補 (結束回合)</button>
+                        <button class="btn btn-primary" id="btnVisitVillage">🏪 造訪村莊</button>
+                        <button class="btn btn-secondary" id="btnRest">💤 休息整補</button>
                         <button class="btn btn-danger" id="btnEnterDungeon"
-                            style="background: #a30000; color: white;">⚔️ 進入地城 (開始戰鬥)</button>
+                            style="background: #a30000; color: white;">⚔️ 進入地城</button>
+                    </div>
+                </div>
+
+                <!-- 休息面板 (v3.1) -->
+                <div class="panel" id="restPanel" style="display: none; border-color: var(--color-secondary);">
+                    <div class="panel-title">💤 休息整補中</div>
+                    <div style="font-size: 13px; margin-bottom: 10px; color: #aaa;">已獲得 1 XP。您可以點擊下方手牌進行銷毀，或直接結束行動。
+                    </div>
+                    <div style="display: flex; justify-content: flex-end;">
+                        <button class="btn btn-secondary" onclick="window.game.finishAction()">完成休息行動</button>
                     </div>
                 </div>
 
@@ -90,8 +99,9 @@
                         style="margin-top: 15px; font-size: 13px; color: #888; background: var(--color-bg); padding: 10px; border-radius: 6px; border: 1px dashed var(--color-primary);">
                         尚未部署英雄...</div>
                     <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
-                        <button class="btn btn-primary" id="combatAttackBtn">攻擊怪物</button>
-                        <button class="btn btn-secondary" onclick="window.game.skipCombat()">撤退 (進攻結束)</button>
+                        <button class="btn btn-primary" id="combatAttackBtn">執行分配攻擊</button>
+                        <button class="btn btn-secondary" style="background: #444;"
+                            onclick="window.game.finishAction()">結束戰鬥行動</button>
                     </div>
                 </div>
 
@@ -135,9 +145,15 @@
                         </div>
                     </div>
                     <div class="plaza-tabs">
-                        <button class="plaza-tab-btn active" id="tab-market">🛒 營地</button>
-                        <button class="plaza-tab-btn" id="tab-training">⚔️ 訓練</button>
-                        <button class="plaza-tab-btn" id="tab-craft">🔨 鍛造</button>
+                        <button class="plaza-tab-btn active" id="tab-market">🛒 市集隨機組</button>
+                        <button class="plaza-tab-btn" id="tab-training">⚔️ 訓練升級</button>
+                        <button class="plaza-tab-btn" id="tab-craft">🔨 常備軍需</button>
+                    </div>
+                    <!-- v3.1 新增：村莊結束按鈕 -->
+                    <div id="villageFinishControl"
+                        style="margin-top: 10px; display: none; justify-content: flex-end; padding: 0 10px;">
+                        <button class="btn btn-primary" style="background: var(--color-success);"
+                            onclick="window.game.finishAction()">結束村莊行動 (推移地城)</button>
                     </div>
                     <div class="plaza-content active" id="marketTab">
                         <div class="market-display-grid" id="marketGrid"></div>

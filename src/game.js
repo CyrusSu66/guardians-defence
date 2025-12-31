@@ -1,6 +1,6 @@
 /**
- * 《守護者防線：雷霆遺產》核心邏輯 (v2.1)
- * 實作規則：怪物效果觸發時機 (進場/光環/戰鬥)、受傷棄牌、精確負重與光源計算。
+ * 《守護者防線：雷霆遺產》核心邏輯 (v3.1)
+ * 實作規則：手動結束行動、4+4 市集佈局、休息銷毀機制、持續戰鬥引擎。
  */
 
 import { CARDPOOL, GameState } from './data.js';
@@ -8,7 +8,7 @@ import { UIManager } from './ui.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.0.251231C"; // 重大改版：怪物效果引擎與規則重構
+        this.version = "v3.1.251231D"; // 精細化流程控制：手動結束、市集重構、休息銷毀
         this.ui = new UIManager(this);
         this.init();
         this.setupErrorHandler();
@@ -40,6 +40,10 @@ class GuardiansDefenceGame {
         this.marketItems = [];
         this.log = [];
         this.combat = null;
+
+        // v3.1 新增：當前行動狀態
+        this.currentAction = null; // null, 'VILLAGE', 'REST', 'DUNGEON'
+        this.actionFinished = false;
     }
 
     // --- 遊戲初始化 ---
@@ -57,9 +61,9 @@ class GuardiansDefenceGame {
         this.shuffle(this.deck);
 
         this.createMonsterDeck();
-        this.spawnNextMonster(); // 初始刷怪觸發 [進場]
+        this.spawnNextMonster();
 
-        this.addLog('守護者防線 v2.1 引擎已就緒，戰役開始！', 'success');
+        this.addLog('守護者防線 v3.1 精細化引擎已就緒！', 'success');
         this.refreshMarket();
         this.nextTurn();
     }
@@ -85,7 +89,7 @@ class GuardiansDefenceGame {
         const bossIdx = Math.floor(Math.random() * s3.length);
         s3[bossIdx].hasThunderstone = true;
         s3[bossIdx].monster.hp += 3;
-        s3[bossIdx].name += " (雷霆之石)";
+        s3[bossIdx].name += " ⚡";
 
         this.monsterDeck = [...s1, ...s2, ...s3].reverse();
     }
@@ -96,13 +100,20 @@ class GuardiansDefenceGame {
         this.turn++;
         this.currentGold = 0;
         this.playedCards = [];
+        this.currentAction = null;
         this.state = GameState.DRAW;
 
-        this.addLog(`【第 ${this.turn} 回合】`, 'info');
+        this.addLog(`【第 ${this.turn} 回合】開始`, 'info');
         this.drawCards(6);
 
+        // 每 3 回合刷新一次隨機市場 (v3.1)
+        if (this.turn % 3 === 0) {
+            this.refreshMarket();
+            this.addLog('市集貨源已更新！', 'success');
+        }
+
         setTimeout(() => {
-            this.state = GameState.VILLAGE;
+            this.state = GameState.VILLAGE; // 預設進入村莊待命
             this.updateUI();
         }, 300);
     }
@@ -119,38 +130,24 @@ class GuardiansDefenceGame {
         this.updateUI();
     }
 
-    // --- 怪物效果引擎 (v2.1 重點) ---
+    // --- 怪物效果與傷害 ---
 
-    // 1. [進場] 效果：怪物進入 Rank 3 時觸發
     processBreachEffect(monster) {
         if (!monster || !monster.abilities || !monster.abilities.onBreach) return;
-
-        this.addLog(`⚠️ 警告：${monster.name} 的進場威壓！`, 'warning');
+        this.addLog(`⚠️ ${monster.name} 的進場威壓！`, 'warning');
         const effect = monster.abilities.onBreach;
-
-        if (effect === 'discard_1') {
+        if (effect === 'gain_disease') {
+            const disease = this.getCardPoolItem('spec_disease');
+            if (disease) this.discard.push(disease);
+        } else if (effect === 'discard_1') {
             this.forcePlayerDiscard(1);
         } else if (effect === 'discard_magic_or_item') {
             this.forceTypeDiscard(['Spell', 'Item', 'Weapon'], 1);
-        } else if (effect === 'gain_disease') {
-            const disease = this.getCardPoolItem('special_disease');
-            if (disease) {
-                this.discard.push(disease);
-                this.addLog(`🦠 ${monster.name} 使你的牌組染上疾病...`, 'danger');
-            }
         }
     }
 
-    // 2. [持續] 效果：計算當前所有光環
     getActiveAuras() {
-        const auras = {
-            strMod: 0,
-            atkMod: 0,
-            lightReqMod: 0,
-            magicOnly: false,
-            physImmune: false
-        };
-
+        const auras = { strMod: 0, atkMod: 0, lightReqMod: 0 };
         [this.dungeonHall.rank1, this.dungeonHall.rank2, this.dungeonHall.rank3].forEach(m => {
             if (!m || !m.abilities || !m.abilities.aura) return;
             const effect = m.abilities.aura;
@@ -158,11 +155,9 @@ class GuardiansDefenceGame {
             if (effect === 'atk_minus_1') auras.atkMod -= 1;
             if (effect === 'light_req_plus_2') auras.lightReqMod += 2;
         });
-
         return auras;
     }
 
-    // 3. [受傷] 邏輯：隨機棄牌
     forcePlayerDiscard(count) {
         for (let i = 0; i < count; i++) {
             if (this.hand.length > 0) {
@@ -179,9 +174,7 @@ class GuardiansDefenceGame {
         let discarded = 0;
         for (let i = this.hand.length - 1; i >= 0; i--) {
             if (types.includes(this.hand[i].type)) {
-                const removed = this.hand.splice(i, 1)[0];
-                this.discard.push(removed);
-                this.addLog(`✨ 魔法干擾，失去卡片：「${removed.name}」`, 'danger');
+                this.discard.push(this.hand.splice(i, 1)[0]);
                 discarded++;
                 if (discarded >= count) break;
             }
@@ -189,45 +182,70 @@ class GuardiansDefenceGame {
         this.updateUI();
     }
 
-    // --- 行動選擇 ---
+    // --- v3.1 精細化行動方法 ---
 
     visitVillageAction() {
-        // 造訪村莊：計算手牌金幣
+        this.state = GameState.VILLAGE;
+        this.currentAction = 'VILLAGE';
+
+        // 計算當前回合金幣產出
         let goldGenerated = 0;
         this.hand.forEach(c => { if (c.goldValue) goldGenerated += c.goldValue; });
         this.currentGold += goldGenerated;
-        if (goldGenerated > 0) this.addLog(`獲得補給資金：${goldGenerated}`, 'success');
 
-        this.refreshMarket();
-        this.endTurnWithAdvance();
+        this.addLog(`造訪村莊，產出資產：${goldGenerated}`, 'info');
+        this.updateUI();
     }
 
     restAction() {
+        this.state = GameState.VILLAGE; // 保持在村莊大類別，但子行動為休息
+        this.currentAction = 'REST';
         this.currentXP += 1;
-        this.addLog('休息整補，獲得 1 XP。', 'success');
-        this.endTurnWithAdvance();
+        this.addLog('休息整補，獲得 1 XP。您可以點擊卡片進行銷毀。', 'success');
+        this.updateUI({ mode: 'REST_UI' });
     }
 
     enterDungeonAction() {
         this.state = GameState.COMBAT;
+        this.currentAction = 'DUNGEON';
         this.combat = { selectedHeroIdx: null, selectedWeaponIdx: null, targetRank: null };
-        this.addLog('進入地城！請分配英雄、裝備與目標。', 'info');
+        this.addLog('進入地城！請選擇英雄、武器與目標。', 'info');
         this.updateUI();
     }
 
-    // --- 市場與升級 ---
+    // 結束行動確認 (手動觸發)
+    finishAction() {
+        this.addLog('行動結束，地城正在推移...', 'info');
+        this.endTurnWithAdvance();
+    }
+
+    // 休息時銷毀卡片
+    destroyCard(cardId) {
+        const idx = this.hand.findIndex(c => c.id === cardId);
+        if (idx === -1) return;
+        const removed = this.hand.splice(idx, 1)[0];
+        this.addLog(`🔥 已銷毀卡片：「${removed.name}」。`, 'warning');
+        this.updateUI({ mode: 'REST_UI' });
+    }
+
+    // --- 市場、購買與升級 ---
 
     refreshMarket() {
         const basics = JSON.parse(JSON.stringify(CARDPOOL.basic));
+        // v3.1：明確 4 英雄 + 4 道具/法術
         const heroes = this.shuffleArray(CARDPOOL.heroes.filter(h => h.hero.level === 1)).slice(0, 4);
-        const weapons = this.shuffleArray(CARDPOOL.weapons).slice(0, 4);
         const items = this.shuffleArray([...CARDPOOL.spells, ...CARDPOOL.items]).slice(0, 4);
-        this.marketItems = [...basics, ...heroes, ...weapons, ...items];
+
+        this.marketItems = {
+            basics: basics,
+            heroes: heroes,
+            items: items
+        };
         this.updateUI();
     }
 
     buyCard(cardId, cost) {
-        if (this.currentGold < cost) return;
+        if (this.currentGold < cost) return this.addLog('金幣不足！', 'danger');
         this.currentGold -= cost;
         const card = this.getCardPoolItem(cardId);
         this.discard.push(card);
@@ -258,6 +276,8 @@ class GuardiansDefenceGame {
     performCombat() {
         if (!this.combat.targetRank) return this.addLog('請選擇目標怪物。', 'danger');
         const monster = this.dungeonHall[`rank${this.combat.targetRank}`];
+        if (!monster) return;
+
         const hIdx = this.combat.selectedHeroIdx;
         const wIdx = this.combat.selectedWeaponIdx;
         const hero = this.hand[hIdx];
@@ -265,65 +285,66 @@ class GuardiansDefenceGame {
 
         if (!hero) return this.addLog('請至少選擇一名英雄。', 'danger');
 
-        // 1. 獲取光環與基礎數值
         const auras = this.getActiveAuras();
         let heroStr = hero.hero.strength + auras.strMod;
-        let weaponWeight = weapon ? weapon.equipment.weight : 0;
 
-        // 2. 負重檢查
-        if (weapon && heroStr < weaponWeight) {
-            return this.addLog(`❌ 負重不足！${hero.name} 無力揮動 ${weapon.name}`, 'danger');
+        // 額外機制：正規軍/長矛連動
+        let synergyDraw = false;
+        if (hero.id === 'basic_regular_army' && weapon && weapon.id === 'basic_spear') synergyDraw = true;
+
+        if (weapon && heroStr < weapon.equipment.weight) {
+            return this.addLog(`❌ 負重不足！${hero.name} 無法使用 ${weapon.name}`, 'danger');
         }
 
-        // 3. 計算光照與懲罰
         let totalLight = 0;
         this.hand.forEach(c => totalLight += (c.light || 0));
         const lightReq = this.combat.targetRank + auras.lightReqMod;
         const lightPenalty = Math.max(0, lightReq - totalLight) * 2;
 
-        // 4. 計算最終攻擊
         let physAtk = hero.hero.attack + (weapon ? weapon.equipment.attack : 0) + auras.atkMod;
         let magAtk = hero.hero.magicAttack + (weapon ? weapon.equipment.magicAttack : 0);
 
-        // 物理免疫判定
         if (monster.abilities && monster.abilities.battle === 'phys_immune') physAtk = 0;
         if (monster.abilities && monster.abilities.battle === 'magic_only') physAtk = 0;
 
         let finalAtk = Math.max(0, physAtk - lightPenalty) + magAtk;
 
-        this.addLog(`⚔️ ${hero.name} 發動攻勢！物理:${physAtk} 魔法:${magAtk} 光懲:-${lightPenalty} 總計:${finalAtk}`, 'info');
-
-        // 5. 結算
         if (finalAtk >= monster.monster.hp) {
-            this.addLog(`✨ 擊敗 ${monster.name}！`, 'success');
+            this.addLog(`✨ 傳捷報！擊敗 ${monster.name}！`, 'success');
             this.currentXP += monster.monster.xpGain;
-            this.totalScore += monster.vp || 0;
+            this.totalScore += (monster.vp || 0);
             this.dungeonHall[`rank${this.combat.targetRank}`] = null;
 
-            // 消耗出戰卡
+            // 消耗卡片
             const toDiscard = [hIdx];
             if (wIdx !== null) toDiscard.push(wIdx);
             toDiscard.sort((a, b) => b - a).forEach(i => this.discard.push(this.hand.splice(i, 1)[0]));
 
+            if (synergyDraw) {
+                this.addLog('正規軍連動效果：額外抽 1 張牌。', 'info');
+                this.drawCards(1);
+            }
+
             if (monster.hasThunderstone) {
-                this.addLog('🏆 獲得雷霆之石！您拯救了防線！', 'success');
+                this.addLog('🏆 您奪得了雷霆之石，防線獲得最終勝利！', 'success');
                 this.gameOver();
             } else {
-                this.endTurnWithAdvance();
+                this.combat = { selectedHeroIdx: null, selectedWeaponIdx: null, targetRank: null };
+                this.updateUI(); // 戰鬥後不跳轉，讓玩家繼續使用剩下手牌
             }
         } else {
-            this.addLog(`❌ 攻擊力不足，敗退！`, 'danger');
-            this.endTurnWithAdvance();
+            this.addLog(`❌ 戰力不足 (${finalAtk}/${monster.monster.hp})，敗退！`, 'danger');
+            this.updateUI();
         }
     }
 
-    // --- 地城進度 ---
+    // --- 地城推進 ---
 
     spawnNextMonster() {
         if (this.monsterDeck.length > 0) {
             const m = this.monsterDeck.pop();
             this.dungeonHall.rank3 = m;
-            this.processBreachEffect(m); // 觸發進場效果
+            this.processBreachEffect(m);
         }
     }
 
@@ -333,19 +354,17 @@ class GuardiansDefenceGame {
 
     monsterAdvance() {
         this.state = GameState.MONSTER_ADVANCE;
-
         if (this.dungeonHall.rank1) {
             const escaped = this.dungeonHall.rank1;
             if (escaped.hasThunderstone) return this.gameOver();
-            this.addLog(`⚠️ ${escaped.name} 逃出地城，村莊受損！`, 'danger');
+            this.addLog(`⚠️ ${escaped.name} 已逃出地城，村莊淪陷中！`, 'danger');
             this.villageHP -= 2;
         }
 
         this.dungeonHall.rank1 = this.dungeonHall.rank2;
         this.dungeonHall.rank2 = this.dungeonHall.rank3;
         this.dungeonHall.rank3 = null;
-
-        this.spawnNextMonster(); // 補位並觸發進場
+        this.spawnNextMonster();
 
         this.updateUI();
         if (this.villageHP <= 0) this.gameOver();
@@ -384,11 +403,11 @@ class GuardiansDefenceGame {
     addLog(msg, type) {
         this.log.unshift({ message: msg, type });
         if (this.log.length > 20) this.log.pop();
-        if (this.ui) this.updateUI();
+        this.updateUI();
     }
 
-    updateUI() {
-        if (this.ui) this.ui.updateUI();
+    updateUI(options = {}) {
+        if (this.ui) this.ui.updateUI(options);
     }
 }
 
