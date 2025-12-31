@@ -12,7 +12,7 @@ export class UIManager {
     }
 
     setupEventListeners() {
-        ['market', 'training', 'craft'].forEach(tab => {
+        ['market', 'training'].forEach(tab => {
             const el = document.getElementById(`tab-${tab}`);
             if (el) el.onclick = () => this.switchPlazaTab(tab);
         });
