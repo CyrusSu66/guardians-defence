@@ -169,6 +169,58 @@ h1 {
     }
 }
 
+/* v2.0 地城 Rank 專屬樣式 */
+.dungeon-rank {
+    min-width: 140px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
+    border: 2px solid rgba(45, 184, 198, 0.4);
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.rank-label {
+    position: absolute;
+    top: -10px;
+    background: var(--color-primary);
+    color: #000;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.dungeon-rank.boss-marked {
+    border-color: var(--color-warning);
+    box-shadow: 0 0 15px rgba(230, 184, 0, 0.4), inset 0 0 10px rgba(0, 0, 0, 0.8);
+    background: linear-gradient(135deg, #1a1a1a 0%, #3a2a00 100%);
+}
+
+.dungeon-rank.boss-marked::after {
+    content: "⚡";
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 16px;
+}
+
+.dungeon-rank.target-locked {
+    border: 2px solid #fff;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+    transform: scale(1.05);
+}
+
+.monster-hp {
+    color: var(--color-accent);
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.monster-reward {
+    font-size: 10px;
+    color: var(--color-success);
+    margin-top: 3px;
+}
+
 .damage-number {
     position: absolute;
     color: #ff3a39;
@@ -239,22 +291,50 @@ h1 {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
-    align-items: flex-end;
+    align-items: flex-start;
     margin-bottom: 10px;
 }
 
 .card {
     background-color: var(--color-surface);
-    border: 2px solid var(--color-primary);
-    border-radius: 8px;
-    padding: 10px;
-    min-width: 85px;
+    border: 1px solid var(--color-primary);
+    border-radius: 6px;
+    padding: 12px;
+    width: 130px;
+    min-height: 160px;
     text-align: center;
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 12px;
     position: relative;
     user-select: none;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-type-tag {
+    font-size: 9px;
+    color: #888;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+}
+
+.card-stats {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 6px;
+    margin: 8px 0;
+    border-radius: 4px;
+    font-weight: bold;
+    color: var(--color-primary);
+    font-size: 11px;
+}
+
+.card-desc {
+    font-size: 10px;
+    color: #aaa;
+    line-height: 1.3;
+    margin-top: auto;
 }
 
 .card:hover {
@@ -566,7 +646,8 @@ h1 {
 }
 
 .btn:disabled {
-    opacity: 0.4;
+    filter: grayscale(1);
+    opacity: 0.3;
     cursor: not-allowed;
 }
 

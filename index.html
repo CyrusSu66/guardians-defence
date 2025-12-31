@@ -59,13 +59,26 @@
             <!-- 中央：主要行動區 -->
             <div style="display: flex; flex-direction: column; gap: 20px;">
                 <div class="panel">
-                    <div class="panel-title">⚔️ 怪物軌道</div>
+                    <div class="panel-title">⚔️ 地城大廳 (Dungeon Hall)</div>
                     <div class="lane-display">
                         <div class="lane-track" id="laneTrack">
-                            <div class="lane-village">🏰<br>村莊</div>
-                            <div class="lane-arrow">→</div>
-                            <div class="lane-slots" id="laneSlots"></div>
+                            <div class="lane-village">🏰<br>村莊防線</div>
+                            <div class="lane-arrow">←</div>
+                            <div class="dungeon-rank-slots" id="dungeonRankSlots" style="display: flex; gap: 15px;">
+                                <!-- Rank 1, 2, 3 will be rendered here -->
+                            </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- 核心行動選擇區 -->
+                <div class="panel action-select-panel" id="actionSelectPanel">
+                    <div class="panel-title">🚩 選擇本回合行動</div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                        <button class="btn btn-primary" id="btnVisitVillage">🏪 造訪村莊 (結束回合)</button>
+                        <button class="btn btn-secondary" id="btnRest">💤 休息整補 (結束回合)</button>
+                        <button class="btn btn-danger" id="btnEnterDungeon"
+                            style="background: #a30000; color: white;">⚔️ 進入地城 (開始戰鬥)</button>
                     </div>
                 </div>
 
