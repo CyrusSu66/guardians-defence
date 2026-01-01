@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.19(01-01-13:15)"; // 穩定版：修復怪物與UI互動
+        this.version = "v3.20(01-01-20:00)"; // 牌庫邏輯重構 (30張/分層)
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);

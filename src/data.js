@@ -121,12 +121,12 @@ export const CARDPOOL = {
     // --- 怪物群 (v3.11 重組：每族群 10 張卡，比例 4:3:3) ---
     monsters: [
         // --- 群落 1: Vermin (毒蟲) ---
-        { id: 'mon_rat', name: '腐化老鼠', type: 'Monster', subTypes: ['Vermin'], monster: { tier: 1, hp: 1, xpGain: 1, breachDamage: 1 }, desc: '【進場】獲得 1 張疾病卡', abilities: { onBreach: 'gain_disease' }, count: 4 },
+        { id: 'mon_rat', name: '腐化老鼠', type: 'Monster', subTypes: ['Vermin'], monster: { tier: 1, hp: 1, xpGain: 1, breachDamage: 1 }, desc: '群聚的瘟疫與害蟲', count: 4 },
         { id: 'mon_centipede', name: '巨型蜈蚣', type: 'Monster', subTypes: ['Vermin'], monster: { tier: 2, hp: 3, xpGain: 1, breachDamage: 2 }, desc: '【進場】隨機棄 1 張手牌', abilities: { onBreach: 'discard_1' }, count: 3 },
         { id: 'mon_spider', name: '變異蜘蛛', type: 'Monster', subTypes: ['Vermin'], monster: { tier: 3, hp: 6, xpGain: 2, breachDamage: 3 }, desc: '【持續】所有英雄力量 -1', abilities: { aura: 'str_minus_1' }, count: 3 },
 
         // --- 群落 2: Undead (不死者) ---
-        { id: 'mon_ghost', name: '幽鬼', type: 'Monster', subTypes: ['Undead'], monster: { tier: 1, hp: 2, xpGain: 1, breachDamage: 1 }, desc: '【戰鬥】物理攻擊無效', abilities: { battle: 'phys_immune' }, count: 4 },
+        { id: 'mon_ghost', name: '幽鬼', type: 'Monster', subTypes: ['Undead'], monster: { tier: 1, hp: 2, xpGain: 1, breachDamage: 1 }, desc: '飄忽不定的靈體', count: 4 },
         { id: 'mon_skeleton', name: '骷髏戰士', type: 'Monster', subTypes: ['Undead'], monster: { tier: 2, hp: 3, xpGain: 2, breachDamage: 2 }, desc: '嘎吱作響的骸骨', count: 3 },
         { id: 'mon_wraith', name: '死靈', type: 'Monster', subTypes: ['Undead'], monster: { tier: 3, hp: 5, xpGain: 3, breachDamage: 3 }, desc: '【進場】棄 1 張能量或裝備卡', abilities: { onBreach: 'discard_magic_or_item' }, count: 3 },
 

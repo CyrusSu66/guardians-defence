@@ -23,31 +23,57 @@ export class CardEngine {
      * 創建怪物牌庫 (v3.11：每族群 10 張卡，隨機雷霆之石)
      */
     createMonsterDeck() {
-        const groups = ['Vermin', 'Undead', 'Darkness', 'Ancient'];
-        let deck = [];
+        // 1. 隨機選出 3 個種族
+        let groups = ['Vermin', 'Undead', 'Darkness', 'Ancient'];
+        groups = this.game.shuffleArray(groups).slice(0, 3);
+        console.log(`[CardEngine] 本局選定種族: ${groups.join(', ')}`);
 
+        let deckT1 = [];
+        let deckT2 = [];
+        let deckT3 = [];
+
+        // 2. 依照種族撈取卡片並按階級分類
+        // 規則: T1 x4, T2 x3, T3 x3 (每個種族)
         groups.forEach(groupName => {
             const groupMonsters = CARDPOOL.monsters.filter(m => m.subTypes.includes(groupName));
+
             groupMonsters.forEach(template => {
-                for (let i = 0; i < (template.count || 1); i++) {
+                const tier = template.monster.tier;
+                // 強制設定數量，覆蓋 data.js 的預設值 (以防未來 data.js 修改但這裡沒變)
+                // T1: 4張, T2: 3張, T3: 3張
+                let count = tier === 1 ? 4 : 3;
+
+                for (let i = 0; i < count; i++) {
                     const newMonster = JSON.parse(JSON.stringify(template));
-                    newMonster.id = `${template.id}_${i}`;
-                    deck.push(newMonster);
+                    newMonster.id = `${template.id}_${i}`; // 生成唯一 ID
+
+                    if (tier === 1) deckT1.push(newMonster);
+                    else if (tier === 2) deckT2.push(newMonster);
+                    else if (tier === 3) deckT3.push(newMonster);
                 }
             });
         });
 
-        deck = this.game.shuffleArray(deck);
+        // 3. 各階級獨立洗牌
+        deckT1 = this.game.shuffleArray(deckT1);
+        deckT2 = this.game.shuffleArray(deckT2);
+        deckT3 = this.game.shuffleArray(deckT3);
 
-        // 雷霆之石邏輯：埋藏於牌庫最底層的 10 張 (索引 0~9, 因為使用 pop())
-        if (deck.length >= 10) {
-            // v3.13: 為了絕對沈底，我們將其限制在索引 0~2 之間
-            const burialIndex = Math.floor(Math.random() * 3);
-            deck[burialIndex].hasThunderstone = true;
-            console.log(`[CardEngine] 雷霆之石已埋藏於索引 ${burialIndex} (${deck[burialIndex].name})，將在最後被抽出。`);
+        // 4. 雷霆之石埋藏於 T3 (最深處)
+        if (deckT3.length > 0) {
+            const stoneIndex = Math.floor(Math.random() * deckT3.length);
+            deckT3[stoneIndex].hasThunderstone = true;
+            console.log(`[CardEngine] 雷霆之石埋藏於 T3 層: ${deckT3[stoneIndex].name}`);
         }
 
-        return deck;
+        // 5. 堆疊牌庫
+        // 因為 DungeonEngine 使用 pop() 從尾端取牌，所以順序應為:
+        // [底部: T3] -> [中層: T2] -> [頂部: T1]
+        // 這樣 pop() 會先拿出 T1
+        const finalDeck = [...deckT3, ...deckT2, ...deckT1];
+
+        console.log(`[CardEngine] 怪物牌庫建構完成，總張數: ${finalDeck.length}`);
+        return finalDeck;
     }
 
     /**
