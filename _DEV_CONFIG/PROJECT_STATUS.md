@@ -29,6 +29,9 @@
 - [ ] **手機版 UI 優化**: 針對手機豎屏操作進行特定介面調整（目前主要是針對桌面寬螢幕）。
 
 ### 優先級：低 / 實驗性 (Priority: Low / Experimental)
+- [ ] **Google Sheets + GAS 後端架構**:
+    - **目標**: 建立 Client-Server-DB 架構，允許透過 Google Sheets 即時調整遊戲數值 (怪物、卡牌) 而無需修改程式碼。
+    - **方案**: Google Apps Script (Server) + Sheets (DB) + JSON API。
 - [ ] **成就系統**: 紀錄玩家的最高分、擊殺數等。
 - [ ] **多語言支援**: 架構化 i18n，雖然目前鎖定繁體中文，但可預留擴充。
 
