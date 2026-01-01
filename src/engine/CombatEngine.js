@@ -135,6 +135,12 @@ export class CombatEngine {
         let prePenaltyTotal = filteredPhys + filteredMag;
         let finalAtk = Math.max(0, prePenaltyTotal - lightPenalty);
 
+        // v3.16: 保底傷害機制 - 只要原始攻擊力 > 0，最終傷害至少為 1 (勇氣加成)
+        if (finalAtk <= 0 && (physAtk + magAtk > 0)) {
+            finalAtk = 1;
+            bonuses.push('勇氣保底: 雖然黑暗籠罩，但憑藉勇氣造成了 1 點保底傷害！');
+        }
+
         if (lightPenalty > 0) bonuses.push(`照明懲罰: -${lightPenalty} 戰力`);
 
         return {

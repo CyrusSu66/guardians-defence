@@ -449,19 +449,24 @@ export class UIManager {
                     ${tsMarker}
                     <div class="monster-name" style="font-weight: bold;">${monster.name}</div>
                     <div class="monster-hp" style="color: ${hpColor}; font-weight: bold;">❤️ HP: ${monster.currentHP}/${monster.monster.hp}</div>
-                    <div style="font-size: 11px; color: #ff5a59; margin-top: 4px; font-weight: bold; background: rgba(0,0,0,0.4); border: 1px solid #ff5a59; padding: 2px 8px; border-radius: 4px; display: inline-block;">⚠️ 村莊受損: ${monster.monster.breachDamage || 1}</div>
+                    <div style="font-size: 11px; color: #ff5a59; margin-top: 4px; font-weight: bold; background: #000; border: 1px solid #ff5a59; padding: 2px 8px; border-radius: 4px; display: inline-block; box-shadow: 0 0 5px rgba(255,90,89,0.3);">⚠️ 村莊受損: ${monster.monster.breachDamage || 1}</div>
                     <div style="font-size: 10px; color: #4caf50; margin-top: 2px;">✨ 獎勵: ${monster.monster.xpGain} XP</div>
-                    <div class="monster-info-btn" style="margin-top: 8px; background: #333; color: #fff; border-radius: 4px; padding: 4px 12px; cursor: pointer; border: 1px solid #555; font-size: 11px; display: inline-block; pointer-events: all !important;">ⓘ 點擊詳情</div>
+                    <div class="monster-info-btn-outer" style="margin-top: 8px; text-align: center;">
+                        <button class="monster-info-btn" style="background: #444; color: #fff; border-radius: 4px; padding: 5px 15px; cursor: pointer; border: 1px solid #777; font-size: 12px; display: inline-block; pointer-events: all !important; transition: all 0.2s;" title="查看怪物詳情">ⓘ 點擊詳情</button>
+                    </div>
                 `;
 
-                // v3.15: 程式化綁定，解決 onclick 字串轉義與 ID 匹配問題
-                const infoBtn = el.querySelector('.monster-info-btn');
-                if (infoBtn) {
-                    infoBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        this.showMonsterDetail(monster.id);
-                    };
-                }
+                // v3.16: 強化的程式化綁定，確保 ID 匹配與響應
+                setTimeout(() => {
+                    const infoBtn = el.querySelector('.monster-info-btn');
+                    if (infoBtn) {
+                        infoBtn.onclick = (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            this.showMonsterDetail(monster.id);
+                        };
+                    }
+                }, 0);
                 if (this.game.state === GameState.COMBAT) {
                     el.style.cursor = 'pointer';
                     if (isSelected) el.classList.add('target-locked');
