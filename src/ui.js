@@ -451,7 +451,6 @@ export class UIManager {
                     <div class="monster-hp" style="color: ${hpColor}; font-weight: bold;">❤️ HP: ${monster.currentHP}/${monster.monster.hp}</div>
                     <div style="font-size: 11px; color: #ff5a59; margin-top: 4px; font-weight: bold; background: #000; border: 1px solid #ff5a59; padding: 2px 8px; border-radius: 4px; display: inline-block; box-shadow: 0 0 5px rgba(255,90,89,0.3);">⚠️ 村莊受損: ${monster.monster.breachDamage || 1}</div>
                     <div style="font-size: 10px; color: #4caf50; margin-top: 2px;">✨ 獎勵: ${monster.monster.xpGain} XP</div>
-                    // v3.17: 統一 UI 樣式與增加除錯 Log
                     <div class="card-info-btn monster-info-btn" style="top: 5px; right: 5px; cursor: pointer;" title="查看怪物詳情">ⓘ</div>
                 `;
 
