@@ -461,7 +461,7 @@ export class UIManager {
                     <div style="font-size: 10px; color: #4caf50; margin-top: 2px;">✨ 獎勵: ${monster.monster.xpGain} XP</div>
                     <div class="card-info-btn monster-info-btn" 
                          title="查看怪物詳情"
-                         onclick="event.stopPropagation(); console.log('[UI DEBUG] Inline Click monster ${monster.id}'); window.ui.showMonsterDetail('${monster.id}');">ⓘ</div>
+                         onclick="event.stopPropagation(); alert('UI Debug: Clicked!'); window.ui.showMonsterDetail('${monster.id}');">ⓘ</div>
                 `;
 
                 if (this.game.state === GameState.COMBAT) {
