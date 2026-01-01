@@ -461,7 +461,7 @@ export class UIManager {
                     <div style="font-size: 10px; color: #4caf50; margin-top: 2px;">✨ 獎勵: ${monster.monster.xpGain} XP</div>
                     <div class="card-info-btn monster-info-btn" 
                          title="查看怪物詳情"
-                         onclick="event.stopPropagation(); alert('UI Debug: Clicked!'); window.ui.showMonsterDetail('${monster.id}');">ⓘ</div>
+                         onclick="event.stopPropagation(); window.ui.showMonsterDetail('${monster.id}');">ⓘ</div>
                 `;
 
                 if (this.game.state === GameState.COMBAT) {
@@ -507,54 +507,75 @@ export class UIManager {
     showMonsterDetail(monsterId) {
         console.log(`[UI] showMonsterDetail called with ID: ${monsterId}`);
         // v3.15: 自動校準 ID (例如 mon_rat_0 -> mon_rat)
-        const templateId = monsterId.includes('_') ? monsterId.split('_')[0] : monsterId;
-        console.log(`[UI] Resolved template ID: ${templateId}`);
-
-        const monster = this.game.getCardPoolItem(templateId);
-        if (!monster) {
-            console.error(`[UI] Monster data not found for ID: ${templateId}`);
-            if (this.game && this.game.logAction) {
-                this.game.logAction(`[ERROR] 找不到怪物資料: ${templateId}`);
+        showMonsterDetail(monsterId) {
+            console.log(`[UI] showMonsterDetail called with ID: ${monsterId}`);
+            // v3.19: 更穩健的 ID 解析 (移除 _0, _1 等動態後綴)
+            // 假設 ID 格式為 mon_name_index，嘗試只取前兩段 (mon_name)
+            let templateId = monsterId;
+            if (monsterId.startsWith('mon_') && monsterId.split('_').length > 2) {
+                templateId = monsterId.split('_').slice(0, 2).join('_');
             }
-            return;
-        }
+            console.log(`[UI] Resolved template ID: ${templateId}`);
 
-        const overlay = document.getElementById('cardTooltipOverlay');
-        if (!overlay) return;
+            let monster = this.game.getCardPoolItem(templateId);
 
-        document.getElementById('ttType').innerText = `怪物 - ${monster.subTypes.join('/')}`;
-        document.getElementById('ttTitle').innerText = monster.name;
-        document.getElementById('ttDescription').innerHTML = `<span style="color:#ff5a59;">[突進傷害: ${monster.monster.breachDamage || 1}]</span><br>${monster.desc || monster.description}`;
+            // Fallback: 如果直接解析失敗，嘗試用完整 ID 查找，或當作是獨立實例查找
+            if (!monster) {
+                monster = this.game.getCardPoolItem(monsterId);
+            }
 
-        let statsHtml = `
+            // Fallback 2: 嘗試在 dungeonHall 中尋找實例
+            if (!monster) {
+                for (let k in this.game.dungeonHall) {
+                    if (this.game.dungeonHall[k] && this.game.dungeonHall[k].id === monsterId) {
+                        monster = this.game.dungeonHall[k];
+                        break;
+                    }
+                }
+            }
+
+            if (!monster) {
+                console.error(`[UI] Monster data not found for ID: ${templateId} or ${monsterId}`);
+                alert(`錯誤：找不到怪物資料 (${templateId})`); // 用 Alert 提示資料錯誤
+                return;
+            }
+
+            const overlay = document.getElementById('cardTooltipOverlay');
+            if (!overlay) return;
+
+            document.getElementById('ttType').innerText = `怪物 - ${monster.subTypes.join('/')}`;
+            document.getElementById('ttTitle').innerText = monster.name;
+            document.getElementById('ttDescription').innerHTML = `<span style="color:#ff5a59;">[突進傷害: ${monster.monster.breachDamage || 1}]</span><br>${monster.desc || monster.description}`;
+
+            let statsHtml = `
             <div class="tooltip-stat-item"><div class="tooltip-stat-label">原始血量</div><div class="tooltip-stat-value">❤️ ${monster.monster.hp}</div></div>
             <div class="tooltip-stat-item"><div class="tooltip-stat-label">擊敗獎勵</div><div class="tooltip-stat-value">✨ ${monster.monster.xpGain} XP</div></div>
         `;
-        document.getElementById('ttStats').innerHTML = statsHtml;
-        document.getElementById('ttLore').innerText = monster.lore || "此怪物的來歷充滿謎團。";
+            document.getElementById('ttStats').innerHTML = statsHtml;
+            document.getElementById('ttLore').innerText = monster.lore || "此怪物的來歷充滿謎團。";
 
-        overlay.classList.add('active'); // Changed to add 'active' class for consistency
-    }
+            overlay.classList.add('active'); // Changed to add 'active' class for consistency
+        }
 
-    updateCombatSummary() {
-        const summary = document.getElementById('combatSummary');
-        if (!summary || this.game.state !== GameState.COMBAT) return;
+        updateCombatSummary() {
+            const summary = document.getElementById('combatSummary');
+            if (!summary || this.game.state !== GameState.COMBAT) return;
 
-        const { selectedHeroIdx, selectedWeaponIdx, targetRank } = this.game.combat;
-        const hero = this.game.hand[selectedHeroIdx];
-        const weapon = this.game.hand[selectedWeaponIdx];
-        const monster = targetRank ? this.game.dungeonHall[`rank${targetRank}`] : null;
+            const { selectedHeroIdx, selectedWeaponIdx, targetRank } = this.game.combat;
+            const hero = this.game.hand[selectedHeroIdx];
+            const weapon = this.game.hand[selectedWeaponIdx];
+            const monster = targetRank ? this.game.dungeonHall[`rank${targetRank}`] : null;
 
-        let totalLight = 0;
-        this.game.hand.forEach(c => totalLight += (c.light || 0));
-        this.game.playedCards.forEach(c => totalLight += (c.light || 0));
+            let totalLight = 0;
+            this.game.hand.forEach(c => totalLight += (c.light || 0));
+            this.game.playedCards.forEach(c => totalLight += (c.light || 0));
 
-        // v3.11：恢復受限照明修正
-        const auras = this.game.calculateHeroCombatStats(hero || { hero: { attack: 0, magicAttack: 0 } }, null, null, 0).auras || { lightReqMod: 0 };
-        const lightReq = targetRank ? (targetRank + (auras.lightReqMod || 0)) : 0;
-        const lightPenalty = targetRank ? Math.max(0, lightReq - totalLight) * 2 : 0;
+            // v3.11：恢復受限照明修正
+            const auras = this.game.calculateHeroCombatStats(hero || { hero: { attack: 0, magicAttack: 0 } }, null, null, 0).auras || { lightReqMod: 0 };
+            const lightReq = targetRank ? (targetRank + (auras.lightReqMod || 0)) : 0;
+            const lightPenalty = targetRank ? Math.max(0, lightReq - totalLight) * 2 : 0;
 
-        const calcGridHtml = `
+            const calcGridHtml = `
             <div class="combat-calc-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; margin-bottom: 12px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 6px; border: 1px solid #444;">
                 <div style="color: #ffeb3b;">💡 手牌總照明: ${totalLight}</div>
                 <div style="color: #00e5ff;">🕯️ 地城需求: ${targetRank ? lightReq : '(未選目標)'}${auras.lightReqMod > 0 ? ` (+${auras.lightReqMod})` : ''}</div>
@@ -564,39 +585,39 @@ export class UIManager {
             </div>
         `;
 
-        // 彙整 Aura 資訊 (v3.10)
-        const activeAuras = [];
-        // 從地城中掃描所有怪物 Aura
-        for (let i = 1; i <= 3; i++) {
-            const m = this.game.dungeonHall[`rank${i}`];
-            if (m && m.abilities && m.abilities.aura) {
-                activeAuras.push({ name: m.name, desc: m.abilities.aura }); // Changed m.desc to m.abilities.aura
+            // 彙整 Aura 資訊 (v3.10)
+            const activeAuras = [];
+            // 從地城中掃描所有怪物 Aura
+            for (let i = 1; i <= 3; i++) {
+                const m = this.game.dungeonHall[`rank${i}`];
+                if (m && m.abilities && m.abilities.aura) {
+                    activeAuras.push({ name: m.name, desc: m.abilities.aura }); // Changed m.desc to m.abilities.aura
+                }
             }
-        }
 
-        const auraListHtml = activeAuras.length > 0 ? `
+            const auraListHtml = activeAuras.length > 0 ? `
             <div style="font-size: 11px; background: rgba(255,100,0,0.1); border: 1px solid rgba(255,100,0,0.2); padding: 5px; border-radius: 4px; margin-bottom: 8px;">
                 <strong style="color: #ff9800;">⚠️ 當前環境效果 (Aura):</strong><br>
                 ${activeAuras.map(a => `<span style="color: #eee;">• [${a.name}] ${a.desc}</span>`).join('<br>')}
             </div>
         ` : '';
 
-        if (!hero) {
-            summary.innerHTML = `
+            if (!hero) {
+                summary.innerHTML = `
                 ${calcGridHtml}
                 ${auraListHtml}
                 <div style="text-align: center; color: #ff5a59; padding: 10px; border: 1px dashed #ff5a59; border-radius: 4px;">
                     👉 請從下方手牌選取英雄與武器
                 </div>
             `;
-            return;
-        }
+                return;
+            }
 
-        const results = this.game.calculateHeroCombatStats(hero, weapon, monster, lightPenalty, totalLight, lightReq);
-        const { finalAtk, bonuses, rawPhysAtk, rawMagAtk, physAtk, magAtk } = results;
-        const adj = Math.max(0, lightReq - totalLight);
+            const results = this.game.calculateHeroCombatStats(hero, weapon, monster, lightPenalty, totalLight, lightReq);
+            const { finalAtk, bonuses, rawPhysAtk, rawMagAtk, physAtk, magAtk } = results;
+            const adj = Math.max(0, lightReq - totalLight);
 
-        summary.innerHTML = `
+            summary.innerHTML = `
             ${calcGridHtml}
             ${auraListHtml}
             <div style="border-bottom: 1px solid #444; padding-bottom: 5px; margin-bottom: 8px;">
@@ -622,46 +643,46 @@ export class UIManager {
                 🎯 目標：${monster ? monster.name + ' (❤️ ' + monster.currentHP + ' HP)' : '<span style="color:#ff5a59;">（未選取目標）</span>'}
             </div>
         `;
-        const btn = document.getElementById('combatAttackBtn');
-        if (btn) btn.disabled = !hero || !targetRank;
-    }
+            const btn = document.getElementById('combatAttackBtn');
+            if (btn) btn.disabled = !hero || !targetRank;
+        }
 
-    // --- 查看功能 ---
-    renderDeckView(title, list) {
-        const modal = document.getElementById('deckViewModal');
-        const titleEl = document.getElementById('deckViewTitle');
-        const listEl = document.getElementById('deckViewList');
-        if (!modal || !titleEl || !listEl) return;
+        // --- 查看功能 ---
+        renderDeckView(title, list) {
+            const modal = document.getElementById('deckViewModal');
+            const titleEl = document.getElementById('deckViewTitle');
+            const listEl = document.getElementById('deckViewList');
+            if (!modal || !titleEl || !listEl) return;
 
-        titleEl.textContent = title;
-        listEl.innerHTML = '';
+            titleEl.textContent = title;
+            listEl.innerHTML = '';
 
-        if (list.length === 0) {
-            listEl.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #888;">此區域目前無任何卡片</div>';
-        } else {
-            list.forEach(card => {
-                const el = document.createElement('div');
-                el.className = 'card small';
-                el.innerHTML = `
+            if (list.length === 0) {
+                listEl.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #888;">此區域目前無任何卡片</div>';
+            } else {
+                list.forEach(card => {
+                    const el = document.createElement('div');
+                    el.className = 'card small';
+                    el.innerHTML = `
                     <div class="card-type-tag" style="font-size: 8px;">${card.type}</div>
                     <div class="card-name" style="font-size: 11px;">${card.name}</div>
                     <div class="card-desc" style="font-size: 9px;">${card.desc || ''}</div>
                 `;
-                listEl.appendChild(el);
-            });
+                    listEl.appendChild(el);
+                });
+            }
+            modal.classList.add('active');
         }
-        modal.classList.add('active');
-    }
 
-    setText(id, text) {
-        const el = document.getElementById(id);
-        if (el) el.textContent = text;
-    }
+        setText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
 
-    show(id, isShow) {
-        const el = document.getElementById(id);
-        if (el) el.style.display = isShow ? 'block' : 'none';
-        if (el && id === 'gameStepButtons') el.style.display = isShow ? 'flex' : 'none';
-        if (el && id === 'villageFinishControl') el.style.display = isShow ? 'flex' : 'none';
+        show(id, isShow) {
+            const el = document.getElementById(id);
+            if (el) el.style.display = isShow ? 'block' : 'none';
+            if (el && id === 'gameStepButtons') el.style.display = isShow ? 'flex' : 'none';
+            if (el && id === 'villageFinishControl') el.style.display = isShow ? 'flex' : 'none';
+        }
     }
-}
