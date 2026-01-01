@@ -21,7 +21,15 @@ export class UIManager {
         const startBtn = document.getElementById('startGameBtn');
         if (startBtn) startBtn.onclick = () => this.game.startNewGame();
 
-        document.getElementById('btnVisitVillage').onclick = () => this.game.visitVillageAction();
+        this.setupEventListeners();
+
+        // [Deep Debug] Global Click Spy
+        document.addEventListener('click', (e) => {
+            console.log(`[Global Click] Target:`, e.target, `Classes: ${e.target.className}`);
+            if (e.target.classList.contains('monster-info-btn')) {
+                console.warn('[Global Click] HIT MONSTER INFO BUTTON!');
+            }
+        });
         document.getElementById('btnRest').onclick = () => this.game.restAction();
         document.getElementById('btnEnterDungeon').onclick = () => this.game.enterDungeonAction();
         document.getElementById('combatAttackBtn').onclick = () => this.game.performCombat();
