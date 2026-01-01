@@ -451,9 +451,8 @@ export class UIManager {
                     <div class="monster-hp" style="color: ${hpColor}; font-weight: bold;">❤️ HP: ${monster.currentHP}/${monster.monster.hp}</div>
                     <div style="font-size: 11px; color: #ff5a59; margin-top: 4px; font-weight: bold; background: #000; border: 1px solid #ff5a59; padding: 2px 8px; border-radius: 4px; display: inline-block; box-shadow: 0 0 5px rgba(255,90,89,0.3);">⚠️ 村莊受損: ${monster.monster.breachDamage || 1}</div>
                     <div style="font-size: 10px; color: #4caf50; margin-top: 2px;">✨ 獎勵: ${monster.monster.xpGain} XP</div>
-                    <div class="monster-info-btn-outer" style="margin-top: 8px; text-align: center;">
-                        <button class="monster-info-btn" style="background: #444; color: #fff; border-radius: 4px; padding: 5px 15px; cursor: pointer; border: 1px solid #777; font-size: 12px; display: inline-block; pointer-events: all !important; transition: all 0.2s;" title="查看怪物詳情">ⓘ 點擊詳情</button>
-                    </div>
+                    // v3.17: 統一 UI 樣式與增加除錯 Log
+                    <div class="card-info-btn monster-info-btn" style="top: 5px; right: 5px; cursor: pointer;" title="查看怪物詳情">ⓘ</div>
                 `;
 
                 // v3.16: 強化的程式化綁定，確保 ID 匹配與響應
@@ -461,10 +460,17 @@ export class UIManager {
                     const infoBtn = el.querySelector('.monster-info-btn');
                     if (infoBtn) {
                         infoBtn.onclick = (e) => {
+                            console.log(`[UI] Clicked info button for monster: ${monster.id} (Name: ${monster.name})`);
+                            if (this.game && this.game.logAction) {
+                                this.game.logAction(`[DEBUG] 點擊怪物詳情: ${monster.name} (${monster.id})`);
+                            }
+
                             e.preventDefault();
                             e.stopPropagation();
                             this.showMonsterDetail(monster.id);
                         };
+                    } else {
+                        console.warn(`[UI] Failed to find info button for monster ${monster.id}`);
                     }
                 }, 0);
                 if (this.game.state === GameState.COMBAT) {
@@ -508,10 +514,19 @@ export class UIManager {
      * 顯示怪物詳細資訊 Tooltip (v3.10)
      */
     showMonsterDetail(monsterId) {
+        console.log(`[UI] showMonsterDetail called with ID: ${monsterId}`);
         // v3.15: 自動校準 ID (例如 mon_rat_0 -> mon_rat)
         const templateId = monsterId.includes('_') ? monsterId.split('_')[0] : monsterId;
+        console.log(`[UI] Resolved template ID: ${templateId}`);
+
         const monster = this.game.getCardPoolItem(templateId);
-        if (!monster) return;
+        if (!monster) {
+            console.error(`[UI] Monster data not found for ID: ${templateId}`);
+            if (this.game && this.game.logAction) {
+                this.game.logAction(`[ERROR] 找不到怪物資料: ${templateId}`);
+            }
+            return;
+        }
 
         const overlay = document.getElementById('cardTooltipOverlay');
         if (!overlay) return;
