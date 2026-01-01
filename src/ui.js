@@ -21,7 +21,7 @@ export class UIManager {
         const startBtn = document.getElementById('startGameBtn');
         if (startBtn) startBtn.onclick = () => this.game.startNewGame();
 
-        this.setupEventListeners();
+        document.getElementById('btnVisitVillage').onclick = () => this.game.visitVillageAction();
 
         // [Deep Debug] Global Click Spy
         document.addEventListener('click', (e) => {
