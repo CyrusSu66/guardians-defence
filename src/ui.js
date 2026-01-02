@@ -423,6 +423,8 @@ export class UIManager {
             el.textContent = `> ${l.message}`;
             container.appendChild(el);
         });
+        // v3.21.3: 自動捲動至最底部 (Auto-scroll to bottom)
+        container.scrollTop = container.scrollHeight;
     }
 
     renderDungeonRanks() {
