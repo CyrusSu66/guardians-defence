@@ -467,6 +467,7 @@ body {
 }
 
 .card-bottom-row {
+    margin-top: auto;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
