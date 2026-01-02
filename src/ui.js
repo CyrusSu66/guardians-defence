@@ -608,17 +608,7 @@ export class UIManager {
         // v3.19: 更穩健的 ID 解析 (移除 _0, _1 等動態後綴)
         // 假設 ID 格式為 mon_name_index，嘗試只取前兩段 (mon_name)
         let templateId = monsterId;
-        if (monsterId.startsWith('mon_') && monsterId.split('_').length > 2) {
-            templateId = monsterId.split('_').slice(0, 2).join('_');
-        }
-        console.log(`[UI] Resolved template ID: ${templateId}`);
 
-        let monster = this.game.getCardPoolItem(templateId);
-
-        // Fallback: 如果直接解析失敗，嘗試用完整 ID 查找，或當作是獨立實例查找
-        if (!monster) {
-            monster = this.game.getCardPoolItem(monsterId);
-        }
 
 
 
