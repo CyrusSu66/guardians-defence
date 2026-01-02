@@ -663,7 +663,13 @@ export class UIManager {
             </div>
 
             <div style="font-size: 11px; color: #aaa; margin-top: 10px; line-height: 1.4; max-height: 80px; overflow-y: auto; padding-left: 5px; border-left: 2px solid #555;">
-                ${bonuses.length > 0 ? '🔹 ' + bonuses.join('<br>🔹 ') : '（無特殊效果）'}
+                ${bonuses.length > 0 ? '🔹 ' + bonuses.join('<br>🔹 ') :
+                `📝 卡牌資訊:<br>
+                     ${hero ? `[${hero.name}] ${hero.desc}<br>` : ''}
+                     ${damageItem ? `[${damageItem.name}] ${damageItem.desc || damageItem.description}<br>` : ''}
+                     ${auxItem ? `[${auxItem.name}] ${auxItem.desc || auxItem.description}` : ''}
+                    `
+            }
             </div>
 
             <div style="margin-top: 10px; font-weight: bold; border-top: 1px solid #444; padding-top: 8px;">
