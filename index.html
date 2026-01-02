@@ -22,14 +22,14 @@
             </div>
 
             <div class="stats-container">
-                <div class="stat-card shield-stat">
+                <div class="stat-card shield-stat" style="display: flex; align-items: center; gap: 10px;">
                     <div class="stat-icon">🛡️</div>
-                    <div class="stat-info">
-                        <label>魔法護罩</label>
-                        <div class="progress-bar-container">
+                    <div class="stat-info" style="flex: 1; display: flex; align-items: center; gap: 10px;">
+                        <label style="margin: 0; white-space: nowrap;">魔法護罩</label>
+                        <div class="progress-bar-container" style="flex: 1; margin: 0; height: 8px;">
                             <div class="progress-bar-fill" id="shieldBar" style="width: 100%;"></div>
                         </div>
-                        <span class="stat-value-text" id="villageHP">20</span>
+                        <span class="stat-value-text" id="villageHP" style="font-size: 16px;">20</span>
                     </div>
                 </div>
 
@@ -45,13 +45,6 @@
                         <label>經驗 / 戰果</label>
                         <span class="stat-value-text"><span id="currentXP">0</span> XP | <span id="totalScore">0</span>
                             VP</span>
-                    </div>
-                </div>
-
-                <div class="stat-card status-state">
-                    <div class="stat-info">
-                        <label>狀態</label>
-                        <span class="stat-value-text" id="gameState">待命</span>
                     </div>
                 </div>
             </div>
