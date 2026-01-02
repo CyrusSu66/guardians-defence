@@ -27,6 +27,11 @@ export class CombatEngine {
         const auras = this.getActiveAuras();
 
         // 1. 負重檢查
+        // 1. 負重與類型檢查
+        if (!hero.hero) {
+            return g.addLog(`❌【錯誤】所選卡牌 ${hero.name} 不是有效的英雄單位！`, 'danger');
+        }
+
         let heroStr = hero.hero.strength + (auras.strMod || 0);
         if (weapon && heroStr < weapon.equipment.weight) {
             return g.addLog(`❌ 負重不足！${hero.name} 無法使用 ${weapon.name}`, 'danger');
@@ -39,7 +44,8 @@ export class CombatEngine {
 
         // 3. 計算地城需求與懲罰
         const lightReq = g.combat.targetRank + (auras.lightReqMod || 0);
-        const lightPenalty = Math.max(0, lightReq - totalLight) * 1;
+        // v3.21.2: 修正照明懲罰，每欠缺 1 點照明扣除 2 點戰力
+        const lightPenalty = Math.max(0, lightReq - totalLight) * 2;
 
         // 4. 計算詳情
         let { physAtk, magAtk, bonuses, finalAtk } = this.calculateStats(hero, weapon, monster, lightPenalty, totalLight, lightReq);

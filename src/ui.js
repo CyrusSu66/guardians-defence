@@ -57,6 +57,13 @@ export class UIManager {
         this.setText('btnDeckCount', g.deck.length);
         this.setText('btnDiscardCount', g.discard.length);
 
+        // v3.21.2: 控制村莊核心(Market)顯示，僅在閒置(選擇行動)或造訪村莊時顯示
+        const plazaPanel = document.querySelector('.village-plaza');
+        if (plazaPanel) {
+            const shouldShow = (!g.currentAction || g.currentAction === 'VILLAGE');
+            plazaPanel.style.display = shouldShow ? 'block' : 'none';
+        }
+
         // v3.3: 版號直接更新到標題
         const titleEl = document.getElementById('gameTitle');
         if (titleEl) titleEl.innerText = `⚔️ 守護者防線 Guardians Defence ${g.version}`;
