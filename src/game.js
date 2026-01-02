@@ -40,6 +40,7 @@ class GuardiansDefenceGame {
         this.totalScore = 0;
 
         this.deck = [];
+        this.hand = [];
         this.discard = [];
         this.playedCards = [];
 
@@ -59,8 +60,16 @@ class GuardiansDefenceGame {
     // --- 遊戲初始化 ---
 
     startNewGame() {
-        this.addLog('正在初始系統資源...', 'info');
-        this.init();
+        try {
+            console.log('[Game] startNewGame begun');
+            this.addLog('正在初始系統資源...', 'info');
+            this.init();
+            console.log('[Game] init completed');
+        } catch (e) {
+            console.error('[Game] init failed:', e);
+            alert('Init Failed: ' + e.message);
+            return;
+        }
         const startingIds = [
             'basic_regular_army', 'basic_regular_army', 'basic_regular_army',
             'basic_regular_army', 'basic_regular_army', 'basic_regular_army',
