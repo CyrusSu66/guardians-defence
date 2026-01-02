@@ -46,6 +46,14 @@ export class UIManager {
         const g = this.game;
         this.setText('villageHP', g.villageHP);
         document.getElementById('villageHP')?.classList.toggle('danger', g.villageHP <= 5);
+
+        // v3.23: Shield Progress Bar
+        const barEl = document.getElementById('shieldBar');
+        if (barEl) {
+            const pct = Math.max(0, Math.min(100, (g.villageHP / 20) * 100));
+            barEl.style.width = `${pct}%`;
+            barEl.style.background = g.villageHP < 5 ? '#e74c3c' : 'linear-gradient(90deg, #9b59b6, #8e44ad)';
+        }
         this.setText('totalScore', g.totalScore);
         this.setText('currentXP', g.currentXP);
         this.setText('turnNumber', g.turn);
