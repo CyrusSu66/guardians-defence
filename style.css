@@ -278,13 +278,7 @@ body {
     padding: 2px;
 }
 
-.monster-stats {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    font-size: 10px;
-    opacity: 0.9;
-}
+/* .monster-stats removed */
 
 .breach-dmg {
     color: #ff5a59;
