@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.22(01-02-12:30)"; // 3欄位戰鬥重構(輔助/英雄/裝備)
+        this.version = "v3.22.1(01-02-12:35)"; // Hotfix: 修復 Aura 顯示錯誤
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);
