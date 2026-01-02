@@ -113,9 +113,11 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <div class="panel-title">🎴 戰略手牌</div>
                 <div style="display: flex; gap: 8px;">
-                    <button class="btn" style="padding: 4px 8px; font-size: 10px; background: #333;"
+                    <button class="btn"
+                        style="padding: 4px 10px; font-size: 11px; background: #f0f0f0; color: #000; font-weight: bold;"
                         onclick="window.game.showDeckModal('deck')">牌庫 (<span id="btnDeckCount">0</span>)</button>
-                    <button class="btn" style="padding: 4px 8px; font-size: 10px; background: #333;"
+                    <button class="btn"
+                        style="padding: 4px 10px; font-size: 11px; background: #f0f0f0; color: #000; font-weight: bold;"
                         onclick="window.game.showDeckModal('discard')">棄牌 (<span id="btnDiscardCount">0</span>)</button>
                 </div>
             </div>
@@ -144,7 +146,6 @@
             </div>
             <div class="plaza-tabs">
                 <button class="plaza-tab-btn active" id="tab-market">🛒 廣場市集</button>
-                <button class="plaza-tab-btn" id="tab-training">⚔️ 訓練升級</button>
             </div>
 
             <div id="villageFinishControl"
