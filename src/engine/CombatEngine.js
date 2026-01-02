@@ -39,10 +39,12 @@ export class CombatEngine {
 
         // v3.22: 輔助卡片帶來的力量加成 (如乾糧)
         let auxStrBonus = 0;
-        if (auxItem && auxItem.abilities && auxItem.abilities.onBattle === 'boost_str_2') {
-            auxStrBonus = 2;
+        // v3.22.11: 乾糧改為 boost_str_1 (+1 STR)
+        if (auxItem && auxItem.abilities && auxItem.abilities.onBattle === 'boost_str_1') {
+            auxStrBonus = 1;
         }
 
+        // v3.22.11: 數值整合 - 力量 (Strength) 同時代表 負重 和 基礎攻擊
         let heroStr = hero.hero.strength + auxStrBonus + (auras.strMod || 0);
 
         // 如果裝備有重量，檢查負重
@@ -61,7 +63,7 @@ export class CombatEngine {
         const lightPenalty = Math.max(0, lightReq - totalLight) * 2;
 
         // 4. 計算詳情
-        let { finalAtk } = this.calculateStats(hero, damageItem, monster, lightPenalty, totalLight, lightReq, auxItem);
+        let { finalAtk } = this.calculateStats(hero, damageItem, monster, lightPenalty, totalLight, lightReq, auxItem, heroStr);
 
         if (finalAtk <= 0) {
             return g.addLog(`❌ 攻擊力不足以造成傷害 (最終傷害: ${finalAtk})。`, 'warning');
@@ -112,12 +114,12 @@ export class CombatEngine {
     /**
      * 計算 3 欄位組合的詳細戰鬥數值
      */
-    calculateStats(hero, damageItem, monster, lightPenalty, totalLight = 0, lightReq = 0, auxItem = null) {
+    calculateStats(hero, damageItem, monster, lightPenalty, totalLight = 0, lightReq = 0, auxItem = null, heroStr = 0) {
         const auras = this.getActiveAuras();
 
-        // 基礎數值
-        let physAtk = hero.hero.attack + auras.atkMod;
-        let magAtk = hero.hero.magicAttack;
+        // 基礎傷害來自力量
+        let physAtk = heroStr;
+        let magAtk = hero.hero.magicAttack || 0;
 
         let bonuses = [];
         // 環境
@@ -130,8 +132,8 @@ export class CombatEngine {
         }
 
         // 輔助加成 (v3.22)
-        if (auxItem && auxItem.abilities && auxItem.abilities.onBattle === 'boost_str_2') {
-            bonuses.push('乾糧補給: 負重 +2');
+        if (auxItem && auxItem.abilities && auxItem.abilities.onBattle === 'boost_str_1') {
+            bonuses.push('乾糧補給: 力量 +1');
         }
 
         // 英雄戰鬥技能

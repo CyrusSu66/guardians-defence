@@ -200,7 +200,7 @@ export class UIManager {
     getStatsHtml(card, isMarket = false) {
         let stats = '';
         if (card.type === 'Hero') {
-            stats = `<div class="card-stats">⚔️ ${card.hero.attack} | 🪄 ${card.hero.magicAttack} | 💪 ${card.hero.strength}</div>`;
+            stats = `<div class="card-stats">🪄 ${card.hero.magicAttack} | 💪 ${card.hero.strength}</div>`;
             if (card.abilities) {
                 stats += '<div style="display:flex; gap:2px; margin-top:3px;">';
                 if (card.abilities.onVillage) stats += `<div class="skill-tag village">🏠</div>`;

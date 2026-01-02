@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.22.10(01-02-14:45)"; // UI Polish: Buttons & Cleanups
+        this.version = "v3.22.11(01-02-14:58)"; // Stat Merge: Atk merged into Str
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);
