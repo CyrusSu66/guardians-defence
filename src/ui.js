@@ -118,8 +118,12 @@ export class UIManager {
 
         g.hand.forEach((card, idx) => {
             let isSelected = false;
-            // 戰鬥選中標記
-            if (g.combat && (g.combat.selectedHeroIdx === idx || g.combat.selectedWeaponIdx === idx)) {
+            // 戰鬥選中標記 (v3.22)
+            if (g.combat && (
+                g.combat.selectedHeroIdx === idx ||
+                g.combat.selectedDamageIdx === idx ||
+                g.combat.selectedAuxIdx === idx
+            )) {
                 isSelected = true;
             }
             // 休息選中標記
@@ -131,8 +135,16 @@ export class UIManager {
                 if (g.currentAction === 'VILLAGE' || g.currentAction === 'REST') {
                     g.playCard(idx);
                 } else if (g.state === GameState.COMBAT) {
-                    if (card.type === 'Hero') g.combat.selectedHeroIdx = idx;
-                    else if (card.type === 'Weapon') g.combat.selectedWeaponIdx = idx;
+                    // v3.22: 3欄位選擇邏輯
+                    if (card.type === 'Hero') {
+                        g.combat.selectedHeroIdx = (g.combat.selectedHeroIdx === idx) ? null : idx;
+                    }
+                    else if (card.type === 'Weapon' || card.type === 'Spell') {
+                        g.combat.selectedDamageIdx = (g.combat.selectedDamageIdx === idx) ? null : idx;
+                    }
+                    else if (card.type === 'Item' || card.type === 'Food') {
+                        g.combat.selectedAuxIdx = (g.combat.selectedAuxIdx === idx) ? null : idx;
+                    }
                     this.updateUI();
                 }
             };
@@ -554,19 +566,42 @@ export class UIManager {
         const summary = document.getElementById('combatSummary');
         if (!summary || this.game.state !== GameState.COMBAT) return;
 
-        const { selectedHeroIdx, selectedWeaponIdx, targetRank } = this.game.combat;
+        const { selectedHeroIdx, selectedDamageIdx, selectedAuxIdx, targetRank } = this.game.combat;
         const hero = this.game.hand[selectedHeroIdx];
-        const weapon = this.game.hand[selectedWeaponIdx];
+        const damageItem = this.game.hand[selectedDamageIdx];
+        const auxItem = this.game.hand[selectedAuxIdx];
         const monster = targetRank ? this.game.dungeonHall[`rank${targetRank}`] : null;
 
         let totalLight = 0;
         this.game.hand.forEach(c => totalLight += (c.light || 0));
         this.game.playedCards.forEach(c => totalLight += (c.light || 0));
 
-        // v3.11：恢復受限照明修正
-        const auras = this.game.calculateHeroCombatStats(hero || { hero: { attack: 0, magicAttack: 0 } }, null, null, 0).auras || { lightReqMod: 0 };
+        // v3.22: 傳遞 auxItem 參與計算
+        const results = this.game.calculateHeroCombatStats(
+            hero || { hero: { attack: 0, magicAttack: 0 } },
+            damageItem,
+            monster,
+            0, // temp penalty, recalculated inside
+            totalLight,
+            targetRank ? targetRank : 0,
+            auxItem
+        );
+        const auras = results.auras || { lightReqMod: 0 };
         const lightReq = targetRank ? (targetRank + (auras.lightReqMod || 0)) : 0;
         const lightPenalty = targetRank ? Math.max(0, lightReq - totalLight) * 2 : 0;
+
+        // Recalculate with correct penalty
+        const finalResults = this.game.calculateHeroCombatStats(
+            hero || { hero: { attack: 0, magicAttack: 0 } },
+            damageItem,
+            monster,
+            lightPenalty,
+            totalLight,
+            lightReq,
+            auxItem
+        );
+        const { finalAtk, bonuses, physAtk, magAtk } = finalResults;
+        const adj = Math.max(0, lightReq - totalLight);
 
         const calcGridHtml = `
             <div class="combat-calc-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; margin-bottom: 12px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 6px; border: 1px solid #444;">
@@ -578,58 +613,57 @@ export class UIManager {
             </div>
         `;
 
-        // 彙整 Aura 資訊 (v3.10)
+        const auraListHtml = this.renderAuras(); // Refactored helper if exists, or inline below
+
+        // 3-Slot Visual Display
+        const renderSlot = (label, card, placeholder) => `
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid ${card ? '#4caf50' : '#444'}; border-radius: 4px; padding: 6px; text-align: center; height: 100%;">
+                <div style="font-size: 10px; color: #888; margin-bottom: 4px;">${label}</div>
+                ${card ? `
+                    <div style="font-weight: bold; color: #fff; font-size: 12px;">${card.name}</div>
+                    <div style="font-size: 9px; color: #aaa;">${card.subTypes ? card.subTypes.join('/') : card.type}</div>
+                ` : `<div style="font-size: 11px; color: #555; padding: 5px;">${placeholder}</div>`}
+            </div>
+        `;
+
+        const slotsHtml = `
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 10px;">
+                ${renderSlot('🟢 輔助物品', auxItem, '選擇食物/道具')}
+                ${renderSlot('🔴 英雄', hero, '選擇英雄')}
+                ${renderSlot('🔵 傷害裝備', damageItem, '選擇武器/法術')}
+            </div>
+        `;
+
+        // Render Auras inline for now (since helper doesn't exist yet)
         const activeAuras = [];
-        // 從地城中掃描所有怪物 Aura
         for (let i = 1; i <= 3; i++) {
             const m = this.game.dungeonHall[`rank${i}`];
             if (m && m.abilities && m.abilities.aura) {
-                activeAuras.push({ name: m.name, desc: m.abilities.aura }); // Changed m.desc to m.abilities.aura
+                activeAuras.push({ name: m.name, desc: m.abilities.aura });
             }
         }
-
-        const auraListHtml = activeAuras.length > 0 ? `
+        const auraHtml = activeAuras.length > 0 ? `
             <div style="font-size: 11px; background: rgba(255,100,0,0.1); border: 1px solid rgba(255,100,0,0.2); padding: 5px; border-radius: 4px; margin-bottom: 8px;">
-                <strong style="color: #ff9800;">⚠️ 當前環境效果 (Aura):</strong><br>
+                <strong style="color: #ff9800;">⚠️ 環境 (Aura):</strong><br>
                 ${activeAuras.map(a => `<span style="color: #eee;">• [${a.name}] ${a.desc}</span>`).join('<br>')}
             </div>
         ` : '';
 
-        if (!hero) {
-            summary.innerHTML = `
-                ${calcGridHtml}
-                ${auraListHtml}
-                <div style="text-align: center; color: #ff5a59; padding: 10px; border: 1px dashed #ff5a59; border-radius: 4px;">
-                    👉 請從下方手牌選取英雄與武器
-                </div>
-            `;
-            return;
-        }
-
-        const results = this.game.calculateHeroCombatStats(hero, weapon, monster, lightPenalty, totalLight, lightReq);
-        const { finalAtk, bonuses, rawPhysAtk, rawMagAtk, physAtk, magAtk } = results;
-        const adj = Math.max(0, lightReq - totalLight);
-
         summary.innerHTML = `
             ${calcGridHtml}
-            ${auraListHtml}
-            <div style="border-bottom: 1px solid #444; padding-bottom: 5px; margin-bottom: 8px;">
-                <strong>當前出戰：</strong> ${hero.name} ${weapon ? ' + ' + weapon.name : ''}
-            </div>
-
+            ${auraHtml}
+            ${slotsHtml}
+            
             <div style="font-size: 16px; color: var(--color-primary); font-weight: bold; text-align: center; background: rgba(0,255,136,0.1); padding: 8px; border-radius: 4px; border: 1px solid rgba(0,255,136,0.3); box-shadow: 0 0 10px rgba(0,255,136,0.1);">
-                💪 預估總傷害：${finalAtk}
+                💪 預估總傷害：${hero ? finalAtk : '-'}
             </div>
             
-            <div style="font-size: 11px; color: #888; text-align: center; margin-top: 6px; font-family: monospace; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 4px;">
-                <div>解析: (⚔️ ${physAtk} + 🪄 ${magAtk}) - ⚖️ ${lightPenalty} = ${finalAtk}</div>
-                <div style="font-size: 9px; opacity: 0.7; margin-top: 2px;">
-                    照明微調: (Req ${lightReq} - Lgt ${totalLight}) = ${adj} (Penalty x2)
-                </div>
+            <div style="font-size: 11px; color: #888; text-align: center; margin-top: 6px; font-family: monospace; padding: 5px;">
+                ${hero ? `(⚔️ ${physAtk} + 🪄 ${magAtk}) - ⚖️ ${lightPenalty} = ${finalAtk}` : '請配置英雄進行計算'}
             </div>
 
-            <div style="font-size: 11px; color: #aaa; margin-top: 10px; line-height: 1.4; max-height: 60px; overflow-y: auto; padding-left: 5px; border-left: 2px solid #555;">
-                ${bonuses.length > 0 ? '🔹 ' + bonuses.join('<br>🔹 ') : '（無其他特殊修正）'}
+            <div style="font-size: 11px; color: #aaa; margin-top: 10px; line-height: 1.4; max-height: 80px; overflow-y: auto; padding-left: 5px; border-left: 2px solid #555;">
+                ${bonuses.length > 0 ? '🔹 ' + bonuses.join('<br>🔹 ') : '（無特殊效果）'}
             </div>
 
             <div style="margin-top: 10px; font-weight: bold; border-top: 1px solid #444; padding-top: 8px;">

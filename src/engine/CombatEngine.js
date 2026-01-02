@@ -11,6 +11,9 @@ export class CombatEngine {
     /**
      * 執行一次戰鬥進攻 (英雄+武器 對 怪物) (v3.11)
      */
+    /**
+     * 執行一次戰鬥進攻 (3欄位系統: 輔助/英雄/裝備 對 怪物) (v3.22)
+     */
     perform() {
         const g = this.game;
         if (!g.combat.targetRank) return g.addLog('請選擇目標怪物。', 'danger');
@@ -18,23 +21,33 @@ export class CombatEngine {
         if (!monster) return;
 
         const hIdx = g.combat.selectedHeroIdx;
-        const wIdx = g.combat.selectedWeaponIdx;
+        const dIdx = g.combat.selectedDamageIdx; // Weapon / Spell
+        const aIdx = g.combat.selectedAuxIdx;    // Food / Item
+
         const hero = g.hand[hIdx];
-        const weapon = g.hand[wIdx];
+        const damageItem = g.hand[dIdx];
+        const auxItem = g.hand[aIdx];
 
         if (!hero) return g.addLog('請至少選擇一名英雄。', 'danger');
 
         const auras = this.getActiveAuras();
 
-        // 1. 負重檢查
         // 1. 負重與類型檢查
         if (!hero.hero) {
             return g.addLog(`❌【錯誤】所選卡牌 ${hero.name} 不是有效的英雄單位！`, 'danger');
         }
 
-        let heroStr = hero.hero.strength + (auras.strMod || 0);
-        if (weapon && heroStr < weapon.equipment.weight) {
-            return g.addLog(`❌ 負重不足！${hero.name} 無法使用 ${weapon.name}`, 'danger');
+        // v3.22: 輔助卡片帶來的力量加成 (如乾糧)
+        let auxStrBonus = 0;
+        if (auxItem && auxItem.abilities && auxItem.abilities.onBattle === 'boost_str_2') {
+            auxStrBonus = 2;
+        }
+
+        let heroStr = hero.hero.strength + auxStrBonus + (auras.strMod || 0);
+
+        // 如果裝備有重量，檢查負重
+        if (damageItem && damageItem.equipment && damageItem.equipment.weight > heroStr) {
+            return g.addLog(`❌ 負重不足！${hero.name} (STR ${heroStr}) 無法配備 ${damageItem.name} (WGT ${damageItem.equipment.weight})`, 'danger');
         }
 
         // 2. 統計總照明
@@ -48,7 +61,7 @@ export class CombatEngine {
         const lightPenalty = Math.max(0, lightReq - totalLight) * 2;
 
         // 4. 計算詳情
-        let { physAtk, magAtk, bonuses, finalAtk } = this.calculateStats(hero, weapon, monster, lightPenalty, totalLight, lightReq);
+        let { finalAtk } = this.calculateStats(hero, damageItem, monster, lightPenalty, totalLight, lightReq, auxItem);
 
         if (finalAtk <= 0) {
             return g.addLog(`❌ 攻擊力不足以造成傷害 (最終傷害: ${finalAtk})。`, 'warning');
@@ -56,13 +69,17 @@ export class CombatEngine {
 
         // 5. 扣除怪物血量
         monster.currentHP -= finalAtk;
-        g.addLog(`⚔️ ${hero.name}${weapon ? ' 持 ' + weapon.name : ''} 對 ${monster.name} 造成 ${finalAtk} 點傷害！`, 'info');
+        const weaponName = damageItem ? ` 配備 ${damageItem.name}` : '';
+        const auxName = auxItem ? ` 使用 ${auxItem.name}` : '';
+        g.addLog(`⚔️ ${hero.name}${weaponName}${auxName} 對 ${monster.name} 造成 ${finalAtk} 點傷害！`, 'info');
 
         if (monster.currentHP <= 0) {
             g.addLog(`✨ 擊斃 ${monster.name}！`, 'success');
             if (hero.abilities && hero.abilities.onVictory) {
                 g.triggerCardEffect(hero.abilities.onVictory, hero.name);
             }
+            // v3.22: 輔助卡若有勝利效果 (目前無，預留)
+
             g.currentXP += monster.monster.xpGain;
             g.totalScore += (monster.vp || 0);
             g.dungeonHall[`rank${g.combat.targetRank}`] = null;
@@ -76,50 +93,61 @@ export class CombatEngine {
             g.addLog(`🛡️ ${monster.name} 剩餘 HP: ${monster.currentHP}/${monster.monster.hp}`, 'warning');
         }
 
-        // 6. 消耗卡片
+        // 6. 消耗卡片 (全部投入棄牌堆)
         const toDiscard = [hIdx];
-        if (wIdx !== null) toDiscard.push(wIdx);
+        if (dIdx !== null) toDiscard.push(dIdx);
+        if (aIdx !== null) toDiscard.push(aIdx);
+
+        // 從大到小排序刪除，避免索引偏移
         toDiscard.sort((a, b) => b - a).forEach(i => g.discard.push(g.hand.splice(i, 1)[0]));
 
-        g.combat = { selectedHeroIdx: null, selectedWeaponIdx: null, targetRank: g.combat.targetRank };
+        // 重置選擇
+        g.combat = { selectedHeroIdx: null, selectedDamageIdx: null, selectedAuxIdx: null, targetRank: g.combat.targetRank };
         g.updateUI();
     }
 
     /**
-     * 計算英雄與武器組合的詳細戰鬥數值 (v3.11 校準)
+     * 計算 3 欄位組合的詳細戰鬥數值
      */
-    calculateStats(hero, weapon, monster, lightPenalty, totalLight = 0, lightReq = 0) {
+    calculateStats(hero, damageItem, monster, lightPenalty, totalLight = 0, lightReq = 0, auxItem = null) {
         const auras = this.getActiveAuras();
-        let physAtk = hero.hero.attack + (weapon ? weapon.equipment.attack : 0) + auras.atkMod;
-        let magAtk = hero.hero.magicAttack + (weapon ? weapon.equipment.magicAttack : 0);
-        let bonuses = [];
 
-        // 包含環境效果描述
+        // 基礎數值
+        let physAtk = hero.hero.attack + auras.atkMod;
+        let magAtk = hero.hero.magicAttack;
+
+        let bonuses = [];
+        // 環境
         auras.auraSources.forEach(s => bonuses.push(`環境影響: ${s}`));
 
-        // 1. 記錄原始數值
-        const rawPhys = physAtk;
-        const rawMag = magAtk;
+        // 裝備數值
+        if (damageItem && damageItem.equipment) {
+            physAtk += (damageItem.equipment.attack || 0);
+            magAtk += (damageItem.equipment.magicAttack || 0);
+        }
 
-        // 2. 英雄戰鬥技能加成
+        // 輔助加成 (v3.22)
+        if (auxItem && auxItem.abilities && auxItem.abilities.onBattle === 'boost_str_2') {
+            bonuses.push('乾糧補給: 負重 +2');
+        }
+
+        // 英雄戰鬥技能
         if (hero.abilities && hero.abilities.onBattle) {
             const effect = hero.abilities.onBattle;
-            if (hero.hero.series === 'Dwarf' && weapon) {
+            if (hero.hero.series === 'Dwarf' && damageItem && damageItem.type === 'Weapon') {
                 physAtk += 1;
                 bonuses.push('矮人武裝: +1 Atk');
             }
             if (effect === 'light_compensation' && lightPenalty > 0) {
-                let currentLight = 0;
-                this.game.hand.forEach(c => currentLight += (c.light || 0));
-                this.game.playedCards.forEach(c => currentLight += (c.light || 0));
-                if (currentLight > 0) {
-                    physAtk += currentLight;
-                    bonuses.push(`騎士信仰(光照補償): +${currentLight} Atk`);
+                // ...existing logic needed? Yes.
+                if (totalLight > 0) { // Using cached totalLight
+                    physAtk += totalLight;
+                    bonuses.push(`騎士信仰(光照補償): +${totalLight} Atk`);
                 }
             }
         }
 
-        // 3. 處理怪物免疫 (Immunity)
+        // 怪物免疫
         let filteredPhys = physAtk;
         let filteredMag = magAtk;
 
@@ -128,20 +156,13 @@ export class CombatEngine {
                 filteredPhys = 0;
                 bonuses.push('物理免疫: 物理傷害歸零');
             } else if (monster.abilities.battle === 'magic_only') {
-                filteredPhys = 0; // v3.9修正：原本為 1，現在歸零
+                filteredPhys = 0;
                 bonuses.push('魔法限定: 物理傷害歸零');
             }
         }
 
-        // 4. 計算照明懲罰
-        // 照明調整值 = Math.max(0, 地城需求 - 手牌總照明)
-        // 最終照明懲罰 = 照明調整值 * 2
-        // 已由參數 lightPenalty 傳入 (此參數在 Game.js 中計算為 (Req - Sum)*2)
-
         let prePenaltyTotal = filteredPhys + filteredMag;
         let finalAtk = Math.max(0, prePenaltyTotal - lightPenalty);
-
-        // v3.16: 保底傷害機制已移除 (2026-01-02)
 
         if (lightPenalty > 0) bonuses.push(`照明懲罰: -${lightPenalty} 戰力`);
 
@@ -155,7 +176,7 @@ export class CombatEngine {
             totalLight,
             lightReq,
             lightPenalty,
-            auras // v3.11
+            auras
         };
     }
 

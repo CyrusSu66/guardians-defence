@@ -49,7 +49,8 @@ class GuardiansDefenceGame {
 
         this.marketItems = { basics: [], heroes: [], items: [], spells: [] };
         this.log = [];
-        this.combat = null;
+        // v3.22: 3欄位戰鬥配置
+        this.combat = { targetRank: null, selectedHeroIdx: null, selectedDamageIdx: null, selectedAuxIdx: null };
 
         this.currentAction = null;
         this.hasBought = false;
