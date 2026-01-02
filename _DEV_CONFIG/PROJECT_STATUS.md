@@ -19,6 +19,14 @@
 
 以下列出此專案尚待開發的功能或是可以探索的方向：
 
+### 🎯 下一個工作目標 (Next Goals)
+- [ ] **道具使用機制 (Item Usage)**: 建立從手牌直接使用藥水、卷軸等消耗品的機制 (非戰鬥裝備)。
+- [ ] **未實作能力補完**:
+    - `basic_regular_army`: `synergy_spear_draw`
+    - `hero_sevin_lv2`: `light_compensation`
+    - `hero_sevin_lv3`: `buy_light`
+    - `item_antidote`: 補完「抽1張牌」效果
+
 ### 優先級：高 (Priority: High)
 - [ ] **音效系統 (Sound FX)**: 目前遊戲完全靜音，建議加入簡單的點擊、戰鬥、怪物嘶吼音效。
 - [ ] **本地儲存 (Local Storage)**: 實作 `save/load` 功能，讓玩家重整網頁後不會遺失進度。
