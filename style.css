@@ -198,18 +198,113 @@ body {
     gap: 10px;
 }
 
-/* Dungeon Slot/Card Placeholder */
-.dungeon-rank {
-    width: 110px;
-    height: 150px;
-    background: #222;
-    border: 1px dashed #555;
-    border-radius: 6px;
-    position: relative;
+/* Dungeon Slot/Card Placeholder (Redesign v3.23.1) */
+.dungeon-rank-slots {
+    display: flex;
+    gap: 12px;
+}
+
+.dungeon-rank-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100px;
+}
+
+.rank-header-text {
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 6px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.rank-placeholder {
+    width: 100%;
+    height: 130px;
+    border-radius: 8px;
+    position: relative;
+    box-sizing: border-box;
+    transition: all 0.2s;
+}
+
+.rank-placeholder.dashed {
+    border: 2px dashed #444;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.rank-placeholder.monster-active {
+    border: 1px solid #555;
+    background: linear-gradient(145deg, #1e1e1e, #131313);
+    padding: 8px 4px;
+    display: flex;
+    align-items: center;
     justify-content: center;
+}
+
+/* Boss/Target Styles */
+.dungeon-rank-wrapper.boss-marked .rank-placeholder {
+    border-color: #00e5ff;
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.2);
+}
+
+.dungeon-rank-wrapper.target-locked .rank-placeholder {
+    border-color: #e74c3c;
+    box-shadow: 0 0 15px rgba(231, 76, 60, 0.4);
+    transform: scale(1.05);
+}
+
+/* Monster Inner Content */
+.monster-mini-card {
+    width: 100%;
+    text-align: center;
+}
+
+.monster-name {
+    font-size: 11px;
+    font-weight: bold;
+    color: #ecf0f1;
+    margin-bottom: 5px;
+    line-height: 1.2;
+    overflow: hidden;
+    height: 26px;
+}
+
+.monster-hp {
+    font-size: 11px;
+    margin-bottom: 5px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    padding: 2px;
+}
+
+.monster-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 10px;
+    opacity: 0.9;
+}
+
+.breach-dmg {
+    color: #ff5a59;
+}
+
+.xp-gain {
+    color: #2ecc71;
+}
+
+.info-icon {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 10px;
+    color: #666;
+    cursor: pointer;
+}
+
+.info-icon:hover {
+    color: #fff;
 }
 
 /* Action Grid */

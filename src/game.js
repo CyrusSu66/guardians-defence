@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.23.0(01-02-23:15)"; // UI Overhaul: Design Spec v1.0
+        this.version = "v3.23.1(01-02-23:48)"; // UI Refine: Header & Dungeon Slots
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);

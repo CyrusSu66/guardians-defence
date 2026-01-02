@@ -83,7 +83,7 @@ export class UIManager {
             [GameState.MONSTER_ADVANCE]: '⚠️ 敵軍推進',
             [GameState.GAME_OVER]: '💀 戰役結束'
         };
-        this.setText('gameState', stateLabels[g.state] || '通訊中斷');
+        // gameState display removed per user request
 
         // v3.3: 面板與啟動按鈕顯示邏輯
         const isIdle = g.state === GameState.IDLE || g.state === GameState.GAME_OVER;
@@ -454,44 +454,67 @@ export class UIManager {
         const container = document.getElementById('dungeonRankSlots');
         if (!container) return;
         container.innerHTML = '';
+
         [1, 2, 3].forEach(rank => {
-            const el = document.createElement('div');
-            el.className = 'lane-slot dungeon-rank';
+            // Container for the whole slot (Rank Header + Content)
+            const slotEl = document.createElement('div');
+            slotEl.className = 'dungeon-rank-wrapper'; // New wrapper class
+
             const monster = this.game.dungeonHall[`rank${rank}`];
-            const lightPenalty = -rank; // This is the base penalty, not the final one.
+            const lightPenalty = -rank;
+
+            // Header: Rank X
+            const headerHtml = `<div class="rank-header-text">Rank ${rank}</div>`;
+
+            // Content Box: Dashed placeholder OR Monster Card
+            let contentHtml = '';
+            let additionalClass = '';
+
             if (!monster) {
-                el.innerHTML = `<div class="rank-label">Rank ${rank}</div><div class="empty-slot">空</div>`;
+                // Empty Dashed Box
+                contentHtml = `<div class="rank-placeholder dashed"></div>`;
             } else {
-                const isSelected = this.game.combat && this.game.combat.targetRank === rank;
-                const tsMarker = monster.hasThunderstone ? '<div class="thunderstone-badge">💠</div>' : '';
-                // v3.5：顯示動態 HP
+                // Monster Info
+                additionalClass = 'occupied';
+                if (monster.hasThunderstone) additionalClass += ' boss-marked';
+
+                // v3.5: Dynamic HP
                 const hpPercent = (monster.currentHP / monster.monster.hp) * 100;
                 const hpColor = hpPercent > 50 ? '#4caf50' : (hpPercent > 25 ? '#ff9800' : '#f44336');
+                const tsMarker = monster.hasThunderstone ? '<span class="ts-icon">💠</span>' : '';
 
-                el.classList.add('occupied');
-                if (monster.hasThunderstone) el.classList.add('boss-marked');
-
-                el.innerHTML = `
-                    <div class="rank-label">Rank ${rank} (💡 ${lightPenalty})</div>
-                    ${tsMarker}
-                    <div class="monster-name" style="font-weight: bold;">${monster.name}</div>
-                    <div class="monster-hp" style="color: ${hpColor}; font-weight: bold;">❤️ HP: ${monster.currentHP}/${monster.monster.hp}</div>
-                    <div style="font-size: 11px; color: #ff5a59; margin-top: 4px; font-weight: bold; background: #000; border: 1px solid #ff5a59; padding: 2px 8px; border-radius: 4px; display: inline-block; box-shadow: 0 0 5px rgba(255,90,89,0.3);">⚠️ 村莊受損: ${monster.monster.breachDamage || 1}</div>
-                    <div style="font-size: 10px; color: #4caf50; margin-top: 2px;">✨ 獎勵: ${monster.monster.xpGain} XP</div>
-                    <div class="card-info-btn monster-info-btn" 
-                         title="查看怪物詳情"
-                         onclick="event.stopPropagation(); window.ui.showMonsterDetail('${monster.id}');">ⓘ</div>
+                contentHtml = `
+                    <div class="rank-placeholder monster-active">
+                        <div class="monster-mini-card">
+                            <div class="monster-name">${tsMarker} ${monster.name}</div>
+                            <div class="monster-hp" style="color:${hpColor}">❤️ ${monster.currentHP}/${monster.monster.hp}</div>
+                            <div class="monster-stats">
+                                <span class="breach-dmg">⚠️ -${monster.monster.breachDamage || 1} HP</span>
+                                <span class="xp-gain">✨ +${monster.monster.xpGain} XP</span>
+                            </div>
+                            <div class="info-icon" onclick="event.stopPropagation(); window.ui.showMonsterDetail('${monster.id}')">ⓘ</div>
+                        </div>
+                    </div>
                 `;
-
-                if (this.game.state === GameState.COMBAT) {
-                    el.style.cursor = 'pointer';
-                    if (isSelected) el.classList.add('target-locked');
-                    el.onclick = () => this.game.selectCombatTarget(rank);
-                }
             }
-            container.appendChild(el);
+
+            slotEl.innerHTML = headerHtml + contentHtml;
+
+            if (additionalClass) slotEl.classList.add(additionalClass);
+
+            // Click handling for combat
+            if (monster && this.game.state === GameState.COMBAT) {
+                slotEl.style.cursor = 'pointer';
+                if (this.game.combat && this.game.combat.targetRank === rank) {
+                    slotEl.classList.add('target-locked');
+                }
+                slotEl.onclick = () => this.game.selectCombatTarget(rank);
+            }
+
+            container.appendChild(slotEl);
         });
-        this.renderMonsterDeckInspector(); // v3.11
+
+        this.renderMonsterDeckInspector();
     }
 
     /**
