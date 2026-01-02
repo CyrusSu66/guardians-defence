@@ -401,41 +401,7 @@ export class UIManager {
         if (modal) modal.classList.add('active');
     }
 
-    renderDungeonRanks() {
-        const container = document.getElementById('dungeonRankSlots');
-        if (!container) return;
-        container.innerHTML = '';
-        [1, 2, 3].forEach(rank => {
-            const el = document.createElement('div');
-            el.className = 'lane-slot dungeon-rank';
-            const monster = this.game.dungeonHall[`rank${rank}`];
-            const lightPenalty = -rank;
-            if (monster) {
-                el.classList.add('occupied');
-                if (monster.hasThunderstone) el.classList.add('boss-marked');
 
-                // v3.5：顯示動態 HP
-                const hpPercent = (monster.currentHP / monster.monster.hp) * 100;
-                const hpColor = hpPercent > 50 ? '#4caf50' : (hpPercent > 25 ? '#ff9800' : '#f44336');
-
-                el.innerHTML = `
-                    <div class="card-info-btn" style="position: absolute; top: 2px; right: 2px; border-color: #ff5a59; color: #ff5a59;" onclick="event.stopPropagation(); window.game.ui.showMonsterDetail('${monster.id}')">ⓘ</div>
-                    <div class="rank-label">Rank ${rank} (💡 ${lightPenalty})</div>
-                    <div class="monster-name">${monster.name}</div>
-                    <div class="monster-hp" style="color: ${hpColor}; font-weight: bold;">❤️ HP: ${monster.currentHP}/${monster.monster.hp}</div>
-                    <div class="monster-reward">XP: ${monster.monster.xpGain}</div>
-                `;
-                if (this.game.state === GameState.COMBAT) {
-                    el.style.cursor = 'pointer';
-                    if (this.game.combat && this.game.combat.targetRank === rank) el.classList.add('target-locked');
-                    el.onclick = () => this.game.selectCombatTarget(rank);
-                }
-            } else {
-                el.innerHTML = `<div class="rank-label">Rank ${rank}</div><div class="empty-slot">空</div>`;
-            }
-            container.appendChild(el);
-        });
-    }
 
     renderMarket() {
         const marketGrid = document.getElementById('marketGrid');
@@ -654,15 +620,7 @@ export class UIManager {
             monster = this.game.getCardPoolItem(monsterId);
         }
 
-        // Fallback 2: 嘗試在 dungeonHall 中尋找實例
-        if (!monster) {
-            for (let k in this.game.dungeonHall) {
-                if (this.game.dungeonHall[k] && this.game.dungeonHall[k].id === monsterId) {
-                    monster = this.game.dungeonHall[k];
-                    break;
-                }
-            }
-        }
+
 
         updateCombatSummary() {
             const summary = document.getElementById('combatSummary');
