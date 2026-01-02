@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.22.6(01-02-13:50)"; // Fix: LightItem 保留手牌 & 數值修正
+        this.version = "v3.22.7(01-02-14:00)"; // Fix: Revert Hand Retention & Debug Combat Discard
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);

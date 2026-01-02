@@ -60,16 +60,8 @@ export class DungeonEngine {
         } else {
             // 延遲一段時間後進入下一抽牌回合
             setTimeout(() => {
-                // v3.22.6: 光源物品 (LightItem) 保留在手牌，不棄掉
-                const keptCards = [];
-                g.hand.forEach(c => {
-                    if (c.type === 'LightItem') {
-                        keptCards.push(c);
-                    } else {
-                        g.discard.push(c);
-                    }
-                });
-                g.hand = keptCards;
+                g.hand.forEach(c => g.discard.push(c));
+                g.hand = [];
                 g.nextTurn();
             }, 800);
         }

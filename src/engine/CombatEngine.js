@@ -94,9 +94,13 @@ export class CombatEngine {
         }
 
         // 6. 消耗卡片 (全部投入棄牌堆)
+        // 6. 消耗卡片 (全部投入棄牌堆)
         const toDiscard = [hIdx];
         if (dIdx !== null) toDiscard.push(dIdx);
         if (aIdx !== null) toDiscard.push(aIdx);
+
+        console.log(`[Combat] Indices to discard: Hero=${hIdx}, Damage=${dIdx}, Aux=${aIdx}`);
+        console.log(`[Combat] toDiscard array (before sort):`, toDiscard);
 
         // 從大到小排序刪除，避免索引偏移
         toDiscard.sort((a, b) => b - a).forEach(i => g.discard.push(g.hand.splice(i, 1)[0]));
