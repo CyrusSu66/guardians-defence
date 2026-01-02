@@ -322,31 +322,24 @@ export class UIManager {
         marketGrid.innerHTML = '';
         const g = this.game;
 
-        const sections = [
-            { label: '--- 等級 1 英雄 (Random 4) ---', cards: g.marketItems.heroes },
-            { label: '--- 隨機道具與裝備 (Random 4) ---', cards: g.marketItems.items },
-            { label: '--- 常備基礎軍需 ---', cards: g.marketItems.basics },
-            { label: '--- 魔法卷軸 ---', cards: g.marketItems.spells || [] }
+        const allItems = [
+            ...g.marketItems.heroes,
+            ...g.marketItems.items,
+            ...g.marketItems.basics,
+            ...(g.marketItems.spells || [])
         ];
 
-        sections.forEach(sec => {
-            const header = document.createElement('div');
-            header.className = 'market-section-header';
-            header.textContent = sec.label;
-            marketGrid.appendChild(header);
+        allItems.forEach(card => {
+            const canAfford = g.currentGold >= card.cost;
+            const onClick = () => {
+                if (canAfford && !g.hasBought) this.game.buyCard(card.id, card.cost);
+            };
 
-            sec.cards.forEach(card => {
-                const canAfford = g.currentGold >= card.cost;
-                const onClick = () => {
-                    if (canAfford && !g.hasBought) this.game.buyCard(card.id, card.cost);
-                };
+            const cardEl = this.renderCard(card, onClick, false, true);
+            if (!canAfford) cardEl.classList.add('disabled');
+            if (g.hasBought) cardEl.classList.add('bought');
 
-                const cardEl = this.renderCard(card, onClick, false, true);
-                if (!canAfford) cardEl.classList.add('disabled');
-                if (g.hasBought) cardEl.classList.add('bought');
-
-                marketGrid.appendChild(cardEl);
-            });
+            marketGrid.appendChild(cardEl);
         });
     }
 

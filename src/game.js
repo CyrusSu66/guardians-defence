@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.20(01-01-20:00)"; // 牌庫邏輯重構 (30張/分層)
+        this.version = "v3.21(01-02-10:20)"; // UI 重構與廢棄系統清理
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);
@@ -35,13 +35,11 @@ class GuardiansDefenceGame {
         this.state = GameState.IDLE;
         this.turn = 0;
         this.villageHP = 20;
-        this.maxVillageHP = 20;
         this.currentGold = 0;
         this.currentXP = 0;
         this.totalScore = 0;
 
         this.deck = [];
-        this.hand = [];
         this.discard = [];
         this.playedCards = [];
 

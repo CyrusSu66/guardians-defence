@@ -21,181 +21,140 @@
                 style="padding: 10px 40px; font-size: 16px;">開始新戰局</button>
         </div>
 
-        <!-- 日誌與狀態頂部區域 -->
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
-            <div class="log-panel">
-                <div class="log-title">📜 冒險日誌</div>
-                <div class="log-content" id="gameLog">
-                    <div class="log-entry info">正在初始化守護者系統...</div>
+        <!-- 1. 頂部資訊列 (Header): 統合村莊狀態 -->
+        <div class="panel full-width-panel" id="headerStatusPanel">
+            <div class="panel-title">🏰 村莊狀態</div>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div class="status-item flex-item">
+                    <div class="status-label">村莊防禦值 (HP)</div>
+                    <div class="status-value" id="villageHP">20</div>
                 </div>
-            </div>
-            <div class="panel">
-                <div class="panel-title">🏰 村莊摘要 & 狀態</div>
-                <div style="display: flex; gap: 10px;">
-                    <div class="status-item" style="flex: 1; margin-bottom: 0;">
-                        <div class="status-label">HP</div>
-                        <div class="status-value" id="villageHP">20</div>
-                    </div>
-                    <div class="status-item" style="flex: 1; margin-bottom: 0;">
-                        <div class="status-label">階段</div>
-                        <div class="status-value" id="gameState" style="font-size: 14px; color: var(--color-primary);">
-                            待命中...</div>
-                    </div>
+                <div class="status-item flex-item">
+                    <div class="status-label">當前回合</div>
+                    <div class="status-value" id="turnNumber">1</div>
                 </div>
-            </div>
-        </div>
-
-        <div class="game-board">
-            <!-- 左側：詳細資源 -->
-            <div class="panel">
-                <div class="panel-title">💎 資源</div>
-                <div class="status-item">
-                    <div class="status-label">能量結晶</div>
-                    <div class="status-value" id="crystals">0</div>
-                </div>
-                <div class="status-item">
-                    <div class="status-label">累計經驗 (XP) / 戰果</div>
+                <div class="status-item flex-item">
+                    <div class="status-label">累計經驗 / 戰果</div>
                     <div class="status-value">
                         <span id="currentXP">0</span> XP | <span id="totalScore">0</span> VP
                     </div>
                 </div>
-                <!-- v3.1.3 可點擊查看的牌庫資訊 -->
-                <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <div class="stat-card"
-                        style="flex: 1; cursor: pointer; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 4px; text-align: center;"
-                        onclick="window.game.showDeckModal('deck')">
-                        <div class="stat-label" style="font-size: 10px; color: #888;">牌庫</div>
-                        <div class="stat-value" id="deckCount" style="font-size: 14px; font-weight: bold;">0</div>
-                    </div>
-                    <div class="stat-card"
-                        style="flex: 1; cursor: pointer; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 4px; text-align: center;"
-                        onclick="window.game.showDeckModal('discard')">
-                        <div class="stat-label" style="font-size: 10px; color: #888;">棄牌</div>
-                        <div class="stat-value" id="discardCount" style="font-size: 14px; font-weight: bold;">0</div>
-                    </div>
-                </div>
-                <div class="status-item">
-                    <div class="status-label">當前回合</div>
-                    <div class="status-value" id="turnNumber">1</div>
+                <!-- 狀態顯示移至此處 -->
+                <div class="status-item flex-item">
+                    <div class="status-label">當前狀態</div>
+                    <div class="status-value" id="gameState" style="font-size: 18px;">待命中...</div>
                 </div>
             </div>
+        </div>
 
-            <!-- 中央：主要行動區 -->
-            <div style="display: flex; flex-direction: column; gap: 20px;">
-                <div class="panel">
-                    <div class="panel-title">⚔️ 地城大廳 (Dungeon Hall)</div>
-                    <div class="lane-display">
-                        <div class="lane-track" id="laneTrack">
-                            <div class="lane-village">🏰<br>村莊防線</div>
-                            <div class="lane-arrow">←</div>
-                            <div class="dungeon-rank-slots" id="dungeonRankSlots" style="display: flex; gap: 15px;">
-                                <!-- Rank 1, 2, 3 will be rendered here -->
-                            </div>
-                        </div>
-                    </div>
-                    <!-- v3.11 牌庫監查器 -->
-                    <div id="debugDeckInspector"></div>
-                </div>
+        <!-- 2. 冒險日誌 (Log) -->
+        <div class="panel full-width-panel log-panel-container">
+            <div class="panel-title">📜 冒險日誌</div>
+            <div class="log-content expanded-log" id="gameLog">
+                <div class="log-entry info">正在初始化守護者系統...</div>
+            </div>
+        </div>
 
-                <div class="panel action-select-panel" id="actionSelectPanel">
-                    <div class="panel-title">🚩 選擇本回合行動</div>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
-                        <button class="btn btn-primary" id="btnVisitVillage">🏪 造訪村莊</button>
-                        <button class="btn btn-secondary" id="btnRest">💤 休息整補</button>
-                        <button class="btn btn-danger" id="btnEnterDungeon"
-                            style="background: #a30000; color: white;">⚔️ 進入地城</button>
-                    </div>
-                </div>
-
-                <!-- 休息面板 (v3.1) -->
-                <div class="panel" id="restPanel" style="display: none; border-color: var(--color-secondary);">
-                    <div class="panel-title">💤 休息整補中</div>
-                    <div style="font-size: 13px; margin-bottom: 10px; color: #aaa;">已獲得 1 XP。您可以點擊下方手牌進行銷毀，或直接結束行動。
-                    </div>
-                    <div style="display: flex; justify-content: flex-end;">
-                        <button class="btn btn-secondary" onclick="window.game.finishAction()">完成休息行動</button>
-                    </div>
-                </div>
-
-                <!-- 戰鬥面板 -->
-                <div class="panel" id="combatPanel" style="display: none;">
-                    <div class="panel-title">🗡️ 戰鬥指揮部</div>
-                    <div id="combatHeroList" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
-                    <div id="combatSummary"
-                        style="margin-top: 15px; font-size: 13px; color: #888; background: var(--color-bg); padding: 10px; border-radius: 6px; border: 1px dashed var(--color-primary);">
-                        尚未部署英雄...</div>
-                    <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
-                        <button class="btn btn-primary" id="combatAttackBtn">執行分配攻擊</button>
-                        <button class="btn btn-secondary" style="background: #444;"
-                            onclick="window.game.finishAction()">結束戰鬥行動</button>
-                    </div>
-                </div>
-
-                <div class="panel">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <div class="panel-title">🎴 戰略手牌</div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn" style="padding: 4px 8px; font-size: 10px; background: #333;"
-                                onclick="window.game.showDeckModal('deck')">牌庫 (<span
-                                    id="btnDeckCount">0</span>)</button>
-                            <button class="btn" style="padding: 4px 8px; font-size: 10px; background: #333;"
-                                onclick="window.game.showDeckModal('discard')">棄牌 (<span
-                                    id="btnDiscardCount">0</span>)</button>
-                        </div>
-                    </div>
-                    <div class="hand-area">
-                        <!-- v3.1.1 已啟用的卡片區 (桌面上) -->
-                        <div id="playedCardsDisplay"
-                            style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; min-height: 40px; padding: 10px; background: rgba(0,255,100,0.05); border-radius: 8px; border: 1px dashed rgba(0,255,100,0.2);">
-                        </div>
-                        <div class="hand-cards" id="handDisplay"></div>
-                        <!-- 確認區域 -->
-                        <div id="confirmationArea"
-                            style="display: none; margin-top: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px dashed var(--color-success);">
-                            <div class="confirmation-cards" id="confirmationCards"
-                                style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;"></div>
-                            <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                                <button class="btn-primary"
-                                    style="padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer;"
-                                    onclick="window.game.confirmCoin()">✓ 使用資源卡</button>
-                                <button class="btn-secondary"
-                                    style="padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; background: #555;"
-                                    onclick="window.game.clearSelection()">✕ 取消</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="panel village-plaza">
-                    <div class="plaza-header">
-                        <div class="panel-title">🏛️ 村莊核心</div>
-                        <div class="plaza-coin-display">
-                            <div class="plaza-coin-label">可用資產</div>
-                            <div class="plaza-coin-value" id="plazaCoinDisplay">0</div>
-                        </div>
-                    </div>
-                    <div class="plaza-tabs">
-                        <button class="plaza-tab-btn active" id="tab-market">🛒 市集隨機組</button>
-                        <button class="plaza-tab-btn" id="tab-training">⚔️ 訓練升級</button>
-                    </div>
-                    <!-- v3.1 新增：村莊結束按鈕 -->
-                    <div id="villageFinishControl"
-                        style="margin-top: 10px; display: none; justify-content: space-between; align-items: center; padding: 0 10px;">
-                        <button class="btn btn-secondary" style="background: #444; font-size: 11px;"
-                            onclick="window.game.activateAllResources()">💰 啟用所有資源卡</button>
-                        <button class="btn btn-primary" style="background: var(--color-success);"
-                            onclick="window.game.finishAction()">結束村莊行動 (推移地城)</button>
-                    </div>
-                    <div class="plaza-content active" id="marketTab">
-                        <div class="market-display-grid" id="marketGrid"></div>
-                    </div>
-                    <div class="plaza-content" id="trainingTab">
-                        <div class="training-heroes" id="trainingHeroes"></div>
+        <!-- 3. 地城大廳 (Dungeon) -->
+        <div class="panel full-width-panel">
+            <div class="panel-title">⚔️ 地城大廳 (Dungeon Hall)</div>
+            <div class="lane-display">
+                <div class="lane-track" id="laneTrack">
+                    <div class="lane-village">🏰<br>村莊防線</div>
+                    <div class="lane-arrow">←</div>
+                    <div class="dungeon-rank-slots" id="dungeonRankSlots" style="display: flex; gap: 15px;">
+                        <!-- Rank 1, 2, 3 will be rendered here -->
                     </div>
                 </div>
             </div>
+            <div id="debugDeckInspector"></div>
+        </div>
 
+        <!-- 4. 行動選擇區 (Action) -->
+        <div class="panel action-select-panel full-width-panel" id="actionSelectPanel">
+            <div class="panel-title">🚩 選擇本回合行動</div>
+            <div class="action-buttons-grid">
+                <button class="btn btn-primary" id="btnVisitVillage">🏪 造訪村莊</button>
+                <button class="btn btn-secondary" id="btnRest">💤 休息整補</button>
+                <button class="btn btn-danger" id="btnEnterDungeon" style="background: #a30000; color: white;">⚔️
+                    進入地城</button>
+            </div>
+        </div>
+
+        <!-- 村莊與戰鬥面板容器 (根據狀態顯示) -->
+        <div id="dynamicPanels">
+            <!-- 休息面板 -->
+            <div class="panel full-width-panel" id="restPanel"
+                style="display: none; border-color: var(--color-secondary);">
+                <div class="panel-title">💤 休息整補中</div>
+                <div style="font-size: 13px; margin-bottom: 10px; color: #aaa;">已獲得 1 XP。您可以點擊下方手牌進行銷毀，或直接結束行動。</div>
+                <div style="display: flex; justify-content: flex-end;">
+                    <button class="btn btn-secondary" onclick="window.game.finishAction()">完成休息行動</button>
+                </div>
+            </div>
+
+            <!-- 戰鬥面板 -->
+            <div class="panel full-width-panel" id="combatPanel" style="display: none;">
+                <div class="panel-title">🗡️ 戰鬥指揮部</div>
+                <div id="combatHeroList" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+                <div id="combatSummary"
+                    style="margin-top: 15px; font-size: 13px; color: #888; background: var(--color-bg); padding: 10px; border-radius: 6px; border: 1px dashed var(--color-primary);">
+                    尚未部署英雄...</div>
+                <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
+                    <button class="btn btn-primary" id="combatAttackBtn">執行分配攻擊</button>
+                    <button class="btn btn-secondary" style="background: #444;"
+                        onclick="window.game.finishAction()">結束戰鬥行動</button>
+                </div>
+            </div>
+
+            <!-- 5. 村莊核心 (Market) -->
+            <div class="panel village-plaza full-width-panel">
+                <div class="plaza-header">
+                    <div class="panel-title">🏛️ 村莊核心</div>
+                    <div class="plaza-coin-display">
+                        <div class="plaza-coin-label">可用資產</div>
+                        <div class="plaza-coin-value" id="plazaCoinDisplay">0</div>
+                    </div>
+                </div>
+                <div class="plaza-tabs">
+                    <button class="plaza-tab-btn active" id="tab-market">🛒 市集隨機組</button>
+                    <button class="plaza-tab-btn" id="tab-training">⚔️ 訓練升級</button>
+                </div>
+
+                <div id="villageFinishControl"
+                    style="margin-top: 10px; display: none; justify-content: space-between; align-items: center; padding: 0 10px;">
+                    <button class="btn btn-secondary" style="background: #444; font-size: 11px;"
+                        onclick="window.game.activateAllResources()">💰 啟用所有資源卡</button>
+                    <button class="btn btn-primary" style="background: var(--color-success);"
+                        onclick="window.game.finishAction()">結束村莊行動 (推移地城)</button>
+                </div>
+
+                <div class="plaza-content active" id="marketTab">
+                    <div class="market-display-grid reflow-grid" id="marketGrid"></div>
+                </div>
+                <div class="plaza-content" id="trainingTab">
+                    <div class="training-heroes" id="trainingHeroes"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. 戰略手牌 (Hand) -->
+        <div class="panel full-width-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div class="panel-title">🎴 戰略手牌</div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn" style="padding: 4px 8px; font-size: 10px; background: #333;"
+                        onclick="window.game.showDeckModal('deck')">牌庫 (<span id="btnDeckCount">0</span>)</button>
+                    <button class="btn" style="padding: 4px 8px; font-size: 10px; background: #333;"
+                        onclick="window.game.showDeckModal('discard')">棄牌 (<span id="btnDiscardCount">0</span>)</button>
+                </div>
+            </div>
+            <div class="hand-area">
+                <div id="playedCardsDisplay"
+                    style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; min-height: 40px; padding: 10px; background: rgba(0,255,100,0.05); border-radius: 8px; border: 1px dashed rgba(0,255,100,0.2);">
+                </div>
+                <div class="hand-cards" id="handDisplay"></div>
+            </div>
         </div>
     </div>
     </div>
