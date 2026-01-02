@@ -174,7 +174,7 @@ export const CARDPOOL = {
         // Moved from basic cards (User Request)
         {
             id: 'item_light_gem', name: '光輝寶石', type: 'LightItem', subTypes: ['Wonder'],
-            cost: 3, vp: 0, goldValue: 2, light: 2,
+            cost: 3, vp: 0, goldValue: 3, light: 2,
             desc: '提供進階光照與採購力'
         }
     ],
