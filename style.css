@@ -1041,114 +1041,18 @@ h1 {
     transform: scale(1.1);
 }
 
+
 /* =========================================
-   Responsive Design (Desktop 3-Column Grid)
+   Layout Reset: Centered Single Column
    ========================================= */
-@media (min-width: 1200px) {
-    .game-container {
-        display: grid;
-        grid-template-columns: 260px 1fr 340px;
-        gap: 20px;
-        align-items: start;
-        grid-template-areas:
-            "title title title"
-            "start start start"
-            "status dungeon village"
-            "log    action  village"
-            "log    dynamic train"
-            "log    hand    train";
-        max-width: 1800px;
-        /* Allow wider screen usage */
-    }
-
-    /* Grid Area Assignments */
-    h1#gameTitle {
-        grid-area: title;
-    }
-
-    #headerActions {
-        grid-area: start;
-    }
-
-    #headerStatusPanel {
-        grid-area: status;
-    }
-
-    #logPanel {
-        grid-area: log;
-        height: auto;
-    }
-
-    #dungeonPanel {
-        grid-area: dungeon;
-    }
-
-    #actionSelectPanel {
-        grid-area: action;
-    }
-
-    #dynamicPanels {
-        grid-area: dynamic;
-    }
-
-    #handPanel {
-        grid-area: hand;
-    }
-
-    #villagePanel {
-        grid-area: village;
-    }
-
-    #trainingPanel {
-        grid-area: train;
-    }
-
-    /* Left Column Adjustment: Stack Status Items */
-    #headerStatusPanel>div {
-        flex-direction: column;
-        gap: 15px !important;
-    }
-
-    #headerStatusPanel .status-item {
-        width: 100%;
-        border-bottom: 1px solid #333;
-        padding-bottom: 8px;
-        margin-bottom: 8px;
-    }
-
-    #headerStatusPanel .status-item:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-    }
-
-    /* Log Panel Height Fix: Fill down */
-    .log-panel-container {
-        height: 100%;
-        min-height: 400px;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .log-panel-container .log-content {
-        flex: 1;
-        height: auto;
-        max-height: 600px;
-        /* Limit max height */
-        min-height: 300px;
-    }
-
-    /* Right Column: Village Panel */
-    .village-plaza {
-        height: auto;
-        min-height: 500px;
-    }
-
-    /* Market Grid Adjustment for Narrower Column */
-    .market-display-grid.reflow-grid {
-        grid-template-columns: repeat(2, 1fr);
-        /* 2 cols in side panel */
-    }
+.game-container {
+    max-width: 600px;
+    /* Limit width */
+    margin: 0 auto;
+    /* Center */
+    padding: 10px;
 }
+
 
 /* Mobile Optimizations */
 @media (max-width: 768px) {
