@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.23.11"; // UI: Remove HP Black BG
+        this.version = "v3.23.12"; // UI: Fix HP Background
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);
