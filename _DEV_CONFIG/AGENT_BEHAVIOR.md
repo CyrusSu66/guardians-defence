@@ -16,13 +16,16 @@
 ## 3. 遠端開發橋接 (Remote Bridge)
 - **目標**: 允許使用者從外部網絡透過手機或瀏覽器控制主要開發環境。
 - **啟動檢查流程**:
-    1. **檢查 Bridge 服務**: 確認 `tools/remote_bridge/bridge.py` 是否正在執行 (Port 8080)。
-    2. **檢查 Tunnel**: 確認 `cloudflared` 是否正在運行。
-    3. **提供連結**: 若上述服務未開啟，應詢問使用者是否啟動；若已開啟，應主動提供 Cloudflare Tunnel 的公開 URL。
+    1. **Tunnel 檢查**: 確認 `cloudflared` 進程是否活躍。
+    2. **Tunnel 網址**: 若使用者詢問或環境重啟，請使用 `grep` 或 `cat` 查找 `tunnel.log` 或終端機輸出來找回公開網址。
+    3. **指令**: `chmod +x cloudflared && ./cloudflared tunnel --url http://localhost:8080 > tunnel.log 2>&1 &`
 
 ## 4. 程式碼風格與專案結構
-- **風格**: 盡量保持模組化 (`src/engine/` 分離)，並加上清晰的註解，特別是版本號標記 (e.g., `// v3.x: description`).
-- **相容性**: 修改 UI 時確保響應式設計，並檢查 `z-index` 以防遮擋。
+- **風格**: 保持模組化 (`src/engine/` 分離)，加上清晰的版本與功能註解 (e.g., `// v3.22: RWD Update`).
+- **UI 規範**: 
+    - 桌面版 (>1200px) 採用三欄式 Grid 佈局。
+    - 手機版 (<768px) 採用單欄垂直堆疊佈局。
+    - 確保所有按鈕在觸控裝置上易於點擊。
 
 ---
-*Last Updated: v3.19 (2026-01-01)*
+*Last Updated: v3.22 (2026-01-02)*
