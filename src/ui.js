@@ -268,29 +268,31 @@ export class UIManager {
         const statsRow = document.createElement('div');
         statsRow.className = 'card-stats-row';
 
-        let statsText = '';
+        let lines = [];
+
+        // Line 1: Basic Stats (Icons Only - Combined)
         if (card.type === 'Hero') {
-            statsText = `🪄${card.hero.magicAttack} 💪${card.hero.strength}`;
+            lines.push(`💪${card.hero.strength} 🪄${card.hero.magicAttack}`);
         } else if (card.type === 'Weapon') {
-            statsText = `⚔️${card.equipment.attack} 🪄${card.equipment.magicAttack}`;
+            lines.push(`🗡️${card.equipment.attack} 🪄${card.equipment.magicAttack}`);
         } else if (card.type === 'Spell') {
-            statsText = `✨ 法術`; // Placeholder
-        } else if (card.goldValue) {
-            // If it's pure treasure/money, maybe show it here too, or just BottomRight
+            lines.push(`✨`);
         }
 
-        // Ability Icons
+        // Subsequent Lines: Light & Abilities (One per line)
+        if (card.light > 0) {
+            lines.push(`💡${card.light}`);
+        }
+
         if (card.abilities) {
-            let icons = '';
-            if (card.abilities.onVillage) icons += '🏠';
-            if (card.abilities.onDungeon) icons += '🌲';
-            if (card.abilities.onBattle) icons += '⚔️';
-            if (card.abilities.onVictory) icons += '🏆';
-            if (icons) statsText += ` ${icons}`;
+            // One line per ability type as requested
+            if (card.abilities.onVillage) lines.push('🏠');
+            if (card.abilities.onDungeon) lines.push('🌲');
+            if (card.abilities.onBattle) lines.push('⚔️');
+            if (card.abilities.onVictory) lines.push('🏆');
         }
-        if (card.light > 0) statsText += ` 💡${card.light}`;
 
-        statsRow.innerText = statsText;
+        statsRow.innerHTML = lines.join('<br>'); // Multi-line layout
 
         // Bottom Row: Cost | Gold Value
         const bottomRow = document.createElement('div');
