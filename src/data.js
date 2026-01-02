@@ -46,17 +46,18 @@ export const CARDPOOL = {
     // --- 英雄系列 ---
     heroes: [
         {
-            id: 'hero_sevin_lv1', name: '塞維恩扈從', type: 'Hero', subTypes: ['Fighter'],
+            id: 'hero_sevin_lv1', name: '塞維恩戰術家', type: 'Hero', subTypes: ['Fighter'],
             cost: 4, vp: 1, goldValue: 0, light: 0,
-            desc: '勇往直前的戰士學徒',
-            hero: { level: 1, series: 'Sevin', magicAttack: 0, strength: 3, xpToUpgrade: 4, upgradeToId: 'hero_sevin_lv2' }
+            desc: '【地下城】手牌中有其他英雄時，攻擊力+1',
+            hero: { level: 1, series: 'Sevin', magicAttack: 0, strength: 3, xpToUpgrade: 4, upgradeToId: 'hero_sevin_lv2' },
+            abilities: { onBattle: 'synergy_hero_group' }
         },
         {
-            id: 'hero_sevin_lv2', name: '塞維恩騎士', type: 'Hero', subTypes: ['Fighter'],
+            id: 'hero_sevin_lv2', name: '塞維恩指揮官', type: 'Hero', subTypes: ['Fighter'],
             cost: 7, vp: 2, goldValue: 0, light: 1,
-            desc: '【地下城】光照不足時，每多一光源攻擊力 +1',
+            desc: '【地下城】手牌中有其他英雄時，攻擊力+2',
             hero: { level: 2, series: 'Sevin', magicAttack: 0, strength: 4, xpToUpgrade: 6, upgradeToId: 'hero_sevin_lv3' },
-            abilities: { onBattle: 'light_compensation' }
+            abilities: { onBattle: 'synergy_hero_group_2' }
         },
         {
             id: 'hero_sevin_lv3', name: '塞維恩君主', type: 'Hero', subTypes: ['Fighter'],
@@ -66,19 +67,17 @@ export const CARDPOOL = {
             abilities: { onBattle: 'light_compensation_lv3', onVictory: 'buy_light' }
         },
         {
-            id: 'hero_amazon_lv1', name: '亞馬遜弓箭手', type: 'Hero', subTypes: ['Archer'],
-            cost: 4, vp: 1, goldValue: 0, light: 0,
-            desc: '身手矯捷的叢林射手',
-            hero: { level: 1, series: 'Amazon', magicAttack: 0, strength: 2, xpToUpgrade: 4, upgradeToId: 'hero_amazon_lv2' }
+            id: 'hero_amazon_lv1', name: '亞馬遜弓箭手', type: 'Hero', subTypes: ['Fighter', 'Ranger'],
+            cost: 5, vp: 1, goldValue: 0, light: 0,
+            desc: '【地下城】若裝備弓，攻擊力+1',
+            hero: { level: 1, series: 'Amazon', magicAttack: 0, strength: 2, xpToUpgrade: 4, upgradeToId: 'hero_amazon_lv2' },
+            abilities: { onBattle: 'synergy_bow' }
         },
         {
-            id: 'hero_amazon_lv2', name: '亞馬遜女獵人', type: 'Hero', subTypes: ['Archer'],
-            cost: 7, vp: 2, goldValue: 0, light: 0,
-            desc: '【地城】進入時抽 1 張牌。',
+            id: 'hero_amazon_lv2', name: '亞馬遜獵手', type: 'Hero', subTypes: ['Fighter', 'Ranger'],
+            cost: 8, vp: 2, goldValue: 1, light: 0,
+            desc: '【地下城】若裝備弓，攻擊力+2',
             hero: { level: 2, series: 'Amazon', magicAttack: 0, strength: 3, xpToUpgrade: 6, upgradeToId: 'hero_amazon_lv3' },
-            abilities: { onDungeon: 'draw_1' }
-        },
-        {
             id: 'hero_amazon_lv3', name: '亞馬遜女王', type: 'Hero', subTypes: ['Archer'],
             cost: 10, vp: 3, goldValue: 0, light: 0,
             desc: '【地城】進入時抽 2 張牌；戰勝得 1 XP。',
@@ -108,7 +107,7 @@ export const CARDPOOL = {
         {
             id: 'hero_dwarf_lv1', name: '矮人守護者', type: 'Hero', subTypes: ['Fighter'],
             cost: 4, vp: 1, goldValue: 0, light: 0,
-            desc: '【能力】若有裝備，額外 Attack+1',
+            desc: '【地下城】若有裝備武器，攻擊力+1',
             hero: { level: 1, series: 'Dwarf', magicAttack: 0, strength: 2, xpToUpgrade: 4, upgradeToId: 'hero_dwarf_lv2' },
             abilities: { onBattle: 'dwarf_weapon_bonus' }
         },
@@ -130,22 +129,23 @@ export const CARDPOOL = {
         {
             id: 'hero_loric_lv1', name: '羅域盜賊', type: 'Hero', subTypes: ['Thief'],
             cost: 4, vp: 1, goldValue: 0, light: 0,
-            desc: '擅長在陰影中襲取的盜賊',
-            hero: { level: 1, series: 'Loric', magicAttack: 0, strength: 1, xpToUpgrade: 4, upgradeToId: 'hero_loric_lv2' }
+            desc: '【地下城】光照不足時，攻擊力+1',
+            hero: { level: 1, series: 'Loric', magicAttack: 0, strength: 1, xpToUpgrade: 4, upgradeToId: 'hero_loric_lv2' },
+            abilities: { onBattle: 'light_compensation_loric' }
         },
         {
             id: 'hero_loric_lv2', name: '羅域刺客', type: 'Hero', subTypes: ['Thief'],
             cost: 7, vp: 2, goldValue: 0, light: 0,
-            desc: '【地城】戰勝怪物後獲得 1 金幣',
+            desc: '【地城】戰勝怪物後獲得 1 金幣；光照不足時攻擊力+2',
             hero: { level: 2, series: 'Loric', magicAttack: 0, strength: 2, xpToUpgrade: 6, upgradeToId: 'hero_loric_lv3' },
-            abilities: { onVictory: 'gain_1gold' }
+            abilities: { onVictory: 'gain_1gold', onBattle: 'light_compensation_loric_2' }
         },
         {
             id: 'hero_loric_lv3', name: '羅域暗影大師', type: 'Hero', subTypes: ['Thief'],
             cost: 10, vp: 3, goldValue: 0, light: 0,
-            desc: '【地城】戰勝怪物後獲得 2 金幣',
+            desc: '【地城】戰勝怪物後獲得 2 金幣；光照不足時攻擊力+3',
             hero: { level: 3, series: 'Loric', magicAttack: 0, strength: 3, xpToUpgrade: 0 },
-            abilities: { onVictory: 'gain_2gold' }
+            abilities: { onVictory: 'gain_2gold', onBattle: 'light_compensation_loric_3' }
         },
 
         {
@@ -158,14 +158,14 @@ export const CARDPOOL = {
         {
             id: 'hero_grail_lv2', name: '聖杯騎士', type: 'Hero', subTypes: ['Cleric'],
             cost: 7, vp: 2, goldValue: 0, light: 1,
-            desc: '【村莊】摧毀任意一張卡；治療 1 點村莊 HP',
+            desc: '【村莊】摧毀任意一張卡；修復 1 點魔法護罩',
             hero: { level: 2, series: 'Grail', magicAttack: 2, strength: 2, xpToUpgrade: 6, upgradeToId: 'hero_grail_lv3' },
             abilities: { onVillage: 'destroy_any_heal_1' }
         },
         {
             id: 'hero_grail_lv3', name: '聖杯守護者', type: 'Hero', subTypes: ['Cleric'],
             cost: 10, vp: 3, goldValue: 0, light: 2,
-            desc: '【村莊】治療 2 點村莊 HP',
+            desc: '【村莊】修復 2 點魔法護罩',
             hero: { level: 3, series: 'Grail', magicAttack: 3, strength: 3, xpToUpgrade: 0 },
             abilities: { onVillage: 'heal_2' }
         }
@@ -191,8 +191,19 @@ export const CARDPOOL = {
         // --- 群落 4: Ancient (遠古遺蹟) ---
         { id: 'mon_slime', name: '粘液怪', type: 'Monster', subTypes: ['Ancient', 'Mire'], monster: { tier: 1, hp: 1, xpGain: 1, breachDamage: 1 }, desc: '難以捉摸的液狀生物', count: 4 },
         { id: 'mon_young_dragon', name: '幼龍', type: 'Monster', subTypes: ['Ancient', 'Dragon'], monster: { tier: 2, hp: 4, xpGain: 3, breachDamage: 3 }, desc: '年幼但具備威脅的巨龍', count: 3 },
-        { id: 'mon_black_dragon', name: '大黑龍', type: 'Monster', subTypes: ['Ancient', 'Dragon'], monster: { tier: 3, hp: 8, xpGain: 6, breachDamage: 5 }, desc: '【戰鬥】僅魔法攻擊有效', abilities: { battle: 'magic_only' }, count: 3 }
+        { id: 'mon_black_dragon', name: '大黑龍', type: 'Monster', subTypes: ['Ancient', 'Dragon'], monster: { tier: 3, hp: 8, xpGain: 6, breachDamage: 5 }, desc: '【戰鬥】僅魔法攻擊有效', abilities: { battle: 'magic_only' }, count: 3 },
+
+        // --- 群落 5: Goblin (哥布林) (v3.22.14) ---
+        { id: 'mon_goblin_grunt', name: '哥布林雜兵', type: 'Monster', subTypes: ['Goblin'], monster: { tier: 1, hp: 2, xpGain: 1, breachDamage: 1 }, desc: '【進場】破壞 1 張手牌', abilities: { onBreach: 'destroy_hand_1' }, count: 4 },
+        { id: 'mon_goblin_raider', name: '哥布林突襲者', type: 'Monster', subTypes: ['Goblin'], monster: { tier: 2, hp: 4, xpGain: 2, breachDamage: 2 }, desc: '【進場】破壞 2 張手牌', abilities: { onBreach: 'destroy_hand_2' }, count: 3 },
+        { id: 'mon_goblin_king', name: '哥布林王', type: 'Monster', subTypes: ['Goblin'], monster: { tier: 3, hp: 7, xpGain: 4, breachDamage: 3 }, desc: '【進場】破壞 2 張手牌 + 1 隨機物品', abilities: { onBreach: 'destroy_hand_2_plus_1' }, count: 3 },
+
+        // --- 群落 6: Mire (泥漿類) (v3.22.14) ---
+        { id: 'mon_green_slime', name: '綠色泥糊', type: 'Monster', subTypes: ['Mire'], monster: { tier: 1, hp: 3, xpGain: 1, breachDamage: 2 }, desc: '有毒的綠色黏液', count: 4 },
+        { id: 'mon_black_slime', name: '黑色史萊姆', type: 'Monster', subTypes: ['Mire'], monster: { tier: 1, hp: 4, xpGain: 1, breachDamage: 2 }, desc: '吞噬一切的黑色泥漿', count: 3 },
+        { id: 'mon_red_gel', name: '紅色凝膠獸', type: 'Monster', subTypes: ['Mire'], monster: { tier: 2, hp: 6, xpGain: 2, breachDamage: 2 }, desc: '【持續】所有英雄攻擊力 -1', abilities: { aura: 'atk_minus_1' }, count: 3 }
     ],
+
 
     // --- 物品與裝備 ---
     // v3.22.4: 市集分類重構
@@ -202,6 +213,12 @@ export const CARDPOOL = {
             cost: 2, vp: 0, goldValue: 1, light: 0,
             desc: '銳利的近身武器',
             equipment: { attack: 1, magicAttack: 0, weight: 2 }
+        },
+        {
+            id: 'weap_short_bow', name: '短弓', type: 'Weapon', subTypes: ['Bow', 'Ranged'],
+            cost: 3, vp: 0, goldValue: 1, light: 0,
+            desc: '輕便的遠程武器',
+            equipment: { attack: 1, magicAttack: 0, weight: 1 }
         },
         {
             id: 'weap_fire_sword', name: '火焰之劍', type: 'Weapon', subTypes: ['Sharp', 'Magical'],

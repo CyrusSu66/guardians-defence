@@ -146,13 +146,61 @@ export class CombatEngine {
                 bonuses.push('長矛協同(正規軍): +1 Atk');
             }
 
-            if (hero.hero.series === 'Dwarf' && damageItem && damageItem.type === 'Weapon') {
-                physAtk += 1;
-                bonuses.push('矮人武裝: +1 Atk');
+            // v3.22.14: 亞馬遜 + 弓箭 連動
+            if ((effect === 'synergy_bow' || effect === 'synergy_bow_2' || effect === 'synergy_bow_3') && damageItem && damageItem.subTypes && damageItem.subTypes.includes('Bow')) {
+                const bonus = effect === 'synergy_bow_3' ? 3 : (effect === 'synergy_bow_2' ? 2 : 1);
+                physAtk += bonus;
+                bonuses.push(`亞馬遜弓術: +${bonus} Atk`);
             }
+
+            // v3.22.14: 精靈 + 法術 連動 (加魔攻)
+            if (effect === 'synergy_spell' && damageItem && damageItem.type === 'Spell') {
+                magAtk += 1;
+                bonuses.push('精靈法術協同: +1 Mag');
+            }
+
+            // v3.22.14: 塞維恩 + 隊伍協同
+            if ((effect === 'synergy_hero_group' || effect === 'synergy_hero_group_2')) {
+                const hasOtherHero = this.game.hand.some(c => c.type === 'Hero' && c !== hero);
+                if (hasOtherHero) {
+                    const bonus = (effect === 'synergy_hero_group_2' ? 2 : 1);
+                    physAtk += bonus;
+                    bonuses.push(`隊伍協同(塞維恩): +${bonus} Atk`);
+                }
+            }
+
+            // v3.22.14: 羅域 + 逆境 (光照不足)
+            if ((effect.startsWith('light_compensation_loric')) && totalLight < lightReq) {
+                let bonus = 1;
+                if (effect.endsWith('_2')) bonus = 2;
+                if (effect.endsWith('_3')) bonus = 3;
+                physAtk += bonus;
+                bonuses.push(`逆境戰鬥(羅域): +${bonus} Atk`);
+            }
+
+            if (hero.hero.series === 'Dwarf' && damageItem && damageItem.type === 'Weapon') {
+                // Dwarf ability logic updated v3.22.12 desc only, logic remains
+                let bonus = 1;
+                if (hero.id.includes('_lv2')) bonus = 2;
+                if (hero.id.includes('_lv3')) bonus = 3;
+                physAtk += bonus;
+                bonuses.push(`矮人武裝: +${bonus} Atk`);
+            }
+
+            // Keep existing light_compensation (Sevin Lv2 legacy logic? Wait, Sevin Lv2 logic changed to synergy_hero_group_2)
+            // But Sevin Lv3 logic is STILL light_compensation_lv3?
+            // User requested changes to "hero_sevin_lv1"... "original ability cancelled".
+            // My data update in Step 1039 replaced Lv1 and Lv2 abilities.
+            // Lv3 is "light_compensation_lv3" still in Step 1039 replacement chunk (top part).
+            // So need to keep that logic.
+            if (effect === 'light_compensation_lv3' && lightPenalty > 0 && totalLight > 0) {
+                magAtk += 2; // Lv3 desc: Magic+2 if low light
+                bonuses.push('騎士信仰(Lv3): +2 Mag');
+            }
+
+            // Legacy Light Compensation (for Sevin Lv2 if any old instances exist? No, user updated data)
             if (effect === 'light_compensation' && lightPenalty > 0) {
-                // ...existing logic needed? Yes.
-                if (totalLight > 0) { // Using cached totalLight
+                if (totalLight > 0) {
                     physAtk += totalLight;
                     bonuses.push(`騎士信仰(光照補償): +${totalLight} Atk`);
                 }

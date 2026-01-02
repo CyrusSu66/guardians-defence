@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.22.13(01-02-15:35)"; // Spear Synergy & Formula UI
+        this.version = "v3.22.14(01-02-15:55)"; // Content Pack 1 & Terminology Fix
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);
@@ -273,6 +273,35 @@ class GuardiansDefenceGame {
                 this.discard.push(this.hand.splice(i, 1)[0]);
                 discarded++;
                 if (discarded >= count) break;
+            }
+        }
+        this.updateUI();
+    }
+
+    // v3.22.14: 破壞手牌 (移除出遊戲)
+    forcePlayerDestroy(count, targetTypes = null) {
+        let destroyed = 0;
+        // 如果指定類型
+        if (targetTypes) {
+            for (let i = this.hand.length - 1; i >= 0; i--) {
+                const card = this.hand[i];
+                // 檢查類型 (type) 或子類型 (subTypes)
+                const isMatch = targetTypes.includes(card.type) || (card.subTypes && card.subTypes.some(t => targetTypes.includes(t)));
+                if (isMatch) {
+                    const removed = this.hand.splice(i, 1)[0];
+                    this.addLog(`💔 遭受破壞，${removed.name} 已被移除。`, 'danger');
+                    destroyed++;
+                    if (destroyed >= count) break;
+                }
+            }
+        } else {
+            // 隨機破壞
+            for (let i = 0; i < count; i++) {
+                if (this.hand.length > 0) {
+                    const idx = Math.floor(Math.random() * this.hand.length);
+                    const removed = this.hand.splice(idx, 1)[0];
+                    this.addLog(`💔 遭受破壞，${removed.name} 已被移除。`, 'danger');
+                }
             }
         }
         this.updateUI();

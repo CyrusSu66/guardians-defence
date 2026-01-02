@@ -84,6 +84,13 @@ export class DungeonEngine {
             g.forcePlayerDiscard(1);
         } else if (effect === 'discard_magic_or_item') {
             g.forceTypeDiscard(['Spell', 'Item', 'Weapon'], 1);
+        } else if (effect === 'destroy_hand_1') {
+            g.forcePlayerDestroy(1);
+        } else if (effect === 'destroy_hand_2') {
+            g.forcePlayerDestroy(2);
+        } else if (effect === 'destroy_hand_2_plus_1') {
+            g.forcePlayerDestroy(2);
+            g.forcePlayerDestroy(1, ['Item', 'Weapon', 'Food', 'LightItem', 'Spell']);
         }
     }
 }
