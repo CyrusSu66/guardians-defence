@@ -63,6 +63,7 @@ h1 {
     /* Approx 8 lines */
     min-height: 12em;
     max-height: 12em;
+    overflow-y: auto;
 }
 
 
