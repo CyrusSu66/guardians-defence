@@ -24,9 +24,14 @@ export const CARDPOOL = {
             abilities: { onDungeon: 'synergy_spear_draw' }
         },
         {
-            id: 'basic_torch', name: '火把', type: 'Item', subTypes: ['Light'],
+            id: 'basic_torch', name: '火把', type: 'LightItem', subTypes: ['Light'],
             cost: 2, vp: 0, goldValue: 2, light: 1,
             desc: '提供基礎光照與採購力'
+        },
+        {
+            id: 'basic_light_gem', name: '光輝寶石', type: 'LightItem', subTypes: ['Wonder'],
+            cost: 3, vp: 0, goldValue: 2, light: 2,
+            desc: '提供進階光照與採購力'
         },
         {
             id: 'basic_spear', name: '長矛', type: 'Weapon', subTypes: ['Polearm', 'Sharp'],
