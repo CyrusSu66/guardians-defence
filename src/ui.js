@@ -579,21 +579,28 @@ export class UIManager {
         this.game.hand.forEach(c => totalLight += (c.light || 0));
         this.game.playedCards.forEach(c => totalLight += (c.light || 0));
 
-        // v3.22: 傳遞 auxItem 參與計算
+        // v3.22.13: 計算 HeroStr (包含 Aux 和 Aura) 以傳遞給 CombatEngine
+        let heroStr = hero ? hero.hero.strength : 0;
+        if (auxItem && auxItem.abilities && auxItem.abilities.onBattle === 'boost_str_1') heroStr += 1;
+        const activeAurasStruct = this.game.getActiveAuras();
+        heroStr += (activeAurasStruct.strMod || 0);
+
+        // 第一次計算 (取得光照懲罰)
         const results = this.game.calculateHeroCombatStats(
             hero || { hero: { attack: 0, magicAttack: 0 } },
             damageItem,
             monster,
-            0, // temp penalty, recalculated inside
+            0,
             totalLight,
             targetRank ? targetRank : 0,
-            auxItem
+            auxItem,
+            heroStr
         );
         const auras = results.auras || { lightReqMod: 0 };
         const lightReq = targetRank ? (targetRank + (auras.lightReqMod || 0)) : 0;
         const lightPenalty = targetRank ? Math.max(0, lightReq - totalLight) * 2 : 0;
 
-        // Recalculate with correct penalty
+        // 第二次計算 (取得最終數值)
         const finalResults = this.game.calculateHeroCombatStats(
             hero || { hero: { attack: 0, magicAttack: 0 } },
             damageItem,
@@ -601,10 +608,33 @@ export class UIManager {
             lightPenalty,
             totalLight,
             lightReq,
-            auxItem
+            auxItem,
+            heroStr
         );
-        const { finalAtk, bonuses, physAtk, magAtk } = finalResults;
-        const adj = Math.max(0, lightReq - totalLight);
+        const { finalAtk, bonuses, physAtk, magAtk, rawPhysAtk } = finalResults;
+
+        // 公式與細節顯示
+        const base = heroStr;
+        const weapon = (damageItem && damageItem.equipment) ? damageItem.equipment.attack : 0;
+        const magic = magAtk;
+        const otherBonus = rawPhysAtk - base - weapon; // 剩餘的物理加成 (如連動、Aura AtkMod)
+
+        const formulaHtml = `
+            <div style="margin-top: 8px; font-family: monospace; font-size: 13px; color: #fff; background: rgba(0,0,0,0.6); padding: 8px; border-radius: 4px; border: 1px solid #555;">
+                <div style="color: #aaa; margin-bottom: 4px;">傷害公式預覽:</div>
+                <div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
+                    <span>[</span>
+                    <span style="color:#ff9800;">${base}(英雄)</span> + 
+                    <span style="color:#2196f3;">${weapon}(武器)</span>
+                    ${magic > 0 ? `+ <span style="color:#9c27b0;">${magic}(魔法)</span>` : ''}
+                    ${otherBonus !== 0 ? `+ <span style="color:#e91e63;">${otherBonus}(特效)</span>` : ''}
+                    <span>]</span>
+                    <span style="color:#ff5a59;"> - [ ${lightPenalty} (懲罰) ]</span>
+                    <span> = </span>
+                    <strong style="font-size:15px; color:#fff;">${finalAtk}</strong>
+                </div>
+            </div>
+        `;
 
         const calcGridHtml = `
             <div class="combat-calc-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; margin-bottom: 12px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 6px; border: 1px solid #444;">
@@ -613,6 +643,8 @@ export class UIManager {
                 <div style="grid-column: 1/-1; padding-top: 5px; border-top: 1px solid #333; color: ${lightPenalty > 0 ? '#ff5a59' : '#4caf50'}; font-weight: bold;">
                     ⚖️ 當前照明影響: -${lightPenalty} 戰力 (x2 懲罰)
                 </div>
+                <!-- 插入公式 -->
+                <div style="grid-column: 1/-1;">${formulaHtml}</div>
             </div>
         `;
 

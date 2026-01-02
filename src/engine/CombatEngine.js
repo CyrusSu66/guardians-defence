@@ -139,6 +139,13 @@ export class CombatEngine {
         // 英雄戰鬥技能
         if (hero.abilities && hero.abilities.onBattle) {
             const effect = hero.abilities.onBattle;
+
+            // v3.22.13: 正規軍 + 長矛 連動
+            if (effect === 'synergy_spear' && damageItem && damageItem.id === 'basic_spear') {
+                physAtk += 1;
+                bonuses.push('長矛協同(正規軍): +1 Atk');
+            }
+
             if (hero.hero.series === 'Dwarf' && damageItem && damageItem.type === 'Weapon') {
                 physAtk += 1;
                 bonuses.push('矮人武裝: +1 Atk');

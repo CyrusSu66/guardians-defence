@@ -19,9 +19,9 @@ export const CARDPOOL = {
         {
             id: 'basic_regular_army', name: '正規軍', type: 'Hero', subTypes: ['Fighter'],
             cost: 2, vp: 0, goldValue: 0, light: 0,
-            desc: '基本步兵單位。可花費 1 XP 晉升為 1 級英雄。',
-            hero: { level: 0, series: 'Regular', magicAttack: 0, strength: 2, xpToUpgrade: 1 },
-            abilities: { onDungeon: 'synergy_spear_draw' }
+            desc: '【地下城】若裝備長矛，攻擊力+1',
+            hero: { level: 0, series: 'Regular', magicAttack: 0, strength: 1, xpToUpgrade: 1 },
+            abilities: { onBattle: 'synergy_spear' }
         },
         {
             id: 'basic_torch', name: '火把', type: 'LightItem', subTypes: ['Light'],
@@ -38,7 +38,7 @@ export const CARDPOOL = {
         {
             id: 'basic_rations', name: '乾糧', type: 'Food', subTypes: ['Supply'],
             cost: 1, vp: 0, goldValue: 1, light: 0,
-            desc: '【戰鬥】額外 STR+1 (同時提升負重與傷害)',
+            desc: '【地下城】額外 STR+1 (同時提升負重與傷害)',
             abilities: { onBattle: 'boost_str_1' }
         }
     ],
@@ -49,19 +49,19 @@ export const CARDPOOL = {
             id: 'hero_sevin_lv1', name: '塞維恩扈從', type: 'Hero', subTypes: ['Fighter'],
             cost: 4, vp: 1, goldValue: 0, light: 0,
             desc: '勇往直前的戰士學徒',
-            hero: { level: 1, series: 'Sevin', magicAttack: 0, strength: 2, xpToUpgrade: 4, upgradeToId: 'hero_sevin_lv2' }
+            hero: { level: 1, series: 'Sevin', magicAttack: 0, strength: 3, xpToUpgrade: 4, upgradeToId: 'hero_sevin_lv2' }
         },
         {
             id: 'hero_sevin_lv2', name: '塞維恩騎士', type: 'Hero', subTypes: ['Fighter'],
             cost: 7, vp: 2, goldValue: 0, light: 1,
-            desc: '【戰鬥】光照不足時，每多一光源攻擊力 +1',
+            desc: '【地下城】光照不足時，每多一光源攻擊力 +1',
             hero: { level: 2, series: 'Sevin', magicAttack: 0, strength: 4, xpToUpgrade: 6, upgradeToId: 'hero_sevin_lv3' },
             abilities: { onBattle: 'light_compensation' }
         },
         {
             id: 'hero_sevin_lv3', name: '塞維恩君主', type: 'Hero', subTypes: ['Fighter'],
             cost: 10, vp: 3, goldValue: 0, light: 2,
-            desc: '【戰鬥】光照不足時 Magic+2；戰勝可額外購買光源。',
+            desc: '【地下城】光照不足時 Magic+2；戰勝可額外購買光源。',
             hero: { level: 3, series: 'Sevin', magicAttack: 0, strength: 5, xpToUpgrade: 0 },
             abilities: { onBattle: 'light_compensation_lv3', onVictory: 'buy_light' }
         },
