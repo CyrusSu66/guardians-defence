@@ -421,9 +421,16 @@ body {
 .card-top-row {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     font-size: 10px;
     color: #888;
+}
+
+.card-type {
+    font-size: 14px;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
 }
 
 .card-info-btn {
