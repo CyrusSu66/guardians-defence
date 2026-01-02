@@ -593,80 +593,65 @@ export class UIManager {
                         <div style="display: flex; justify-content: space-between; ${m.hasThunderstone ? 'color:#00e5ff; font-weight:bold; background: rgba(0,229,255,0.1);' : ''}">
                             <span>${deck.length - i}. ${m.name}${m.hasThunderstone ? ' 💠' : ''}</span>
                             <span style="opacity: 0.5;">(HP: ${m.monster.hp}⚔️${m.monster.breachDamage})</span>
-                        </div>
-                    `).reverse().join('')}
-                </div>
-            </div>
         `;
     }
 
-    /**
-     * 顯示怪物詳細資訊 Tooltip (v3.10)
-     */
-    showMonsterDetail(monsterId) {
-        console.log(`[UI] showMonsterDetail called with ID: ${monsterId}`);
-        // v3.19: 更穩健的 ID 解析 (移除 _0, _1 等動態後綴)
-        // 假設 ID 格式為 mon_name_index，嘗試只取前兩段 (mon_name)
-        let templateId = monsterId;
 
+    updateCombatSummary() {
+        const summary = document.getElementById('combatSummary');
+        if (!summary || this.game.state !== GameState.COMBAT) return;
 
+        const { selectedHeroIdx, selectedDamageIdx, selectedAuxIdx, targetRank } = this.game.combat;
+        const hero = this.game.hand[selectedHeroIdx];
+        const damageItem = this.game.hand[selectedDamageIdx];
+        const auxItem = this.game.hand[selectedAuxIdx];
+        const monster = targetRank ? this.game.dungeonHall[`rank${targetRank}`] : null;
 
+        let totalLight = 0;
+        this.game.hand.forEach(c => totalLight += (c.light || 0));
+        this.game.playedCards.forEach(c => totalLight += (c.light || 0));
 
-        updateCombatSummary() {
-            const summary = document.getElementById('combatSummary');
-            if (!summary || this.game.state !== GameState.COMBAT) return;
+        // v3.22.13: 計算 HeroStr (包含 Aux 和 Aura) 以傳遞給 CombatEngine
+        let heroStr = hero ? hero.hero.strength : 0;
+        if (auxItem && auxItem.abilities && auxItem.abilities.onBattle === 'boost_str_1') heroStr += 1;
+        const activeAurasStruct = this.game.getActiveAuras();
+        heroStr += (activeAurasStruct.strMod || 0);
 
-            const { selectedHeroIdx, selectedDamageIdx, selectedAuxIdx, targetRank } = this.game.combat;
-            const hero = this.game.hand[selectedHeroIdx];
-            const damageItem = this.game.hand[selectedDamageIdx];
-            const auxItem = this.game.hand[selectedAuxIdx];
-            const monster = targetRank ? this.game.dungeonHall[`rank${targetRank}`] : null;
+        // 第一次計算 (取得光照懲罰)
+        const results = this.game.calculateHeroCombatStats(
+            hero || { hero: { attack: 0, magicAttack: 0 } },
+            damageItem,
+            monster,
+            0,
+            totalLight,
+            targetRank ? targetRank : 0,
+            auxItem,
+            heroStr
+        );
+        const auras = results.auras || { lightReqMod: 0 };
+        const lightReq = targetRank ? (targetRank + (auras.lightReqMod || 0)) : 0;
+        const lightPenalty = targetRank ? Math.max(0, lightReq - totalLight) * 2 : 0;
 
-            let totalLight = 0;
-            this.game.hand.forEach(c => totalLight += (c.light || 0));
-            this.game.playedCards.forEach(c => totalLight += (c.light || 0));
+        // 第二次計算 (取得最終數值)
+        const finalResults = this.game.calculateHeroCombatStats(
+            hero || { hero: { attack: 0, magicAttack: 0 } },
+            damageItem,
+            monster,
+            lightPenalty,
+            totalLight,
+            lightReq,
+            auxItem,
+            heroStr
+        );
+        const { finalAtk, bonuses, physAtk, magAtk, rawPhysAtk } = finalResults;
 
-            // v3.22.13: 計算 HeroStr (包含 Aux 和 Aura) 以傳遞給 CombatEngine
-            let heroStr = hero ? hero.hero.strength : 0;
-            if (auxItem && auxItem.abilities && auxItem.abilities.onBattle === 'boost_str_1') heroStr += 1;
-            const activeAurasStruct = this.game.getActiveAuras();
-            heroStr += (activeAurasStruct.strMod || 0);
+        // 公式與細節顯示
+        const base = heroStr;
+        const weapon = (damageItem && damageItem.equipment) ? damageItem.equipment.attack : 0;
+        const magic = magAtk;
+        const otherBonus = rawPhysAtk - base - weapon; // 剩餘的物理加成 (如連動、Aura AtkMod)
 
-            // 第一次計算 (取得光照懲罰)
-            const results = this.game.calculateHeroCombatStats(
-                hero || { hero: { attack: 0, magicAttack: 0 } },
-                damageItem,
-                monster,
-                0,
-                totalLight,
-                targetRank ? targetRank : 0,
-                auxItem,
-                heroStr
-            );
-            const auras = results.auras || { lightReqMod: 0 };
-            const lightReq = targetRank ? (targetRank + (auras.lightReqMod || 0)) : 0;
-            const lightPenalty = targetRank ? Math.max(0, lightReq - totalLight) * 2 : 0;
-
-            // 第二次計算 (取得最終數值)
-            const finalResults = this.game.calculateHeroCombatStats(
-                hero || { hero: { attack: 0, magicAttack: 0 } },
-                damageItem,
-                monster,
-                lightPenalty,
-                totalLight,
-                lightReq,
-                auxItem,
-                heroStr
-            );
-            const { finalAtk, bonuses, physAtk, magAtk, rawPhysAtk } = finalResults;
-
-            // 公式與細節顯示
-            const base = heroStr;
-            const weapon = (damageItem && damageItem.equipment) ? damageItem.equipment.attack : 0;
-            const magic = magAtk;
-            const otherBonus = rawPhysAtk - base - weapon; // 剩餘的物理加成 (如連動、Aura AtkMod)
-
-            const formulaHtml = `
+        const formulaHtml = `
             <div style="margin-top: 8px; font-family: monospace; font-size: 13px; color: #fff; background: rgba(0,0,0,0.6); padding: 8px; border-radius: 4px; border: 1px solid #555;">
                 <div style="color: #aaa; margin-bottom: 4px;">傷害公式預覽:</div>
                 <div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
@@ -683,7 +668,7 @@ export class UIManager {
             </div>
         `;
 
-            const calcGridHtml = `
+        const calcGridHtml = `
             <div class="combat-calc-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; margin-bottom: 12px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 6px; border: 1px solid #444;">
                 <div style="color: #ffeb3b;">💡 手牌總照明: ${totalLight}</div>
                 <div style="color: #00e5ff;">🕯️ 地城需求: ${targetRank ? lightReq : '(未選目標)'}${auras.lightReqMod > 0 ? ` (+${auras.lightReqMod})` : ''}</div>
@@ -695,10 +680,10 @@ export class UIManager {
             </div>
         `;
 
-            // const auraListHtml = this.renderAuras(); // Removed: causing crash, using inline logic below
+        // const auraListHtml = this.renderAuras(); // Removed: causing crash, using inline logic below
 
-            // 3-Slot Visual Display
-            const renderSlot = (label, card, placeholder) => `
+        // 3-Slot Visual Display
+        const renderSlot = (label, card, placeholder) => `
             <div style="background: rgba(255,255,255,0.05); border: 1px solid ${card ? '#4caf50' : '#444'}; border-radius: 4px; padding: 6px; text-align: center; height: 100%;">
                 <div style="font-size: 10px; color: #888; margin-bottom: 4px;">${label}</div>
                 ${card ? `
@@ -708,7 +693,7 @@ export class UIManager {
             </div>
         `;
 
-            const slotsHtml = `
+        const slotsHtml = `
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 10px;">
                 ${renderSlot('🟢 輔助物品', auxItem, '選擇食物/道具')}
                 ${renderSlot('🔴 英雄', hero, '選擇英雄')}
@@ -716,22 +701,22 @@ export class UIManager {
             </div>
         `;
 
-            // Render Auras inline for now (since helper doesn't exist yet)
-            const activeAuras = [];
-            for (let i = 1; i <= 3; i++) {
-                const m = this.game.dungeonHall[`rank${i}`];
-                if (m && m.abilities && m.abilities.aura) {
-                    activeAuras.push({ name: m.name, desc: m.abilities.aura });
-                }
+        // Render Auras inline for now (since helper doesn't exist yet)
+        const activeAuras = [];
+        for (let i = 1; i <= 3; i++) {
+            const m = this.game.dungeonHall[`rank${i}`];
+            if (m && m.abilities && m.abilities.aura) {
+                activeAuras.push({ name: m.name, desc: m.abilities.aura });
             }
-            const auraHtml = activeAuras.length > 0 ? `
+        }
+        const auraHtml = activeAuras.length > 0 ? `
             <div style="font-size: 11px; background: rgba(255,100,0,0.1); border: 1px solid rgba(255,100,0,0.2); padding: 5px; border-radius: 4px; margin-bottom: 8px;">
                 <strong style="color: #ff9800;">⚠️ 環境 (Aura):</strong><br>
                 ${activeAuras.map(a => `<span style="color: #eee;">• [${a.name}] ${a.desc}</span>`).join('<br>')}
             </div>
         ` : '';
 
-            summary.innerHTML = `
+        summary.innerHTML = `
             ${calcGridHtml}
             ${auraHtml}
             ${slotsHtml}
@@ -752,46 +737,46 @@ export class UIManager {
                 🎯 目標：${monster ? monster.name + ' (❤️ ' + monster.currentHP + ' HP)' : '<span style="color:#ff5a59;">（未選取目標）</span>'}
             </div>
         `;
-            const btn = document.getElementById('combatAttackBtn');
-            if (btn) btn.disabled = !hero || !targetRank;
-        }
+        const btn = document.getElementById('combatAttackBtn');
+        if (btn) btn.disabled = !hero || !targetRank;
+    }
 
-        // --- 查看功能 ---
-        renderDeckView(title, list) {
-            const modal = document.getElementById('deckViewModal');
-            const titleEl = document.getElementById('deckViewTitle');
-            const listEl = document.getElementById('deckViewList');
-            if (!modal || !titleEl || !listEl) return;
+    // --- 查看功能 ---
+    renderDeckView(title, list) {
+        const modal = document.getElementById('deckViewModal');
+        const titleEl = document.getElementById('deckViewTitle');
+        const listEl = document.getElementById('deckViewList');
+        if (!modal || !titleEl || !listEl) return;
 
-            titleEl.textContent = title;
-            listEl.innerHTML = '';
+        titleEl.textContent = title;
+        listEl.innerHTML = '';
 
-            if (list.length === 0) {
-                listEl.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #888;">此區域目前無任何卡片</div>';
-            } else {
-                list.forEach(card => {
-                    const el = document.createElement('div');
-                    el.className = 'card small';
-                    el.innerHTML = `
+        if (list.length === 0) {
+            listEl.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #888;">此區域目前無任何卡片</div>';
+        } else {
+            list.forEach(card => {
+                const el = document.createElement('div');
+                el.className = 'card small';
+                el.innerHTML = `
                     <div class="card-type-tag" style="font-size: 8px;">${card.type}</div>
                     <div class="card-name" style="font-size: 11px;">${card.name}</div>
                     <div class="card-desc" style="font-size: 9px;">${card.desc || ''}</div>
                 `;
-                    listEl.appendChild(el);
-                });
-            }
-            modal.classList.add('active');
+                listEl.appendChild(el);
+            });
         }
-
-        setText(id, text) {
-            const el = document.getElementById(id);
-            if (el) el.textContent = text;
-        }
-
-        show(id, isShow) {
-            const el = document.getElementById(id);
-            if (el) el.style.display = isShow ? 'block' : 'none';
-            if (el && id === 'gameStepButtons') el.style.display = isShow ? 'flex' : 'none';
-            if (el && id === 'villageFinishControl') el.style.display = isShow ? 'flex' : 'none';
-        }
+        modal.classList.add('active');
     }
+
+    setText(id, text) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+    }
+
+    show(id, isShow) {
+        const el = document.getElementById(id);
+        if (el) el.style.display = isShow ? 'block' : 'none';
+        if (el && id === 'gameStepButtons') el.style.display = isShow ? 'flex' : 'none';
+        if (el && id === 'villageFinishControl') el.style.display = isShow ? 'flex' : 'none';
+    }
+}
