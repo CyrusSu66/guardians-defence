@@ -361,7 +361,7 @@ export class UIManager {
         const modalContent = document.getElementById('infoModalContent');
         const modal = document.getElementById('infoModal');
 
-        if (modalTitle) modalTitle.innerText = '卡牌詳情';
+        if (modalTitle) modalTitle.innerText = ''; // User requested to remove title
         if (modalContent) modalContent.innerHTML = content;
         if (modal) modal.classList.add('active');
     }
@@ -384,6 +384,7 @@ export class UIManager {
                 const hpColor = hpPercent > 50 ? '#4caf50' : (hpPercent > 25 ? '#ff9800' : '#f44336');
 
                 el.innerHTML = `
+                    <div class="card-info-btn" style="position: absolute; top: 2px; right: 2px; border-color: #ff5a59; color: #ff5a59;" onclick="event.stopPropagation(); window.game.ui.showMonsterDetail('${monster.id}')">ⓘ</div>
                     <div class="rank-label">Rank ${rank} (💡 ${lightPenalty})</div>
                     <div class="monster-name">${monster.name}</div>
                     <div class="monster-hp" style="color: ${hpColor}; font-weight: bold;">❤️ HP: ${monster.currentHP}/${monster.monster.hp}</div>
