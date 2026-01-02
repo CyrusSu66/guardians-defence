@@ -542,7 +542,10 @@ export class UIManager {
                         <div class="monster-mini-card">
                             <div class="monster-name">${tsMarker} ${monster.name}</div>
                             <div class="monster-hp" style="color:${hpColor}">❤️ ${monster.currentHP}/${monster.monster.hp}</div>
-                            <!-- monster-stats removed per user request -->
+                            <div class="monster-stats">
+                                <span class="breach-dmg">⚠️ -${monster.monster.breachDamage || 1} HP</span>
+                                <span class="xp-gain">✨ +${monster.monster.xpGain} XP</span>
+                            </div>
                             <div class="info-icon" onclick="event.stopPropagation(); window.ui.showMonsterDetail('${monster.id}')">ⓘ</div>
                         </div>
                     </div>
