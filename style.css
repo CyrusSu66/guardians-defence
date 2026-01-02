@@ -393,6 +393,7 @@ body {
 
 /* Card Styles (Standardized) */
 /* Card Styles (Refined v3.23.5) */
+/* Card Styles (Refined v3.23.8) */
 .card {
     width: var(--card-width);
     height: calc(var(--card-width) * 1.5);
@@ -408,7 +409,7 @@ body {
 
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    /* justify-content: space-between; removed to allow stacking */
 }
 
 .card:hover {
