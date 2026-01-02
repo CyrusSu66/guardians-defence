@@ -613,7 +613,7 @@ export class UIManager {
             </div>
         `;
 
-        const auraListHtml = this.renderAuras(); // Refactored helper if exists, or inline below
+        // const auraListHtml = this.renderAuras(); // Removed: causing crash, using inline logic below
 
         // 3-Slot Visual Display
         const renderSlot = (label, card, placeholder) => `
