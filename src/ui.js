@@ -315,7 +315,7 @@ export class UIManager {
     // I will keep getStatsHtml if it is used elsewhere, but renderCard now builds DOM directly.
 
     // v3.4 顯示卡牌詳情 Tooltip
-    // v3.4 顯示卡牌詳情 Tooltip (Fixed v3.23.18)
+    // v3.4 顯示卡牌詳情 Tooltip (Fixed v3.23.19)
     showCardDetail(cardId) {
         const card = this.game.getCardPoolItem(cardId);
         if (!card) return;
@@ -344,204 +344,181 @@ export class UIManager {
             content += '</div>';
         }
 
-        // Generate stats HTML
-        let statsHtml = '';
+        // Generate stats HTML (Appended to content instead of ttStats)
+        let statsHtml = '<div style="margin-top:10px; border-top:1px solid #444; padding-top:10px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">';
         if (card.hero) {
-            statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">攻擊力/力量</div><div class="tooltip-stat-value">💪 ${card.hero.strength}</div></div>`;
-            statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">魔攻力</div><div class="tooltip-stat-value">🪄 ${card.hero.magicAttack || 0}</div></div>`;
+            statsHtml += `<div>💪 力量: ${card.hero.strength}</div><div>🪄 魔攻: ${card.hero.magicAttack}</div>`;
         } else if (card.equipment) {
-            statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">攻擊力</div><div class="tooltip-stat-value">⚔️ ${card.equipment.attack}</div></div>`;
-            statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">重量</div><div class="tooltip-stat-value">⚖️ ${card.equipment.weight}</div></div>`;
-        }
+            container.innerHTML = '';
+            [1, 2, 3].forEach(rank => {
+                const el = document.createElement('div');
+                el.className = 'lane-slot dungeon-rank';
+                const monster = this.game.dungeonHall[`rank${rank}`];
+                const lightPenalty = -rank;
+                if (monster) {
+                    el.classList.add('occupied');
+                    if (monster.hasThunderstone) el.classList.add('boss-marked');
 
-        if (card.cost) {
-            statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">購買費用</div><div class="tooltip-stat-value" style="color:#ffd700;">💰 ${card.cost}</div></div>`;
-        }
-        if (card.goldValue) {
-            statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">提供金錢</div><div class="tooltip-stat-value" style="color:#ffd700;">🪙 ${card.goldValue}</div></div>`;
-        }
-        if (card.light) {
-            statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">照明點數</div><div class="tooltip-stat-value" style="color:#ffeb3b;">💡 ${card.light}</div></div>`;
-        }
-        document.getElementById('ttStats').innerHTML = statsHtml;
-        document.getElementById('ttLore').innerText = card.lore || "此卡片尚未被歷史記載。";
+                    // v3.5：顯示動態 HP
+                    const hpPercent = (monster.currentHP / monster.monster.hp) * 100;
+                    const hpColor = hpPercent > 50 ? '#4caf50' : (hpPercent > 25 ? '#ff9800' : '#f44336');
 
-        document.getElementById('cardTooltipOverlay').classList.add('active');
-    }
-
-    renderDungeonRanks() {
-        const container = document.getElementById('dungeonRankSlots');
-        if (!container) return;
-        container.innerHTML = '';
-        [1, 2, 3].forEach(rank => {
-            const el = document.createElement('div');
-            el.className = 'lane-slot dungeon-rank';
-            const monster = this.game.dungeonHall[`rank${rank}`];
-            const lightPenalty = -rank;
-            if (monster) {
-                el.classList.add('occupied');
-                if (monster.hasThunderstone) el.classList.add('boss-marked');
-
-                // v3.5：顯示動態 HP
-                const hpPercent = (monster.currentHP / monster.monster.hp) * 100;
-                const hpColor = hpPercent > 50 ? '#4caf50' : (hpPercent > 25 ? '#ff9800' : '#f44336');
-
-                el.innerHTML = `
+                    el.innerHTML = `
                     <div class="rank-label">Rank ${rank} (💡 ${lightPenalty})</div>
                     <div class="monster-name">${monster.name}</div>
                     <div class="monster-hp" style="color: ${hpColor}; font-weight: bold;">❤️ HP: ${monster.currentHP}/${monster.monster.hp}</div>
                     <div class="monster-reward">XP: ${monster.monster.xpGain}</div>
                 `;
-                if (this.game.state === GameState.COMBAT) {
-                    el.style.cursor = 'pointer';
-                    if (this.game.combat && this.game.combat.targetRank === rank) el.classList.add('target-locked');
-                    el.onclick = () => this.game.selectCombatTarget(rank);
+                    if (this.game.state === GameState.COMBAT) {
+                        el.style.cursor = 'pointer';
+                        if (this.game.combat && this.game.combat.targetRank === rank) el.classList.add('target-locked');
+                        el.onclick = () => this.game.selectCombatTarget(rank);
+                    }
+                } else {
+                    el.innerHTML = `<div class="rank-label">Rank ${rank}</div><div class="empty-slot">空</div>`;
                 }
-            } else {
-                el.innerHTML = `<div class="rank-label">Rank ${rank}</div><div class="empty-slot">空</div>`;
-            }
-            container.appendChild(el);
-        });
-    }
-
-    renderMarket() {
-        const marketGrid = document.getElementById('marketGrid');
-        if (!marketGrid) return;
-        marketGrid.innerHTML = '';
-        const g = this.game;
-
-        const allItems = [
-            ...g.marketItems.heroes,
-            ...g.marketItems.items,
-            ...g.marketItems.basics,
-            ...(g.marketItems.spells || [])
-        ];
-
-        allItems.forEach(card => {
-            const canAfford = g.currentGold >= card.cost;
-            const onClick = () => {
-                if (canAfford && !g.hasBought) this.game.buyCard(card.id, card.cost);
-            };
-
-            const cardEl = this.renderCard(card, onClick, false, true);
-            if (!canAfford) cardEl.classList.add('disabled');
-            if (g.hasBought) cardEl.classList.add('bought');
-
-            marketGrid.appendChild(cardEl);
-        });
-    }
-
-    renderTraining() {
-        const container = document.getElementById('trainingContent');
-        if (!container) return;
-        container.innerHTML = '';
-
-        // 1. 正規軍轉職 (v3.2)
-        const regulars = this.game.hand.map((c, i) => ({ card: c, idx: i })).filter(x => x.card.id === 'basic_regular_army');
-        if (regulars.length > 0) {
-            const promoSection = document.createElement('div');
-            promoSection.className = 'training-promo-section';
-            promoSection.innerHTML = `<h4>🛡 正規軍轉職 (需 1 XP)</h4>`;
-
-            regulars.forEach(reg => {
-                const regEl = document.createElement('div');
-                regEl.className = 'training-promo-item';
-                regEl.innerHTML = `<div><strong>正規軍 (#${reg.idx + 1})</strong> 可轉職為：</div>`;
-
-                const btnGroup = document.createElement('div');
-                btnGroup.style.display = 'flex';
-                btnGroup.style.gap = '5px';
-                btnGroup.style.marginTop = '5px';
-
-                this.game.marketItems.heroes.forEach(marketHero => {
-                    const btn = document.createElement('button');
-                    btn.className = 'btn btn-primary small';
-                    btn.style.fontSize = '10px';
-                    btn.style.padding = '5px';
-                    btn.textContent = marketHero.name;
-                    btn.disabled = this.game.currentXP < 1;
-                    btn.onclick = () => this.game.promoteRegularArmy(reg.idx, marketHero.id);
-                    btnGroup.appendChild(btn);
-                });
-                regEl.appendChild(btnGroup);
-                promoSection.appendChild(regEl);
-            });
-            container.appendChild(promoSection);
-        }
-
-        // 2. 英雄升級
-        const upgradable = this.game.hand.filter(c => c.type === 'Hero' && c.hero && c.hero.upgradeToId);
-        if (upgradable.length > 0) {
-            const upgradeHeader = document.createElement('div');
-            upgradeHeader.innerHTML = `<h4 style="margin-top:15px;">🌟 英雄晉階</h4>`;
-            container.appendChild(upgradeHeader);
-
-            upgradable.forEach(h => {
-                const canAfford = this.game.currentXP >= h.hero.xpToUpgrade;
-                const el = document.createElement('div');
-                el.className = 'training-hero-item';
-                el.innerHTML = `
-                    <div class="hero-info"><strong>${h.name}</strong> ➔ 需 ${h.hero.xpToUpgrade} XP</div>
-                    <button class="btn btn-primary" ${canAfford ? '' : 'disabled'} 
-                        onclick="window.game.upgradeHero('${h.id}')">升級</button>
-                `;
                 container.appendChild(el);
             });
         }
 
-        if (regulars.length === 0 && upgradable.length === 0) {
-            container.innerHTML = '<div class="empty-msg">手牌中無可訓練或轉職的單位</div>';
+        renderMarket() {
+            const marketGrid = document.getElementById('marketGrid');
+            if (!marketGrid) return;
+            marketGrid.innerHTML = '';
+            const g = this.game;
+
+            const allItems = [
+                ...g.marketItems.heroes,
+                ...g.marketItems.items,
+                ...g.marketItems.basics,
+                ...(g.marketItems.spells || [])
+            ];
+
+            allItems.forEach(card => {
+                const canAfford = g.currentGold >= card.cost;
+                const onClick = () => {
+                    if (canAfford && !g.hasBought) this.game.buyCard(card.id, card.cost);
+                };
+
+                const cardEl = this.renderCard(card, onClick, false, true);
+                if (!canAfford) cardEl.classList.add('disabled');
+                if (g.hasBought) cardEl.classList.add('bought');
+
+                marketGrid.appendChild(cardEl);
+            });
         }
-    }
 
-    renderLog() {
-        const container = document.getElementById('gameLog');
-        if (!container) return;
-        container.innerHTML = '';
-        this.game.log.forEach(l => {
-            const el = document.createElement('div');
-            el.className = `log-entry ${l.type}`;
-            el.textContent = `> ${l.message}`;
-            container.appendChild(el);
-        });
-        // v3.21.3: 自動捲動至最底部 (Auto-scroll to bottom)
-        container.scrollTop = container.scrollHeight;
-    }
+        renderTraining() {
+            const container = document.getElementById('trainingContent');
+            if (!container) return;
+            container.innerHTML = '';
 
-    renderDungeonRanks() {
-        const container = document.getElementById('dungeonRankSlots');
-        if (!container) return;
-        container.innerHTML = '';
+            // 1. 正規軍轉職 (v3.2)
+            const regulars = this.game.hand.map((c, i) => ({ card: c, idx: i })).filter(x => x.card.id === 'basic_regular_army');
+            if (regulars.length > 0) {
+                const promoSection = document.createElement('div');
+                promoSection.className = 'training-promo-section';
+                promoSection.innerHTML = `<h4>🛡 正規軍轉職 (需 1 XP)</h4>`;
 
-        [1, 2, 3].forEach(rank => {
-            // Container for the whole slot (Rank Header + Content)
-            const slotEl = document.createElement('div');
-            slotEl.className = 'dungeon-rank-wrapper'; // New wrapper class
+                regulars.forEach(reg => {
+                    const regEl = document.createElement('div');
+                    regEl.className = 'training-promo-item';
+                    regEl.innerHTML = `<div><strong>正規軍 (#${reg.idx + 1})</strong> 可轉職為：</div>`;
 
-            const monster = this.game.dungeonHall[`rank${rank}`];
-            const lightPenalty = -rank;
+                    const btnGroup = document.createElement('div');
+                    btnGroup.style.display = 'flex';
+                    btnGroup.style.gap = '5px';
+                    btnGroup.style.marginTop = '5px';
 
-            // Header: Rank X
-            const headerHtml = `<div class="rank-header-text">Rank ${rank}</div>`;
+                    this.game.marketItems.heroes.forEach(marketHero => {
+                        const btn = document.createElement('button');
+                        btn.className = 'btn btn-primary small';
+                        btn.style.fontSize = '10px';
+                        btn.style.padding = '5px';
+                        btn.textContent = marketHero.name;
+                        btn.disabled = this.game.currentXP < 1;
+                        btn.onclick = () => this.game.promoteRegularArmy(reg.idx, marketHero.id);
+                        btnGroup.appendChild(btn);
+                    });
+                    regEl.appendChild(btnGroup);
+                    promoSection.appendChild(regEl);
+                });
+                container.appendChild(promoSection);
+            }
 
-            // Content Box: Dashed placeholder OR Monster Card
-            let contentHtml = '';
-            let additionalClass = '';
+            // 2. 英雄升級
+            const upgradable = this.game.hand.filter(c => c.type === 'Hero' && c.hero && c.hero.upgradeToId);
+            if (upgradable.length > 0) {
+                const upgradeHeader = document.createElement('div');
+                upgradeHeader.innerHTML = `<h4 style="margin-top:15px;">🌟 英雄晉階</h4>`;
+                container.appendChild(upgradeHeader);
 
-            if (!monster) {
-                // Empty Dashed Box
-                contentHtml = `<div class="rank-placeholder dashed"></div>`;
-            } else {
-                // Monster Info
-                additionalClass = 'occupied';
-                if (monster.hasThunderstone) additionalClass += ' boss-marked';
+                upgradable.forEach(h => {
+                    const canAfford = this.game.currentXP >= h.hero.xpToUpgrade;
+                    const el = document.createElement('div');
+                    el.className = 'training-hero-item';
+                    el.innerHTML = `
+                    <div class="hero-info"><strong>${h.name}</strong> ➔ 需 ${h.hero.xpToUpgrade} XP</div>
+                    <button class="btn btn-primary" ${canAfford ? '' : 'disabled'} 
+                        onclick="window.game.upgradeHero('${h.id}')">升級</button>
+                `;
+                    container.appendChild(el);
+                });
+            }
 
-                // v3.5: Dynamic HP
-                const hpPercent = (monster.currentHP / monster.monster.hp) * 100;
-                const hpColor = hpPercent > 50 ? '#4caf50' : (hpPercent > 25 ? '#ff9800' : '#f44336');
-                const tsMarker = monster.hasThunderstone ? '<span class="ts-icon">💠</span>' : '';
+            if (regulars.length === 0 && upgradable.length === 0) {
+                container.innerHTML = '<div class="empty-msg">手牌中無可訓練或轉職的單位</div>';
+            }
+        }
 
-                contentHtml = `
+        renderLog() {
+            const container = document.getElementById('gameLog');
+            if (!container) return;
+            container.innerHTML = '';
+            this.game.log.forEach(l => {
+                const el = document.createElement('div');
+                el.className = `log-entry ${l.type}`;
+                el.textContent = `> ${l.message}`;
+                container.appendChild(el);
+            });
+            // v3.21.3: 自動捲動至最底部 (Auto-scroll to bottom)
+            container.scrollTop = container.scrollHeight;
+        }
+
+        renderDungeonRanks() {
+            const container = document.getElementById('dungeonRankSlots');
+            if (!container) return;
+            container.innerHTML = '';
+
+            [1, 2, 3].forEach(rank => {
+                // Container for the whole slot (Rank Header + Content)
+                const slotEl = document.createElement('div');
+                slotEl.className = 'dungeon-rank-wrapper'; // New wrapper class
+
+                const monster = this.game.dungeonHall[`rank${rank}`];
+                const lightPenalty = -rank;
+
+                // Header: Rank X
+                const headerHtml = `<div class="rank-header-text">Rank ${rank}</div>`;
+
+                // Content Box: Dashed placeholder OR Monster Card
+                let contentHtml = '';
+                let additionalClass = '';
+
+                if (!monster) {
+                    // Empty Dashed Box
+                    contentHtml = `<div class="rank-placeholder dashed"></div>`;
+                } else {
+                    // Monster Info
+                    additionalClass = 'occupied';
+                    if (monster.hasThunderstone) additionalClass += ' boss-marked';
+
+                    // v3.5: Dynamic HP
+                    const hpPercent = (monster.currentHP / monster.monster.hp) * 100;
+                    const hpColor = hpPercent > 50 ? '#4caf50' : (hpPercent > 25 ? '#ff9800' : '#f44336');
+                    const tsMarker = monster.hasThunderstone ? '<span class="ts-icon">💠</span>' : '';
+
+                    contentHtml = `
                     <div class="rank-placeholder monster-active">
                         <div class="monster-mini-card">
                             <div class="monster-name">${tsMarker} ${monster.name}</div>
@@ -554,36 +531,36 @@ export class UIManager {
                         </div>
                     </div>
                 `;
-            }
-
-            slotEl.innerHTML = headerHtml + contentHtml;
-
-            if (additionalClass) slotEl.classList.add(additionalClass);
-
-            // Click handling for combat
-            if (monster && this.game.state === GameState.COMBAT) {
-                slotEl.style.cursor = 'pointer';
-                if (this.game.combat && this.game.combat.targetRank === rank) {
-                    slotEl.classList.add('target-locked');
                 }
-                slotEl.onclick = () => this.game.selectCombatTarget(rank);
-            }
 
-            container.appendChild(slotEl);
-        });
+                slotEl.innerHTML = headerHtml + contentHtml;
 
-        this.renderMonsterDeckInspector();
-    }
+                if (additionalClass) slotEl.classList.add(additionalClass);
 
-    /**
-     * 怪物牌庫監查器 (v3.11 Debug Tool)
-     */
-    renderMonsterDeckInspector() {
-        const container = document.getElementById('debugDeckInspector');
-        if (!container) return;
+                // Click handling for combat
+                if (monster && this.game.state === GameState.COMBAT) {
+                    slotEl.style.cursor = 'pointer';
+                    if (this.game.combat && this.game.combat.targetRank === rank) {
+                        slotEl.classList.add('target-locked');
+                    }
+                    slotEl.onclick = () => this.game.selectCombatTarget(rank);
+                }
 
-        const deck = this.game.monsterDeck;
-        container.innerHTML = `
+                container.appendChild(slotEl);
+            });
+
+            this.renderMonsterDeckInspector();
+        }
+
+        /**
+         * 怪物牌庫監查器 (v3.11 Debug Tool)
+         */
+        renderMonsterDeckInspector() {
+            const container = document.getElementById('debugDeckInspector');
+            if (!container) return;
+
+            const deck = this.game.monsterDeck;
+            container.innerHTML = `
             <div style="font-size: 11px; color: #aaa; margin-top: 15px; border: 1px dashed #555; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span>🔎 [DEBUG] 怪物牌庫餘量: <strong>${deck.length}</strong></span>
@@ -599,116 +576,116 @@ export class UIManager {
                 </div>
             </div>
         `;
-    }
-
-    /**
-     * 顯示怪物詳細資訊 Tooltip (v3.10)
-     */
-    showMonsterDetail(monsterId) {
-        console.log(`[UI] showMonsterDetail called with ID: ${monsterId}`);
-        // v3.19: 更穩健的 ID 解析 (移除 _0, _1 等動態後綴)
-        // 假設 ID 格式為 mon_name_index，嘗試只取前兩段 (mon_name)
-        let templateId = monsterId;
-        if (monsterId.startsWith('mon_') && monsterId.split('_').length > 2) {
-            templateId = monsterId.split('_').slice(0, 2).join('_');
-        }
-        console.log(`[UI] Resolved template ID: ${templateId}`);
-
-        let monster = this.game.getCardPoolItem(templateId);
-
-        // Fallback: 如果直接解析失敗，嘗試用完整 ID 查找，或當作是獨立實例查找
-        if (!monster) {
-            monster = this.game.getCardPoolItem(monsterId);
         }
 
-        // Fallback 2: 嘗試在 dungeonHall 中尋找實例
-        if (!monster) {
-            for (let k in this.game.dungeonHall) {
-                if (this.game.dungeonHall[k] && this.game.dungeonHall[k].id === monsterId) {
-                    monster = this.game.dungeonHall[k];
-                    break;
+        /**
+         * 顯示怪物詳細資訊 Tooltip (v3.10)
+         */
+        showMonsterDetail(monsterId) {
+            console.log(`[UI] showMonsterDetail called with ID: ${monsterId}`);
+            // v3.19: 更穩健的 ID 解析 (移除 _0, _1 等動態後綴)
+            // 假設 ID 格式為 mon_name_index，嘗試只取前兩段 (mon_name)
+            let templateId = monsterId;
+            if (monsterId.startsWith('mon_') && monsterId.split('_').length > 2) {
+                templateId = monsterId.split('_').slice(0, 2).join('_');
+            }
+            console.log(`[UI] Resolved template ID: ${templateId}`);
+
+            let monster = this.game.getCardPoolItem(templateId);
+
+            // Fallback: 如果直接解析失敗，嘗試用完整 ID 查找，或當作是獨立實例查找
+            if (!monster) {
+                monster = this.game.getCardPoolItem(monsterId);
+            }
+
+            // Fallback 2: 嘗試在 dungeonHall 中尋找實例
+            if (!monster) {
+                for (let k in this.game.dungeonHall) {
+                    if (this.game.dungeonHall[k] && this.game.dungeonHall[k].id === monsterId) {
+                        monster = this.game.dungeonHall[k];
+                        break;
+                    }
                 }
             }
-        }
 
-        if (!monster) {
-            console.error(`[UI] Monster data not found for ID: ${templateId} or ${monsterId}`);
-            alert(`錯誤：找不到怪物資料 (${templateId})`); // 用 Alert 提示資料錯誤
-            return;
-        }
+            if (!monster) {
+                console.error(`[UI] Monster data not found for ID: ${templateId} or ${monsterId}`);
+                alert(`錯誤：找不到怪物資料 (${templateId})`); // 用 Alert 提示資料錯誤
+                return;
+            }
 
-        const overlay = document.getElementById('cardTooltipOverlay');
-        if (!overlay) return;
+            const overlay = document.getElementById('cardTooltipOverlay');
+            if (!overlay) return;
 
-        document.getElementById('ttType').innerText = `怪物 - ${monster.subTypes.join('/')}`;
-        document.getElementById('ttTitle').innerText = monster.name;
-        document.getElementById('ttDescription').innerHTML = `<span style="color:#ff5a59;">[突進傷害: ${monster.monster.breachDamage || 1}]</span><br>${monster.desc || monster.description}`;
+            document.getElementById('ttType').innerText = `怪物 - ${monster.subTypes.join('/')}`;
+            document.getElementById('ttTitle').innerText = monster.name;
+            document.getElementById('ttDescription').innerHTML = `<span style="color:#ff5a59;">[突進傷害: ${monster.monster.breachDamage || 1}]</span><br>${monster.desc || monster.description}`;
 
-        let statsHtml = `
+            let statsHtml = `
             <div class="tooltip-stat-item"><div class="tooltip-stat-label">原始血量</div><div class="tooltip-stat-value">❤️ ${monster.monster.hp}</div></div>
             <div class="tooltip-stat-item"><div class="tooltip-stat-label">擊敗獎勵</div><div class="tooltip-stat-value">✨ ${monster.monster.xpGain} XP</div></div>
         `;
-        document.getElementById('ttStats').innerHTML = statsHtml;
-        document.getElementById('ttLore').innerText = monster.lore || "此怪物的來歷充滿謎團。";
+            document.getElementById('ttStats').innerHTML = statsHtml;
+            document.getElementById('ttLore').innerText = monster.lore || "此怪物的來歷充滿謎團。";
 
-        overlay.classList.add('active'); // Changed to add 'active' class for consistency
-    }
+            overlay.classList.add('active'); // Changed to add 'active' class for consistency
+        }
 
-    updateCombatSummary() {
-        const summary = document.getElementById('combatSummary');
-        if (!summary || this.game.state !== GameState.COMBAT) return;
+        updateCombatSummary() {
+            const summary = document.getElementById('combatSummary');
+            if (!summary || this.game.state !== GameState.COMBAT) return;
 
-        const { selectedHeroIdx, selectedDamageIdx, selectedAuxIdx, targetRank } = this.game.combat;
-        const hero = this.game.hand[selectedHeroIdx];
-        const damageItem = this.game.hand[selectedDamageIdx];
-        const auxItem = this.game.hand[selectedAuxIdx];
-        const monster = targetRank ? this.game.dungeonHall[`rank${targetRank}`] : null;
+            const { selectedHeroIdx, selectedDamageIdx, selectedAuxIdx, targetRank } = this.game.combat;
+            const hero = this.game.hand[selectedHeroIdx];
+            const damageItem = this.game.hand[selectedDamageIdx];
+            const auxItem = this.game.hand[selectedAuxIdx];
+            const monster = targetRank ? this.game.dungeonHall[`rank${targetRank}`] : null;
 
-        let totalLight = 0;
-        this.game.hand.forEach(c => totalLight += (c.light || 0));
-        this.game.playedCards.forEach(c => totalLight += (c.light || 0));
+            let totalLight = 0;
+            this.game.hand.forEach(c => totalLight += (c.light || 0));
+            this.game.playedCards.forEach(c => totalLight += (c.light || 0));
 
-        // v3.22.13: 計算 HeroStr (包含 Aux 和 Aura) 以傳遞給 CombatEngine
-        let heroStr = hero ? hero.hero.strength : 0;
-        if (auxItem && auxItem.abilities && auxItem.abilities.onBattle === 'boost_str_1') heroStr += 1;
-        const activeAurasStruct = this.game.getActiveAuras();
-        heroStr += (activeAurasStruct.strMod || 0);
+            // v3.22.13: 計算 HeroStr (包含 Aux 和 Aura) 以傳遞給 CombatEngine
+            let heroStr = hero ? hero.hero.strength : 0;
+            if (auxItem && auxItem.abilities && auxItem.abilities.onBattle === 'boost_str_1') heroStr += 1;
+            const activeAurasStruct = this.game.getActiveAuras();
+            heroStr += (activeAurasStruct.strMod || 0);
 
-        // 第一次計算 (取得光照懲罰)
-        const results = this.game.calculateHeroCombatStats(
-            hero || { hero: { attack: 0, magicAttack: 0 } },
-            damageItem,
-            monster,
-            0,
-            totalLight,
-            targetRank ? targetRank : 0,
-            auxItem,
-            heroStr
-        );
-        const auras = results.auras || { lightReqMod: 0 };
-        const lightReq = targetRank ? (targetRank + (auras.lightReqMod || 0)) : 0;
-        const lightPenalty = targetRank ? Math.max(0, lightReq - totalLight) * 2 : 0;
+            // 第一次計算 (取得光照懲罰)
+            const results = this.game.calculateHeroCombatStats(
+                hero || { hero: { attack: 0, magicAttack: 0 } },
+                damageItem,
+                monster,
+                0,
+                totalLight,
+                targetRank ? targetRank : 0,
+                auxItem,
+                heroStr
+            );
+            const auras = results.auras || { lightReqMod: 0 };
+            const lightReq = targetRank ? (targetRank + (auras.lightReqMod || 0)) : 0;
+            const lightPenalty = targetRank ? Math.max(0, lightReq - totalLight) * 2 : 0;
 
-        // 第二次計算 (取得最終數值)
-        const finalResults = this.game.calculateHeroCombatStats(
-            hero || { hero: { attack: 0, magicAttack: 0 } },
-            damageItem,
-            monster,
-            lightPenalty,
-            totalLight,
-            lightReq,
-            auxItem,
-            heroStr
-        );
-        const { finalAtk, bonuses, physAtk, magAtk, rawPhysAtk } = finalResults;
+            // 第二次計算 (取得最終數值)
+            const finalResults = this.game.calculateHeroCombatStats(
+                hero || { hero: { attack: 0, magicAttack: 0 } },
+                damageItem,
+                monster,
+                lightPenalty,
+                totalLight,
+                lightReq,
+                auxItem,
+                heroStr
+            );
+            const { finalAtk, bonuses, physAtk, magAtk, rawPhysAtk } = finalResults;
 
-        // 公式與細節顯示
-        const base = heroStr;
-        const weapon = (damageItem && damageItem.equipment) ? damageItem.equipment.attack : 0;
-        const magic = magAtk;
-        const otherBonus = rawPhysAtk - base - weapon; // 剩餘的物理加成 (如連動、Aura AtkMod)
+            // 公式與細節顯示
+            const base = heroStr;
+            const weapon = (damageItem && damageItem.equipment) ? damageItem.equipment.attack : 0;
+            const magic = magAtk;
+            const otherBonus = rawPhysAtk - base - weapon; // 剩餘的物理加成 (如連動、Aura AtkMod)
 
-        const formulaHtml = `
+            const formulaHtml = `
             <div style="margin-top: 8px; font-family: monospace; font-size: 13px; color: #fff; background: rgba(0,0,0,0.6); padding: 8px; border-radius: 4px; border: 1px solid #555;">
                 <div style="color: #aaa; margin-bottom: 4px;">傷害公式預覽:</div>
                 <div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
@@ -725,7 +702,7 @@ export class UIManager {
             </div>
         `;
 
-        const calcGridHtml = `
+            const calcGridHtml = `
             <div class="combat-calc-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; margin-bottom: 12px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 6px; border: 1px solid #444;">
                 <div style="color: #ffeb3b;">💡 手牌總照明: ${totalLight}</div>
                 <div style="color: #00e5ff;">🕯️ 地城需求: ${targetRank ? lightReq : '(未選目標)'}${auras.lightReqMod > 0 ? ` (+${auras.lightReqMod})` : ''}</div>
@@ -737,10 +714,10 @@ export class UIManager {
             </div>
         `;
 
-        // const auraListHtml = this.renderAuras(); // Removed: causing crash, using inline logic below
+            // const auraListHtml = this.renderAuras(); // Removed: causing crash, using inline logic below
 
-        // 3-Slot Visual Display
-        const renderSlot = (label, card, placeholder) => `
+            // 3-Slot Visual Display
+            const renderSlot = (label, card, placeholder) => `
             <div style="background: rgba(255,255,255,0.05); border: 1px solid ${card ? '#4caf50' : '#444'}; border-radius: 4px; padding: 6px; text-align: center; height: 100%;">
                 <div style="font-size: 10px; color: #888; margin-bottom: 4px;">${label}</div>
                 ${card ? `
@@ -750,7 +727,7 @@ export class UIManager {
             </div>
         `;
 
-        const slotsHtml = `
+            const slotsHtml = `
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 10px;">
                 ${renderSlot('🟢 輔助物品', auxItem, '選擇食物/道具')}
                 ${renderSlot('🔴 英雄', hero, '選擇英雄')}
@@ -758,22 +735,22 @@ export class UIManager {
             </div>
         `;
 
-        // Render Auras inline for now (since helper doesn't exist yet)
-        const activeAuras = [];
-        for (let i = 1; i <= 3; i++) {
-            const m = this.game.dungeonHall[`rank${i}`];
-            if (m && m.abilities && m.abilities.aura) {
-                activeAuras.push({ name: m.name, desc: m.abilities.aura });
+            // Render Auras inline for now (since helper doesn't exist yet)
+            const activeAuras = [];
+            for (let i = 1; i <= 3; i++) {
+                const m = this.game.dungeonHall[`rank${i}`];
+                if (m && m.abilities && m.abilities.aura) {
+                    activeAuras.push({ name: m.name, desc: m.abilities.aura });
+                }
             }
-        }
-        const auraHtml = activeAuras.length > 0 ? `
+            const auraHtml = activeAuras.length > 0 ? `
             <div style="font-size: 11px; background: rgba(255,100,0,0.1); border: 1px solid rgba(255,100,0,0.2); padding: 5px; border-radius: 4px; margin-bottom: 8px;">
                 <strong style="color: #ff9800;">⚠️ 環境 (Aura):</strong><br>
                 ${activeAuras.map(a => `<span style="color: #eee;">• [${a.name}] ${a.desc}</span>`).join('<br>')}
             </div>
         ` : '';
 
-        summary.innerHTML = `
+            summary.innerHTML = `
             ${calcGridHtml}
             ${auraHtml}
             ${slotsHtml}
@@ -794,46 +771,46 @@ export class UIManager {
                 🎯 目標：${monster ? monster.name + ' (❤️ ' + monster.currentHP + ' HP)' : '<span style="color:#ff5a59;">（未選取目標）</span>'}
             </div>
         `;
-        const btn = document.getElementById('combatAttackBtn');
-        if (btn) btn.disabled = !hero || !targetRank;
-    }
+            const btn = document.getElementById('combatAttackBtn');
+            if (btn) btn.disabled = !hero || !targetRank;
+        }
 
-    // --- 查看功能 ---
-    renderDeckView(title, list) {
-        const modal = document.getElementById('deckViewModal');
-        const titleEl = document.getElementById('deckViewTitle');
-        const listEl = document.getElementById('deckViewList');
-        if (!modal || !titleEl || !listEl) return;
+        // --- 查看功能 ---
+        renderDeckView(title, list) {
+            const modal = document.getElementById('deckViewModal');
+            const titleEl = document.getElementById('deckViewTitle');
+            const listEl = document.getElementById('deckViewList');
+            if (!modal || !titleEl || !listEl) return;
 
-        titleEl.textContent = title;
-        listEl.innerHTML = '';
+            titleEl.textContent = title;
+            listEl.innerHTML = '';
 
-        if (list.length === 0) {
-            listEl.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #888;">此區域目前無任何卡片</div>';
-        } else {
-            list.forEach(card => {
-                const el = document.createElement('div');
-                el.className = 'card small';
-                el.innerHTML = `
+            if (list.length === 0) {
+                listEl.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #888;">此區域目前無任何卡片</div>';
+            } else {
+                list.forEach(card => {
+                    const el = document.createElement('div');
+                    el.className = 'card small';
+                    el.innerHTML = `
                     <div class="card-type-tag" style="font-size: 8px;">${card.type}</div>
                     <div class="card-name" style="font-size: 11px;">${card.name}</div>
                     <div class="card-desc" style="font-size: 9px;">${card.desc || ''}</div>
                 `;
-                listEl.appendChild(el);
-            });
+                    listEl.appendChild(el);
+                });
+            }
+            modal.classList.add('active');
         }
-        modal.classList.add('active');
-    }
 
-    setText(id, text) {
-        const el = document.getElementById(id);
-        if (el) el.textContent = text;
-    }
+        setText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
 
-    show(id, isShow) {
-        const el = document.getElementById(id);
-        if (el) el.style.display = isShow ? 'block' : 'none';
-        if (el && id === 'gameStepButtons') el.style.display = isShow ? 'flex' : 'none';
-        if (el && id === 'villageFinishControl') el.style.display = isShow ? 'flex' : 'none';
+        show(id, isShow) {
+            const el = document.getElementById(id);
+            if (el) el.style.display = isShow ? 'block' : 'none';
+            if (el && id === 'gameStepButtons') el.style.display = isShow ? 'flex' : 'none';
+            if (el && id === 'villageFinishControl') el.style.display = isShow ? 'flex' : 'none';
+        }
     }
-}
