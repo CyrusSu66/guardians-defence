@@ -127,17 +127,23 @@
             </div>
         </div>
 
-        <!-- 5. 村莊核心 (Market) - Moved to Bottom -->
-        <div class="panel village-plaza full-width-panel">
+        <!-- NEW: 訓練場 (Training Ground) - Hidden by default -->
+        <div class="panel full-width-panel" id="trainingPanel" style="display: none; border-left: 5px solid #ffcc00;">
+            <div class="panel-title">⚔️ 訓練場 (Training Ground)</div>
+            <div id="trainingContent" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+
+        <!-- 5. 村莊 (Village) - Moved to Bottom -->
+        <div class="panel village-plaza full-width-panel" id="villagePanel">
             <div class="plaza-header">
-                <div class="panel-title">🏛️ 村莊核心</div>
+                <div class="panel-title">🏛️ 村莊</div>
                 <div class="plaza-coin-display">
                     <div class="plaza-coin-label">可用資產</div>
                     <div class="plaza-coin-value" id="plazaCoinDisplay">0</div>
                 </div>
             </div>
             <div class="plaza-tabs">
-                <button class="plaza-tab-btn active" id="tab-market">🛒 市集隨機組</button>
+                <button class="plaza-tab-btn active" id="tab-market">🛒 廣場市集</button>
                 <button class="plaza-tab-btn" id="tab-training">⚔️ 訓練升級</button>
             </div>
 

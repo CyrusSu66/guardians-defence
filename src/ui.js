@@ -13,7 +13,7 @@ export class UIManager {
     }
 
     setupEventListeners() {
-        ['market', 'training'].forEach(tab => {
+        ['market'].forEach(tab => {
             const el = document.getElementById(`tab-${tab}`);
             if (el) el.onclick = () => this.switchPlazaTab(tab);
         });
@@ -86,6 +86,10 @@ export class UIManager {
         this.show('combatPanel', g.state === GameState.COMBAT);
         this.show('restPanel', g.currentAction === 'REST');
         this.show('villageFinishControl', g.currentAction === 'VILLAGE');
+
+        // v3.22.9: 訓練場顯示控制
+        const trainingPanel = document.getElementById('trainingPanel');
+        if (trainingPanel) trainingPanel.style.display = (g.currentAction === 'VILLAGE') ? 'block' : 'none';
 
         // 更新休息按鈕文字 (v3.1.3)
         const btnRestConfirm = document.querySelector('#restPanel .btn-secondary');
@@ -363,7 +367,7 @@ export class UIManager {
     }
 
     renderTraining() {
-        const container = document.getElementById('trainingHeroes');
+        const container = document.getElementById('trainingContent');
         if (!container) return;
         container.innerHTML = '';
 

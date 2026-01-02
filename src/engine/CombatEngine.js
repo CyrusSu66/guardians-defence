@@ -94,7 +94,6 @@ export class CombatEngine {
         }
 
         // 6. 消耗卡片 (全部投入棄牌堆)
-        // 6. 消耗卡片 (全部投入棄牌堆)
         const toDiscard = [hIdx];
         if (Number.isInteger(dIdx)) toDiscard.push(dIdx);
         if (Number.isInteger(aIdx)) toDiscard.push(aIdx);

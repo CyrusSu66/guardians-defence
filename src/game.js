@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.22.8(01-02-14:15)"; // Fix: Undefined Index Discard Bug (Critical)
+        this.version = "v3.22.9(01-02-14:35)"; // UI Refactor: Training Ground Separation
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);
