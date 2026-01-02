@@ -315,34 +315,36 @@ export class UIManager {
     // I will keep getStatsHtml if it is used elsewhere, but renderCard now builds DOM directly.
 
     // v3.4 顯示卡牌詳情 Tooltip
+    // v3.4 顯示卡牌詳情 Tooltip (Fixed v3.23.18)
     showCardDetail(cardId) {
         const card = this.game.getCardPoolItem(cardId);
         if (!card) return;
 
-        document.getElementById('ttType').innerText = card.type;
-        document.getElementById('ttTitle').innerText = card.name;
+        let content = `
+            <div style="margin-bottom: 10px;">
+                <span class="badge badge-primary">${card.type}</span>
+                <strong style="font-size: 1.2em; margin-left: 8px;">${card.name}</strong>
+            </div>
+            <p>${card.desc || card.description || '（無特殊效果說明）'}</p>
+        `;
 
-        // 生成描述
-        let desc = card.desc || card.description || '（無特殊效果說明）';
         if (card.abilities) {
-            desc += '<div style="margin-top:10px; border-top:1px solid #444; padding-top:10px;"><strong>特殊能力：</strong><br>';
+            content += '<div style="margin-top:10px; border-top:1px solid #444; padding-top:10px;"><strong>特殊能力：</strong><br>';
 
-            // v3.5：定義未實作或開發中的關鍵字
             const isIncomplete = (text) => text.includes('開發中') || text.includes('待實作');
             const getStyledSkill = (icon, label, text) => {
                 const style = isIncomplete(text) ? 'color: #ff5a59; font-weight: bold;' : '';
                 return `<span style="${style}">${icon} ${label}：${text}</span><br>`;
             };
 
-            if (card.abilities.onVillage) desc += getStyledSkill('🏠', '於村莊', card.abilities.onVillage);
-            if (card.abilities.onDungeon) desc += getStyledSkill('🌲', '入地城', card.abilities.onDungeon);
-            if (card.abilities.onBattle) desc += getStyledSkill('⚔️', '戰鬥中', card.abilities.onBattle);
-            if (card.abilities.onVictory) desc += getStyledSkill('🏆', '戰勝後', card.abilities.onVictory);
-            desc += '</div>';
+            if (card.abilities.onVillage) content += getStyledSkill('🏠', '於村莊', card.abilities.onVillage);
+            if (card.abilities.onDungeon) content += getStyledSkill('🌲', '入地城', card.abilities.onDungeon);
+            if (card.abilities.onBattle) content += getStyledSkill('⚔️', '戰鬥中', card.abilities.onBattle);
+            if (card.abilities.onVictory) content += getStyledSkill('🏆', '戰勝後', card.abilities.onVictory);
+            content += '</div>';
         }
-        document.getElementById('ttDescription').innerHTML = desc;
 
-        // 生成數值網格
+        // Generate stats HTML
         let statsHtml = '';
         if (card.hero) {
             statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">攻擊力/力量</div><div class="tooltip-stat-value">💪 ${card.hero.strength}</div></div>`;
