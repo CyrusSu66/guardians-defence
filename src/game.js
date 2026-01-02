@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.22.7(01-02-14:00)"; // Fix: Revert Hand Retention & Debug Combat Discard
+        this.version = "v3.22.8(01-02-14:15)"; // Fix: Undefined Index Discard Bug (Critical)
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);

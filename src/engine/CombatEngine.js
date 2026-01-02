@@ -96,8 +96,8 @@ export class CombatEngine {
         // 6. 消耗卡片 (全部投入棄牌堆)
         // 6. 消耗卡片 (全部投入棄牌堆)
         const toDiscard = [hIdx];
-        if (dIdx !== null) toDiscard.push(dIdx);
-        if (aIdx !== null) toDiscard.push(aIdx);
+        if (Number.isInteger(dIdx)) toDiscard.push(dIdx);
+        if (Number.isInteger(aIdx)) toDiscard.push(aIdx);
 
         console.log(`[Combat] Indices to discard: Hero=${hIdx}, Damage=${dIdx}, Aux=${aIdx}`);
         console.log(`[Combat] toDiscard array (before sort):`, toDiscard);
