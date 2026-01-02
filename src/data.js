@@ -49,7 +49,7 @@ export const CARDPOOL = {
             id: 'hero_sevin_lv1', name: '塞維恩扈從', type: 'Hero', subTypes: ['Fighter'],
             cost: 4, vp: 1, goldValue: 0, light: 0,
             desc: '勇往直前的戰士學徒',
-            hero: { level: 1, series: 'Sevin', magicAttack: 0, strength: 3, xpToUpgrade: 4, upgradeToId: 'hero_sevin_lv2' }
+            hero: { level: 1, series: 'Sevin', magicAttack: 0, strength: 2, xpToUpgrade: 4, upgradeToId: 'hero_sevin_lv2' }
         },
         {
             id: 'hero_sevin_lv2', name: '塞維恩騎士', type: 'Hero', subTypes: ['Fighter'],
@@ -109,20 +109,65 @@ export const CARDPOOL = {
             id: 'hero_dwarf_lv1', name: '矮人守護者', type: 'Hero', subTypes: ['Fighter'],
             cost: 4, vp: 1, goldValue: 0, light: 0,
             desc: '【能力】若有裝備，額外 Attack+1',
-            hero: { level: 1, series: 'Dwarf', attack: 2, magicAttack: 0, strength: 5, xpToUpgrade: 4 }
+            hero: { level: 1, series: 'Dwarf', magicAttack: 0, strength: 2, xpToUpgrade: 4, upgradeToId: 'hero_dwarf_lv2' },
+            abilities: { onBattle: 'dwarf_weapon_bonus' }
         },
+        {
+            id: 'hero_dwarf_lv2', name: '矮人戰士', type: 'Hero', subTypes: ['Fighter'],
+            cost: 7, vp: 2, goldValue: 0, light: 0,
+            desc: '【能力】若有裝備，額外 Attack+2',
+            hero: { level: 2, series: 'Dwarf', magicAttack: 0, strength: 3, xpToUpgrade: 6, upgradeToId: 'hero_dwarf_lv3' },
+            abilities: { onBattle: 'dwarf_weapon_bonus_2' }
+        },
+        {
+            id: 'hero_dwarf_lv3', name: '矮人領主', type: 'Hero', subTypes: ['Fighter'],
+            cost: 10, vp: 3, goldValue: 0, light: 0,
+            desc: '【能力】若有裝備，額外 Attack+3',
+            hero: { level: 3, series: 'Dwarf', magicAttack: 0, strength: 4, xpToUpgrade: 0 },
+            abilities: { onBattle: 'dwarf_weapon_bonus_3' }
+        },
+
         {
             id: 'hero_loric_lv1', name: '羅域盜賊', type: 'Hero', subTypes: ['Thief'],
             cost: 4, vp: 1, goldValue: 0, light: 0,
             desc: '擅長在陰影中襲取的盜賊',
-            hero: { level: 1, series: 'Loric', attack: 2, magicAttack: 0, strength: 3, xpToUpgrade: 4, upgradeToId: 'hero_loric_lv2' }
+            hero: { level: 1, series: 'Loric', magicAttack: 0, strength: 1, xpToUpgrade: 4, upgradeToId: 'hero_loric_lv2' }
         },
+        {
+            id: 'hero_loric_lv2', name: '羅域刺客', type: 'Hero', subTypes: ['Thief'],
+            cost: 7, vp: 2, goldValue: 0, light: 0,
+            desc: '【地城】戰勝怪物後獲得 1 金幣',
+            hero: { level: 2, series: 'Loric', magicAttack: 0, strength: 2, xpToUpgrade: 6, upgradeToId: 'hero_loric_lv3' },
+            abilities: { onVictory: 'gain_1gold' }
+        },
+        {
+            id: 'hero_loric_lv3', name: '羅域暗影大師', type: 'Hero', subTypes: ['Thief'],
+            cost: 10, vp: 3, goldValue: 0, light: 0,
+            desc: '【地城】戰勝怪物後獲得 2 金幣',
+            hero: { level: 3, series: 'Loric', magicAttack: 0, strength: 3, xpToUpgrade: 0 },
+            abilities: { onVictory: 'gain_2gold' }
+        },
+
         {
             id: 'hero_grail_lv1', name: '聖杯探求者', type: 'Hero', subTypes: ['Cleric'],
             cost: 4, vp: 1, goldValue: 0, light: 0,
             desc: '【村莊】摧毀一張疾病卡。',
-            hero: { level: 1, series: 'Chail', attack: 0, magicAttack: 1, strength: 3, xpToUpgrade: 4 },
+            hero: { level: 1, series: 'Grail', magicAttack: 1, strength: 1, xpToUpgrade: 4, upgradeToId: 'hero_grail_lv2' },
             abilities: { onVillage: 'destroy_disease' }
+        },
+        {
+            id: 'hero_grail_lv2', name: '聖杯騎士', type: 'Hero', subTypes: ['Cleric'],
+            cost: 7, vp: 2, goldValue: 0, light: 1,
+            desc: '【村莊】摧毀任意一張卡；治療 1 點村莊 HP',
+            hero: { level: 2, series: 'Grail', magicAttack: 2, strength: 2, xpToUpgrade: 6, upgradeToId: 'hero_grail_lv3' },
+            abilities: { onVillage: 'destroy_any_heal_1' }
+        },
+        {
+            id: 'hero_grail_lv3', name: '聖杯守護者', type: 'Hero', subTypes: ['Cleric'],
+            cost: 10, vp: 3, goldValue: 0, light: 2,
+            desc: '【村莊】治療 2 點村莊 HP',
+            hero: { level: 3, series: 'Grail', magicAttack: 3, strength: 3, xpToUpgrade: 0 },
+            abilities: { onVillage: 'heal_2' }
         }
     ],
 

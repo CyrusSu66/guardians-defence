@@ -281,9 +281,8 @@ export class UIManager {
         // 生成數值網格
         let statsHtml = '';
         if (card.hero) {
-            statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">攻擊力</div><div class="tooltip-stat-value">⚔️ ${card.hero.attack}</div></div>`;
-            statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">魔攻力</div><div class="tooltip-stat-value">🪄 ${card.hero.magicAttack}</div></div>`;
-            statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">力量</div><div class="tooltip-stat-value">💪 ${card.hero.strength}</div></div>`;
+            statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">攻擊力/力量</div><div class="tooltip-stat-value">💪 ${card.hero.strength}</div></div>`;
+            statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">魔攻力</div><div class="tooltip-stat-value">🪄 ${card.hero.magicAttack || 0}</div></div>`;
         } else if (card.equipment) {
             statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">攻擊力</div><div class="tooltip-stat-value">⚔️ ${card.equipment.attack}</div></div>`;
             statsHtml += `<div class="tooltip-stat-item"><div class="tooltip-stat-label">重量</div><div class="tooltip-stat-value">⚖️ ${card.equipment.weight}</div></div>`;
