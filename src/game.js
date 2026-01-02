@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.22.4(01-02-13:30)"; // 市集重構：攻/輔各半 & 光輝寶石
+        this.version = "v3.22.5(01-02-13:35)"; // ID修正: Light Gem
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);
