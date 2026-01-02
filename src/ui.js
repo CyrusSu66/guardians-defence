@@ -366,6 +366,41 @@ export class UIManager {
         if (modal) modal.classList.add('active');
     }
 
+    // v3.5 顯示怪物詳情 (Re-added v3.23.22)
+    showMonsterDetail(monsterInstanceId) {
+        console.log('[UI] showMonsterDetail', monsterInstanceId);
+        // 先嘗試從地城 slots 找
+        // 由於 currentMonsters 是在 engine 內部，我們嘗試遍歷所有來找到對應 ID
+        const monster = this.game.dungeon.currentMonsters.find(m => m && m.id === monsterInstanceId);
+
+        if (!monster) {
+            console.warn('Monster not found:', monsterInstanceId);
+            return;
+        }
+
+        let content = `
+            <div style="margin-bottom: 10px;">
+                <span class="badge badge-danger">MONSTER</span>
+                <strong style="font-size: 1.2em; margin-left: 8px;">${monster.name}</strong>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                <div>❤️ 血量: ${monster.currentHP}/${monster.monster.hp}</div>
+                <div>⚡ 速度: ${monster.monster.speed}</div>
+                <div>⚠️ 突破傷害: -${monster.monster.breachDamage} HP</div>
+                <div>✨ 擊殺獎勵: +${monster.monster.xpGain} XP</div>
+            </div>
+            <p>${monster.monster.desc || '（無怪物描述）'}</p>
+        `;
+
+        const modalTitle = document.getElementById('infoModalTitle');
+        const modalContent = document.getElementById('infoModalContent');
+        const modal = document.getElementById('infoModal');
+
+        if (modalTitle) modalTitle.innerText = '';
+        if (modalContent) modalContent.innerHTML = content;
+        if (modal) modal.classList.add('active');
+    }
+
     renderDungeonRanks() {
         const container = document.getElementById('dungeonRankSlots');
         if (!container) return;
@@ -629,84 +664,61 @@ export class UIManager {
             }
         }
 
-        if (!monster) {
-            console.error(`[UI] Monster data not found for ID: ${templateId} or ${monsterId}`);
-            alert(`錯誤：找不到怪物資料 (${templateId})`); // 用 Alert 提示資料錯誤
-            return;
-        }
+        updateCombatSummary() {
+            const summary = document.getElementById('combatSummary');
+            if (!summary || this.game.state !== GameState.COMBAT) return;
 
-        const overlay = document.getElementById('cardTooltipOverlay');
-        if (!overlay) return;
+            const { selectedHeroIdx, selectedDamageIdx, selectedAuxIdx, targetRank } = this.game.combat;
+            const hero = this.game.hand[selectedHeroIdx];
+            const damageItem = this.game.hand[selectedDamageIdx];
+            const auxItem = this.game.hand[selectedAuxIdx];
+            const monster = targetRank ? this.game.dungeonHall[`rank${targetRank}`] : null;
 
-        document.getElementById('ttType').innerText = `怪物 - ${monster.subTypes.join('/')}`;
-        document.getElementById('ttTitle').innerText = monster.name;
-        document.getElementById('ttDescription').innerHTML = `<span style="color:#ff5a59;">[突進傷害: ${monster.monster.breachDamage || 1}]</span><br>${monster.desc || monster.description}`;
+            let totalLight = 0;
+            this.game.hand.forEach(c => totalLight += (c.light || 0));
+            this.game.playedCards.forEach(c => totalLight += (c.light || 0));
 
-        let statsHtml = `
-            <div class="tooltip-stat-item"><div class="tooltip-stat-label">原始血量</div><div class="tooltip-stat-value">❤️ ${monster.monster.hp}</div></div>
-            <div class="tooltip-stat-item"><div class="tooltip-stat-label">擊敗獎勵</div><div class="tooltip-stat-value">✨ ${monster.monster.xpGain} XP</div></div>
-        `;
-        document.getElementById('ttStats').innerHTML = statsHtml;
-        document.getElementById('ttLore').innerText = monster.lore || "此怪物的來歷充滿謎團。";
+            // v3.22.13: 計算 HeroStr (包含 Aux 和 Aura) 以傳遞給 CombatEngine
+            let heroStr = hero ? hero.hero.strength : 0;
+            if (auxItem && auxItem.abilities && auxItem.abilities.onBattle === 'boost_str_1') heroStr += 1;
+            const activeAurasStruct = this.game.getActiveAuras();
+            heroStr += (activeAurasStruct.strMod || 0);
 
-        overlay.classList.add('active'); // Changed to add 'active' class for consistency
-    }
+            // 第一次計算 (取得光照懲罰)
+            const results = this.game.calculateHeroCombatStats(
+                hero || { hero: { attack: 0, magicAttack: 0 } },
+                damageItem,
+                monster,
+                0,
+                totalLight,
+                targetRank ? targetRank : 0,
+                auxItem,
+                heroStr
+            );
+            const auras = results.auras || { lightReqMod: 0 };
+            const lightReq = targetRank ? (targetRank + (auras.lightReqMod || 0)) : 0;
+            const lightPenalty = targetRank ? Math.max(0, lightReq - totalLight) * 2 : 0;
 
-    updateCombatSummary() {
-        const summary = document.getElementById('combatSummary');
-        if (!summary || this.game.state !== GameState.COMBAT) return;
+            // 第二次計算 (取得最終數值)
+            const finalResults = this.game.calculateHeroCombatStats(
+                hero || { hero: { attack: 0, magicAttack: 0 } },
+                damageItem,
+                monster,
+                lightPenalty,
+                totalLight,
+                lightReq,
+                auxItem,
+                heroStr
+            );
+            const { finalAtk, bonuses, physAtk, magAtk, rawPhysAtk } = finalResults;
 
-        const { selectedHeroIdx, selectedDamageIdx, selectedAuxIdx, targetRank } = this.game.combat;
-        const hero = this.game.hand[selectedHeroIdx];
-        const damageItem = this.game.hand[selectedDamageIdx];
-        const auxItem = this.game.hand[selectedAuxIdx];
-        const monster = targetRank ? this.game.dungeonHall[`rank${targetRank}`] : null;
+            // 公式與細節顯示
+            const base = heroStr;
+            const weapon = (damageItem && damageItem.equipment) ? damageItem.equipment.attack : 0;
+            const magic = magAtk;
+            const otherBonus = rawPhysAtk - base - weapon; // 剩餘的物理加成 (如連動、Aura AtkMod)
 
-        let totalLight = 0;
-        this.game.hand.forEach(c => totalLight += (c.light || 0));
-        this.game.playedCards.forEach(c => totalLight += (c.light || 0));
-
-        // v3.22.13: 計算 HeroStr (包含 Aux 和 Aura) 以傳遞給 CombatEngine
-        let heroStr = hero ? hero.hero.strength : 0;
-        if (auxItem && auxItem.abilities && auxItem.abilities.onBattle === 'boost_str_1') heroStr += 1;
-        const activeAurasStruct = this.game.getActiveAuras();
-        heroStr += (activeAurasStruct.strMod || 0);
-
-        // 第一次計算 (取得光照懲罰)
-        const results = this.game.calculateHeroCombatStats(
-            hero || { hero: { attack: 0, magicAttack: 0 } },
-            damageItem,
-            monster,
-            0,
-            totalLight,
-            targetRank ? targetRank : 0,
-            auxItem,
-            heroStr
-        );
-        const auras = results.auras || { lightReqMod: 0 };
-        const lightReq = targetRank ? (targetRank + (auras.lightReqMod || 0)) : 0;
-        const lightPenalty = targetRank ? Math.max(0, lightReq - totalLight) * 2 : 0;
-
-        // 第二次計算 (取得最終數值)
-        const finalResults = this.game.calculateHeroCombatStats(
-            hero || { hero: { attack: 0, magicAttack: 0 } },
-            damageItem,
-            monster,
-            lightPenalty,
-            totalLight,
-            lightReq,
-            auxItem,
-            heroStr
-        );
-        const { finalAtk, bonuses, physAtk, magAtk, rawPhysAtk } = finalResults;
-
-        // 公式與細節顯示
-        const base = heroStr;
-        const weapon = (damageItem && damageItem.equipment) ? damageItem.equipment.attack : 0;
-        const magic = magAtk;
-        const otherBonus = rawPhysAtk - base - weapon; // 剩餘的物理加成 (如連動、Aura AtkMod)
-
-        const formulaHtml = `
+            const formulaHtml = `
             <div style="margin-top: 8px; font-family: monospace; font-size: 13px; color: #fff; background: rgba(0,0,0,0.6); padding: 8px; border-radius: 4px; border: 1px solid #555;">
                 <div style="color: #aaa; margin-bottom: 4px;">傷害公式預覽:</div>
                 <div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
@@ -723,7 +735,7 @@ export class UIManager {
             </div>
         `;
 
-        const calcGridHtml = `
+            const calcGridHtml = `
             <div class="combat-calc-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; margin-bottom: 12px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 6px; border: 1px solid #444;">
                 <div style="color: #ffeb3b;">💡 手牌總照明: ${totalLight}</div>
                 <div style="color: #00e5ff;">🕯️ 地城需求: ${targetRank ? lightReq : '(未選目標)'}${auras.lightReqMod > 0 ? ` (+${auras.lightReqMod})` : ''}</div>
@@ -735,10 +747,10 @@ export class UIManager {
             </div>
         `;
 
-        // const auraListHtml = this.renderAuras(); // Removed: causing crash, using inline logic below
+            // const auraListHtml = this.renderAuras(); // Removed: causing crash, using inline logic below
 
-        // 3-Slot Visual Display
-        const renderSlot = (label, card, placeholder) => `
+            // 3-Slot Visual Display
+            const renderSlot = (label, card, placeholder) => `
             <div style="background: rgba(255,255,255,0.05); border: 1px solid ${card ? '#4caf50' : '#444'}; border-radius: 4px; padding: 6px; text-align: center; height: 100%;">
                 <div style="font-size: 10px; color: #888; margin-bottom: 4px;">${label}</div>
                 ${card ? `
@@ -748,7 +760,7 @@ export class UIManager {
             </div>
         `;
 
-        const slotsHtml = `
+            const slotsHtml = `
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 10px;">
                 ${renderSlot('🟢 輔助物品', auxItem, '選擇食物/道具')}
                 ${renderSlot('🔴 英雄', hero, '選擇英雄')}
@@ -756,22 +768,22 @@ export class UIManager {
             </div>
         `;
 
-        // Render Auras inline for now (since helper doesn't exist yet)
-        const activeAuras = [];
-        for (let i = 1; i <= 3; i++) {
-            const m = this.game.dungeonHall[`rank${i}`];
-            if (m && m.abilities && m.abilities.aura) {
-                activeAuras.push({ name: m.name, desc: m.abilities.aura });
+            // Render Auras inline for now (since helper doesn't exist yet)
+            const activeAuras = [];
+            for (let i = 1; i <= 3; i++) {
+                const m = this.game.dungeonHall[`rank${i}`];
+                if (m && m.abilities && m.abilities.aura) {
+                    activeAuras.push({ name: m.name, desc: m.abilities.aura });
+                }
             }
-        }
-        const auraHtml = activeAuras.length > 0 ? `
+            const auraHtml = activeAuras.length > 0 ? `
             <div style="font-size: 11px; background: rgba(255,100,0,0.1); border: 1px solid rgba(255,100,0,0.2); padding: 5px; border-radius: 4px; margin-bottom: 8px;">
                 <strong style="color: #ff9800;">⚠️ 環境 (Aura):</strong><br>
                 ${activeAuras.map(a => `<span style="color: #eee;">• [${a.name}] ${a.desc}</span>`).join('<br>')}
             </div>
         ` : '';
 
-        summary.innerHTML = `
+            summary.innerHTML = `
             ${calcGridHtml}
             ${auraHtml}
             ${slotsHtml}
@@ -792,46 +804,46 @@ export class UIManager {
                 🎯 目標：${monster ? monster.name + ' (❤️ ' + monster.currentHP + ' HP)' : '<span style="color:#ff5a59;">（未選取目標）</span>'}
             </div>
         `;
-        const btn = document.getElementById('combatAttackBtn');
-        if (btn) btn.disabled = !hero || !targetRank;
-    }
+            const btn = document.getElementById('combatAttackBtn');
+            if (btn) btn.disabled = !hero || !targetRank;
+        }
 
-    // --- 查看功能 ---
-    renderDeckView(title, list) {
-        const modal = document.getElementById('deckViewModal');
-        const titleEl = document.getElementById('deckViewTitle');
-        const listEl = document.getElementById('deckViewList');
-        if (!modal || !titleEl || !listEl) return;
+        // --- 查看功能 ---
+        renderDeckView(title, list) {
+            const modal = document.getElementById('deckViewModal');
+            const titleEl = document.getElementById('deckViewTitle');
+            const listEl = document.getElementById('deckViewList');
+            if (!modal || !titleEl || !listEl) return;
 
-        titleEl.textContent = title;
-        listEl.innerHTML = '';
+            titleEl.textContent = title;
+            listEl.innerHTML = '';
 
-        if (list.length === 0) {
-            listEl.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #888;">此區域目前無任何卡片</div>';
-        } else {
-            list.forEach(card => {
-                const el = document.createElement('div');
-                el.className = 'card small';
-                el.innerHTML = `
+            if (list.length === 0) {
+                listEl.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #888;">此區域目前無任何卡片</div>';
+            } else {
+                list.forEach(card => {
+                    const el = document.createElement('div');
+                    el.className = 'card small';
+                    el.innerHTML = `
                     <div class="card-type-tag" style="font-size: 8px;">${card.type}</div>
                     <div class="card-name" style="font-size: 11px;">${card.name}</div>
                     <div class="card-desc" style="font-size: 9px;">${card.desc || ''}</div>
                 `;
-                listEl.appendChild(el);
-            });
+                    listEl.appendChild(el);
+                });
+            }
+            modal.classList.add('active');
         }
-        modal.classList.add('active');
-    }
 
-    setText(id, text) {
-        const el = document.getElementById(id);
-        if (el) el.textContent = text;
-    }
+        setText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
 
-    show(id, isShow) {
-        const el = document.getElementById(id);
-        if (el) el.style.display = isShow ? 'block' : 'none';
-        if (el && id === 'gameStepButtons') el.style.display = isShow ? 'flex' : 'none';
-        if (el && id === 'villageFinishControl') el.style.display = isShow ? 'flex' : 'none';
+        show(id, isShow) {
+            const el = document.getElementById(id);
+            if (el) el.style.display = isShow ? 'block' : 'none';
+            if (el && id === 'gameStepButtons') el.style.display = isShow ? 'flex' : 'none';
+            if (el && id === 'villageFinishControl') el.style.display = isShow ? 'flex' : 'none';
+        }
     }
-}
