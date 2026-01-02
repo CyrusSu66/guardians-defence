@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.23.4"; // UI Refine: Shield Overlay
+        this.version = "v3.23.5"; // UI: Card Layout & Init State
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);
@@ -56,6 +56,9 @@ class GuardiansDefenceGame {
         this.hasBought = false;
         this.hasDestroyed = false;
         this.selectedDestroyIdx = null;
+
+        // v3.23.5: Ensure UI reflects Initial State (Hidden Panels)
+        if (this.ui) this.ui.updateUI();
     }
 
     // --- 遊戲初始化 ---

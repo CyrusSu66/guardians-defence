@@ -246,22 +246,71 @@ export class UIManager {
         return stats + footer;
     }
 
-    // v3.4: 統一的卡牌渲染函數
+    // v3.23.5: Refactored Card Layout
     renderCard(card, onClick, isSelected = false, isMarket = false) {
         const div = document.createElement('div');
         div.className = `card ${card.type.toLowerCase()} ${isSelected ? 'selected' : ''}`;
 
-        // v3.4: 增加右鍵或雙擊顯示詳情的提示感 (這裡改為點擊名稱或特定區域，或者按住)
-        // 為了不影響原有操作，我們在卡片右上角加一個 (i) 按鈕
-        div.innerHTML = `
+        // Top Row: Type | Info
+        const topRow = document.createElement('div');
+        topRow.className = 'card-top-row';
+        topRow.innerHTML = `
+            <span class="card-type">${card.type}</span>
             <div class="card-info-btn" onclick="event.stopPropagation(); window.game.ui.showCardDetail('${card.id}')">ⓘ</div>
-            <div class="card-type">${card.type}</div>
-            <div class="card-name">${card.name}</div>
-            ${this.getStatsHtml(card, isMarket)}
         `;
+
+        // Name (Middle)
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'card-name';
+        nameDiv.innerText = card.name;
+
+        // Stats (Below Name)
+        const statsRow = document.createElement('div');
+        statsRow.className = 'card-stats-row';
+
+        let statsText = '';
+        if (card.type === 'Hero') {
+            statsText = `🪄${card.hero.magicAttack} 💪${card.hero.strength}`;
+        } else if (card.type === 'Weapon') {
+            statsText = `⚔️${card.equipment.attack} 🪄${card.equipment.magicAttack}`;
+        } else if (card.type === 'Spell') {
+            statsText = `✨ 法術`; // Placeholder
+        } else if (card.goldValue) {
+            // If it's pure treasure/money, maybe show it here too, or just BottomRight
+        }
+
+        // Ability Icons
+        if (card.abilities) {
+            let icons = '';
+            if (card.abilities.onVillage) icons += '🏠';
+            if (card.abilities.onDungeon) icons += '🌲';
+            if (card.abilities.onBattle) icons += '⚔️';
+            if (card.abilities.onVictory) icons += '🏆';
+            if (icons) statsText += ` ${icons}`;
+        }
+        if (card.light > 0) statsText += ` 💡${card.light}`;
+
+        statsRow.innerText = statsText;
+
+        // Bottom Row: Cost | Gold Value
+        const bottomRow = document.createElement('div');
+        bottomRow.className = 'card-bottom-row';
+
+        const costHtml = isMarket ? `<span class="val-cost">💰${card.cost}</span>` : '<span></span>';
+        const goldHtml = (card.goldValue > 0) ? `<span class="val-gold">🪙${card.goldValue}</span>` : '<span></span>';
+
+        bottomRow.innerHTML = `${costHtml}${goldHtml}`;
+
+        div.append(topRow, nameDiv, statsRow, bottomRow);
+
         div.onclick = onClick;
         return div;
     }
+
+    // Legacy support removal: getStatsHtml is no longer used by renderCard directly in this new layout, 
+    // but might be used by RenderPlayedCards? Let's check. 
+    // RenderPlayedCards usually uses simplified view. 
+    // I will keep getStatsHtml if it is used elsewhere, but renderCard now builds DOM directly.
 
     // v3.4 顯示卡牌詳情 Tooltip
     showCardDetail(cardId) {
