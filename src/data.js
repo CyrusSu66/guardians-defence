@@ -28,11 +28,7 @@ export const CARDPOOL = {
             cost: 2, vp: 0, goldValue: 2, light: 1,
             desc: '提供基礎光照與採購力'
         },
-        {
-            id: 'basic_light_gem', name: '光輝寶石', type: 'LightItem', subTypes: ['Wonder'],
-            cost: 3, vp: 0, goldValue: 2, light: 2,
-            desc: '提供進階光照與採購力'
-        },
+
         {
             id: 'basic_spear', name: '長矛', type: 'Weapon', subTypes: ['Polearm', 'Sharp'],
             cost: 2, vp: 0, goldValue: 1, light: 0,
@@ -147,7 +143,8 @@ export const CARDPOOL = {
     ],
 
     // --- 物品與裝備 ---
-    weapons: [
+    // v3.22.4: 市集分類重構
+    attackItems: [
         {
             id: 'weap_iron_sword', name: '短劍', type: 'Weapon', subTypes: ['Sharp'],
             cost: 2, vp: 0, goldValue: 1, light: 0,
@@ -159,9 +156,7 @@ export const CARDPOOL = {
             cost: 5, vp: 0, goldValue: 1, light: 1,
             desc: '燃燒的魔法刃',
             equipment: { attack: 2, magicAttack: 0, weight: 3 }
-        }
-    ],
-    spells: [
+        },
         {
             id: 'spell_fireball', name: '火球', type: 'Spell', subTypes: ['Fire'],
             cost: 5, vp: 0, goldValue: 1, light: 1,
@@ -169,12 +164,18 @@ export const CARDPOOL = {
             equipment: { attack: 0, magicAttack: 2, weight: 0 }
         }
     ],
-    items: [
+    villageItems: [
         {
             id: 'item_antidote', name: '解毒劑', type: 'Item', subTypes: ['Potion'],
             cost: 3, vp: 0, goldValue: 1, light: 0,
             desc: '【使用】移除疾病並抽 1 張牌',
             abilities: { onVillage: 'destroy_disease' }
+        },
+        // Moved from basic cards (User Request)
+        {
+            id: 'basic_light_gem', name: '光輝寶石', type: 'LightItem', subTypes: ['Wonder'],
+            cost: 3, vp: 0, goldValue: 2, light: 2,
+            desc: '提供進階光照與採購力'
         }
     ],
     special: [

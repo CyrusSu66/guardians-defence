@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.22.3(01-02-13:10)"; // 修復詳情顯示、新增光輝寶石與 LightItem
+        this.version = "v3.22.4(01-02-13:30)"; // 市集重構：攻/輔各半 & 光輝寶石
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);

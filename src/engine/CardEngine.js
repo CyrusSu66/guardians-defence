@@ -80,19 +80,25 @@ export class CardEngine {
      * 刷新市集內容
      */
     refreshMarket() {
-        const basics = JSON.parse(JSON.stringify(CARDPOOL.basic));
-        const heroes = this.game.shuffleArray(CARDPOOL.heroes.filter(h => h.hero.level === 1)).slice(0, 4);
-        const randomPool = [
-            ...(CARDPOOL.items || []),
-            ...(CARDPOOL.weapons || []),
-            ...(CARDPOOL.spells || [])
-        ];
-        const items = this.game.shuffleArray(randomPool).slice(0, 4);
+        // 1. 基礎卡 (Basic) - 始終供應
+        const basics = [...CARDPOOL.basic]; // No id needed for logic here, just pass array? Or map to instances?
+        // Wait, init logic used IDs. Here we return defining objects or instances?
+        // Let's keep consistent.
 
-        return {
-            basics: basics.slice(0, 4),
-            heroes: heroes,
-            items: items
-        };
+        // 2. 英雄 (Heroes) - 隨機 4 名 Level 1
+        // Keeping original logic as getRandomHeroes is not defined in the provided context.
+        const heroes = this.game.shuffleArray(CARDPOOL.heroes.filter(h => h.hero.level === 1)).slice(0, 4);
+
+        // 3. 物品/法術 (Items/Spells) 
+        // v3.22.4: 改為 2 AttackItems + 2 VillageItems (Total 4)
+        const attackPool = [...CARDPOOL.attackItems];
+        const villagePool = [...CARDPOOL.villageItems];
+
+        const randomAttack = attackPool.sort(() => 0.5 - Math.random()).slice(0, 2);
+        const randomVillage = villagePool.sort(() => 0.5 - Math.random()).slice(0, 2);
+
+        const items = [...randomAttack, ...randomVillage];
+
+        return { basics: basics.slice(0, 4), heroes, items };
     }
 }
