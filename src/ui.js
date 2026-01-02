@@ -72,9 +72,14 @@ export class UIManager {
             plazaPanel.style.display = shouldShow ? 'block' : 'none';
         }
 
-        // v3.3: 版號直接更新到標題
+        // v3.23.2: 版號移至左上角
+        this.setText('appVersion', g.version);
+
+        // v3.3: 標題不再顯示版號
+        /* 
         const titleEl = document.getElementById('gameTitle');
-        if (titleEl) titleEl.innerText = `⚔️ 守護者防線 Guardians Defence ${g.version}`;
+        if (titleEl) titleEl.innerText = `⚔️ 守護者防線 Guardians Defence`;
+        */
 
         const stateLabels = {
             [GameState.DRAW]: '🎲 抽牌與補給',
