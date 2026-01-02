@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.23.25"; // UI: Fix Missing Class Brace
+        this.version = "v3.23.26"; // UI: Fix Syntax Error (Final)
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);
