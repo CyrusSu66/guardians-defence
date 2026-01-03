@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>守護者防線 - 核心系統 v1.0</title>
-    <link rel="stylesheet" href="style.css?v=3.24.6">
+    <link rel="stylesheet" href="style.css?v=3.24.7">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
@@ -183,11 +183,9 @@
                     <div class="panel-title desktop-only">🎴 戰略手牌</div>
                     <div class="deck-status" style="display: flex; gap: 10px;">
                         <button class="btn btn-secondary" style="font-size: 10px; padding: 4px 8px;"
-                            onclick="window.game.showDeckModal('deck')">📚 牌庫 (<span
-                                id="btnDeckCount">0</span>)</button>
+                            onclick="window.ui.showDeck()">📚 牌庫 (<span id="btnDeckCount">0</span>)</button>
                         <button class="btn btn-secondary" style="font-size: 10px; padding: 4px 8px;"
-                            onclick="window.game.showDeckModal('discard')">🗑️ 棄牌 (<span
-                                id="btnDiscardCount">0</span>)</button>
+                            onclick="window.ui.showDiscard()">🗑️ 棄牌 (<span id="btnDiscardCount">0</span>)</button>
                     </div>
                 </div>
                 <div class="hand-area">
@@ -232,7 +230,7 @@
         </div>
     </div>
 
-    <script type="module" src="src/game.js?v=3.24.6"></script>
+    <script type="module" src="src/game.js?v=3.24.7"></script>
     <script>
         // Start Game
         const startBtn = document.getElementById('startGameBtn');
