@@ -160,10 +160,12 @@ export class CombatEngine {
             }
 
             // v3.22.14: 塞維恩 + 隊伍協同
-            if ((effect === 'synergy_hero_group' || effect === 'synergy_hero_group_2')) {
+            if ((effect.startsWith('synergy_hero_group'))) {
                 const hasOtherHero = this.game.hand.some(c => c.type === 'Hero' && c !== hero);
                 if (hasOtherHero) {
-                    const bonus = (effect === 'synergy_hero_group_2' ? 2 : 1);
+                    let bonus = 1; // Lv1 Base: +1
+                    if (effect.endsWith('_2')) bonus = 3; // Lv2: +3 (User Request)
+                    if (effect.endsWith('_3')) bonus = 5; // Lv3: +5 (User Request)
                     physAtk += bonus;
                     bonuses.push(`隊伍協同(塞維恩): +${bonus} Atk`);
                 }
@@ -171,9 +173,9 @@ export class CombatEngine {
 
             // v3.22.14: 羅域 + 逆境 (光照不足)
             if ((effect.startsWith('light_compensation_loric')) && totalLight < lightReq) {
-                let bonus = 3; // Lv1 Base: +3
-                if (effect.endsWith('_2')) bonus = 4; // Lv2: +4
-                if (effect.endsWith('_3')) bonus = 5; // Lv3: +5
+                let bonus = 2; // Lv1 Base: +2
+                if (effect.endsWith('_2')) bonus = 3; // Lv2: +3
+                if (effect.endsWith('_3')) bonus = 4; // Lv3: +4
                 physAtk += bonus;
                 bonuses.push(`逆境戰鬥(羅域): +${bonus} Atk`);
             }
@@ -187,16 +189,7 @@ export class CombatEngine {
                 bonuses.push(`矮人武裝: +${bonus} Atk`);
             }
 
-            // Keep existing light_compensation (Sevin Lv2 legacy logic? Wait, Sevin Lv2 logic changed to synergy_hero_group_2)
-            // But Sevin Lv3 logic is STILL light_compensation_lv3?
-            // User requested changes to "hero_sevin_lv1"... "original ability cancelled".
-            // My data update in Step 1039 replaced Lv1 and Lv2 abilities.
-            // Lv3 is "light_compensation_lv3" still in Step 1039 replacement chunk (top part).
-            // So need to keep that logic.
-            if (effect === 'light_compensation_lv3' && lightPenalty > 0 && totalLight > 0) {
-                magAtk += 2; // Lv3 desc: Magic+2 if low light
-                bonuses.push('騎士信仰(Lv3): +2 Mag');
-            }
+            // v3.26 Clean up: Removed old light_compensation_lv3 (Sevin Lv3) as requested.
 
             // Legacy Light Compensation (for Sevin Lv2 if any old instances exist? No, user updated data)
             if (effect === 'light_compensation' && lightPenalty > 0) {
