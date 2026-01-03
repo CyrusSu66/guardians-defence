@@ -428,7 +428,7 @@ export class UIManager {
         const modalContent = document.getElementById('infoModalContent');
         const modal = document.getElementById('infoModal');
 
-        if (modalTitle) modalTitle.innerText = title + ` (${cards.length})`;
+        if (modalTitle) modalTitle.innerText = title + ` (${cards ? cards.length : 0})`;
 
         if (!cards || cards.length === 0) {
             modalContent.innerHTML = '<p style="padding: 20px; text-align: center; color: #888;">（空）</p>';
