@@ -12,14 +12,15 @@
 
 ## 🚧 進行中的開發分支 (Active Features)
 
-### 1. 修復怪物進場效果 (Fix Monster Breach)
+### 1. 修復怪物進場效果 & 新架構 (Fix Breach & Landing Page)
 *   **分支名稱**: `fix-monster-breach`
-*   **建立日期**: 2026-01-03
-*   **負責項目**:
-    *   修復 `DungeonEngine.processBreach` 邏輯未被呼叫的問題。
-    *   確保哥布林、蜈蚣等怪物進場時正確觸發異能。
+*   **更新日期**: 2026-01-04
+*   **實作功能**:
+    *   **Landing Page**: 新增 `index.html` 作為入口，改為手動進入戰局。
+    *   **Dev Comm**: 新增開發溝通區按鈕，讀取 `DEV_RESPONSE.md`。
+    *   **UI Resize**: 地城卡片寬度調整為 85px。
+    *   **Breach Fix**: 修正進場觸發點。
 *   **預覽連結**: https://guardians-defence-git-fix-monster-breach-cyrussu66s-projects.vercel.app/
-    *(備註：這是自動生成的預覽連結，若無法存取，請至 Vercel 後台查看)*
 
 ---
 

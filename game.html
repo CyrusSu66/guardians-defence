@@ -236,17 +236,16 @@
     </div>
 
     <script type="module" src="src/game.js?v=3.25.3"></script>
-    <script type="module">
-        import { GuardiansDefenceGame } from './src/game.js';
-
+    <script>
         // Auto-Start Game
-        window.addEventListener('DOMContentLoaded', () => {
-            window.game = new GuardiansDefenceGame();
-            window.ui = window.game.ui;
-            console.log('[Login] Auto-starting game...');
-            // Small delay to ensure engines are ready
-            setTimeout(() => window.game.startNewGame(), 100);
-        });
+        // Wait for module to load and initialize window.game
+        const checkGameReady = setInterval(() => {
+            if (window.game) {
+                clearInterval(checkGameReady);
+                console.log('[Login] Game Interface Ready. Auto-starting...');
+                window.game.startNewGame();
+            }
+        }, 100);
     </script>
 
     <!-- Global Back Button -->
