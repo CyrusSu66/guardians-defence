@@ -389,7 +389,7 @@ export class UIManager {
                 <div>🛡️ 護盾損耗: -${monster.monster.breachDamage}</div>
                 <div style="grid-column: 1 / -1;">✨ 擊殺獎勵: +${monster.monster.xpGain} XP</div>
             </div>
-            <p>${monster.monster.desc || '（無怪物描述）'}</p>
+            <p>${monster.desc || '（無怪物描述）'}</p>
         `;
 
         const modalTitle = document.getElementById('infoModalTitle');
@@ -546,7 +546,7 @@ export class UIManager {
                             <div class="monster-name">${tsMarker} ${monster.name}</div>
                             <div class="monster-hp" style="color:${hpColor}">❤️ ${monster.currentHP}/${monster.monster.hp}</div>
                             <div class="monster-stats">
-                                <span class="breach-dmg">⚠️ -${monster.monster.breachDamage || 1} HP</span>
+                                <span class="breach-dmg">⚠️ -${monster.monster.breachDamage || 1} 🛡️</span>
                                 <span class="xp-gain">✨ +${monster.monster.xpGain} XP</span>
                             </div>
                             <div class="info-icon" onclick="event.stopPropagation(); window.ui.showMonsterDetail('${monster.id}')">ⓘ</div>
