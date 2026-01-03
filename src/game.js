@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.24.11"; // Fix: Syntax Error in UI
+        this.version = "v3.24.12"; // Fix: Deck Count Display ID Conflict
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);

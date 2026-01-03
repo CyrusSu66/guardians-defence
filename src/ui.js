@@ -63,7 +63,9 @@ export class UIManager {
         this.setText('deckCount', g.deck.length);
         this.setText('discardCount', g.discard.length);
         this.setText('btnDeckCount', g.deck.length);
-        this.setText('btnDiscardCount', g.discard.length);
+        this.setText('btnDeckCountBtn', g.deck.length);
+        this.setText('btnDiscardCount', g.discard.length); // Assuming handle doesn't have discard count, wait check index.html
+        this.setText('btnDiscardCountBtn', g.discard.length);
 
         // v3.21.2: 控制村莊核心(Market)顯示，僅在閒置(選擇行動)或造訪村莊時顯示
         const plazaPanel = document.querySelector('.village-plaza');
