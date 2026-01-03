@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.25.3"; // Fix: Card Hover Clipping
+        this.version = "v3.26.0-beta (Breach Fix)"; // Branch: fix-monster-breach
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);

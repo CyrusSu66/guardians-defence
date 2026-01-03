@@ -19,9 +19,18 @@ export class DungeonEngine {
         monster.currentHP = monster.monster.hp; // v3.5: 初始化 HP
 
         // 找出最遠的空位 (遞減嘗試)
-        if (!g.dungeonHall.rank3) g.dungeonHall.rank3 = monster;
-        else if (!g.dungeonHall.rank2) g.dungeonHall.rank2 = monster;
-        else if (!g.dungeonHall.rank1) g.dungeonHall.rank1 = monster;
+        if (!g.dungeonHall.rank3) {
+            g.dungeonHall.rank3 = monster;
+            this.processBreach(monster); // Trigger Enter/Spawn Effect
+        }
+        else if (!g.dungeonHall.rank2) {
+            g.dungeonHall.rank2 = monster;
+            this.processBreach(monster);
+        }
+        else if (!g.dungeonHall.rank1) {
+            g.dungeonHall.rank1 = monster;
+            this.processBreach(monster);
+        }
         else {
             g.monsterDeck.push(monster);
             g.addLog('⚠️ 地城已滿，怪物暫時無法進入。', 'warning');
@@ -74,7 +83,7 @@ export class DungeonEngine {
         const g = this.game;
         if (!monster || !monster.abilities || !monster.abilities.onBreach) return;
 
-        this.game.addLog(`⚠️ ${monster.name} 的進場威壓！`, 'warning');
+        this.game.addLog(`⚠️ ${monster.name} 進場發動突襲！`, 'warning');
         const effect = monster.abilities.onBreach;
 
         if (effect === 'gain_disease') {
