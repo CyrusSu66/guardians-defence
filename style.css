@@ -397,6 +397,11 @@ body {
     align-items: flex-start;
 }
 
+.hand-cards .card {
+    flex-shrink: 0;
+    width: var(--card-width);
+}
+
 /* Custom Scrollbar for Hand Cards */
 .hand-cards::-webkit-scrollbar {
     height: 6px;
