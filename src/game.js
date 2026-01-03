@@ -227,7 +227,7 @@ class GuardiansDefenceGame {
             if (hasAbility) {
                 // Case A: Ability -> Confirm & Execute
                 if (confirm(`是否發動 ${card.name} 的效果？`)) {
-                    const played = this.hand.splice(idx, 1)[0];
+                    const played = this.hand.splice(handIdx, 1)[0];
                     this.playedCards.push(played);
                     this.triggerCardEffect(played.abilities.onVillage);
                     this.updateUI();
@@ -237,7 +237,7 @@ class GuardiansDefenceGame {
 
             if (hasGold) {
                 // Case B: Value Only -> Move to Played & Add Gold
-                const played = this.hand.splice(idx, 1)[0];
+                const played = this.hand.splice(handIdx, 1)[0];
                 this.playedCards.push(played);
                 this.currentGold += played.goldValue;
                 this.addLog(`啟動「${played.name}」，獲得 ${played.goldValue} 金幣。`, 'success');
@@ -247,11 +247,11 @@ class GuardiansDefenceGame {
 
         } else if (this.currentAction === 'REST') {
             if (this.hasDestroyed) return this.addLog('本回合休息已執行過銷毀。', 'warning');
-            if (this.selectedDestroyIdx === idx) {
+            if (this.selectedDestroyIdx === handIdx) {
                 this.selectedDestroyIdx = null; // For REST action
                 this.pendingGrailEffect = false; // v3.26: For Grail Knight destroy effect
             } else {
-                this.selectedDestroyIdx = idx;
+                this.selectedDestroyIdx = handIdx;
                 this.addLog(`已選取「${card.name}」，點擊下方確認按鈕以執行銷毀。`, 'info');
             }
             this.updateUI();
