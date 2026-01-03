@@ -391,8 +391,10 @@ body {
     overflow-x: auto;
     /* Enable horizontal scroll */
     padding-bottom: 5px;
+    padding-top: 30px;
+    /* Space for hover lift */
     /* Space for scrollbar */
-    min-height: 160px;
+    min-height: 190px;
     /* Ensure height for cards */
     align-items: flex-start;
 }
@@ -448,6 +450,14 @@ body {
     display: flex;
     flex-direction: column;
     /* justify-content: space-between; removed to allow stacking */
+}
+
+.card.played:hover {
+    transform: none;
+    z-index: 1;
+    /* Keep slightly above but no zoom */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    /* Reset shadow */
 }
 
 .card:hover {
