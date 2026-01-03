@@ -174,34 +174,34 @@ export const CARDPOOL = {
     // --- 怪物群 (v3.11 重組：每族群 10 張卡，比例 4:3:3) ---
     monsters: [
         // --- 群落 1: Vermin (毒蟲) ---
-        { id: 'mon_rat', name: '腐化老鼠', type: 'Monster', subTypes: ['Vermin'], monster: { tier: 1, hp: 1, xpGain: 1, breachDamage: 1 }, desc: '群聚的瘟疫與害蟲', count: 4 },
-        { id: 'mon_centipede', name: '巨型蜈蚣', type: 'Monster', subTypes: ['Vermin'], monster: { tier: 2, hp: 3, xpGain: 1, breachDamage: 2 }, desc: '【進場】隨機棄 1 張手牌', abilities: { onBreach: 'discard_1' }, count: 3 },
+        { id: 'mon_rat', name: '腐化老鼠', type: 'Monster', subTypes: ['Vermin'], monster: { tier: 1, hp: 1, xpGain: 1, breachDamage: 1 }, desc: '受到黑暗魔力侵蝕的巨大老鼠，成群結隊地啃食村莊的防禦設施。', count: 4 },
+        { id: 'mon_centipede', name: '巨型蜈蚣', type: 'Monster', subTypes: ['Vermin'], monster: { tier: 2, hp: 3, xpGain: 1, breachDamage: 2 }, desc: '【進場】隨機棄 1 張手牌。<br>擁有堅硬甲殼的多足掠食者，其毒液能麻痺冒險者的心智。', abilities: { onBreach: 'discard_1' }, count: 3 },
         { id: 'mon_spider', name: '變異蜘蛛', type: 'Monster', subTypes: ['Vermin'], monster: { tier: 3, hp: 6, xpGain: 2, breachDamage: 3 }, desc: '【持續】所有英雄力量 -1', abilities: { aura: 'str_minus_1' }, count: 3 },
 
         // --- 群落 2: Undead (不死者) ---
-        { id: 'mon_ghost', name: '幽鬼', type: 'Monster', subTypes: ['Undead'], monster: { tier: 1, hp: 2, xpGain: 1, breachDamage: 1 }, desc: '飄忽不定的靈體', count: 4 },
-        { id: 'mon_skeleton', name: '骷髏戰士', type: 'Monster', subTypes: ['Undead'], monster: { tier: 2, hp: 3, xpGain: 2, breachDamage: 2 }, desc: '嘎吱作響的骸骨', count: 3 },
-        { id: 'mon_wraith', name: '死靈', type: 'Monster', subTypes: ['Undead'], monster: { tier: 3, hp: 5, xpGain: 3, breachDamage: 3 }, desc: '【進場】棄 1 張能量或裝備卡', abilities: { onBreach: 'discard_magic_or_item' }, count: 3 },
+        { id: 'mon_ghost', name: '幽鬼', type: 'Monster', subTypes: ['Undead'], monster: { tier: 1, hp: 2, xpGain: 1, breachDamage: 1 }, desc: '徘徊在戰場上的怨靈，一般的物理攻擊難以對其造成傷害。', count: 4 },
+        { id: 'mon_skeleton', name: '骷髏戰士', type: 'Monster', subTypes: ['Undead'], monster: { tier: 2, hp: 3, xpGain: 2, breachDamage: 2 }, desc: '被黑魔法喚醒的古代士兵，手持生鏽的鐵劍無情地斬殺生者。', count: 3 },
+        { id: 'mon_wraith', name: '死靈', type: 'Monster', subTypes: ['Undead'], monster: { tier: 3, hp: 5, xpGain: 3, breachDamage: 3 }, desc: '【進場】棄 1 張能量或裝備卡。<br>高階的不死生物，其寒冷的氣息能瞬間凍結勇者的裝備。', abilities: { onBreach: 'discard_magic_or_item' }, count: 3 },
 
         // --- 群落 3: Darkness (黑暗軍團) ---
-        { id: 'mon_shadow', name: '影魔', type: 'Monster', subTypes: ['Darkness'], monster: { tier: 1, hp: 1, xpGain: 1, breachDamage: 1 }, desc: '潛伏於陰影中的威脅', count: 4 },
-        { id: 'mon_nightmare_knight', name: '夢魘騎士', type: 'Monster', subTypes: ['Darkness'], monster: { tier: 2, hp: 4, xpGain: 3, breachDamage: 3 }, desc: '【持續】地城照明需求 +1 (最高累計 1)', abilities: { aura: 'light_req_plus_1' }, count: 3 },
-        { id: 'mon_harbinger', name: '末日使者', type: 'Monster', subTypes: ['Darkness'], monster: { tier: 3, hp: 7, xpGain: 5, breachDamage: 4 }, desc: '【持續】所有英雄戰力 -1', abilities: { aura: 'atk_minus_1' }, count: 3 },
+        { id: 'mon_shadow', name: '影魔', type: 'Monster', subTypes: ['Darkness'], monster: { tier: 1, hp: 1, xpGain: 1, breachDamage: 1 }, desc: '從陰影中誕生的無形殺手，常在光照不足時發動致命突襲。', count: 4 },
+        { id: 'mon_nightmare_knight', name: '夢魘騎士', type: 'Monster', subTypes: ['Darkness'], monster: { tier: 2, hp: 4, xpGain: 3, breachDamage: 3 }, desc: '【持續】地城照明需求 +1 (最高累計 1)。<br>騎乘著黑馬的恐怖騎士，他的存在本身就會吞噬周圍的光芒。', abilities: { aura: 'light_req_plus_1' }, count: 3 },
+        { id: 'mon_harbinger', name: '末日使者', type: 'Monster', subTypes: ['Darkness'], monster: { tier: 3, hp: 7, xpGain: 5, breachDamage: 4 }, desc: '【持續】所有英雄戰力 -1。<br>毀滅的先驅，他所散發的絕望氣場能削弱最堅強的戰士。', abilities: { aura: 'atk_minus_1' }, count: 3 },
 
         // --- 群落 4: Ancient (遠古遺蹟) ---
-        { id: 'mon_slime', name: '粘液怪', type: 'Monster', subTypes: ['Ancient', 'Mire'], monster: { tier: 1, hp: 1, xpGain: 1, breachDamage: 1 }, desc: '難以捉摸的液狀生物', count: 4 },
-        { id: 'mon_young_dragon', name: '幼龍', type: 'Monster', subTypes: ['Ancient', 'Dragon'], monster: { tier: 2, hp: 4, xpGain: 3, breachDamage: 3 }, desc: '年幼但具備威脅的巨龍', count: 3 },
-        { id: 'mon_black_dragon', name: '大黑龍', type: 'Monster', subTypes: ['Ancient', 'Dragon'], monster: { tier: 3, hp: 8, xpGain: 6, breachDamage: 5 }, desc: '【戰鬥】僅魔法攻擊有效', abilities: { battle: 'magic_only' }, count: 3 },
+        { id: 'mon_slime', name: '粘液怪', type: 'Monster', subTypes: ['Ancient', 'Mire'], monster: { tier: 1, hp: 1, xpGain: 1, breachDamage: 1 }, desc: '古老遺跡中常見的有機陷阱，雖然弱小但極難徹底消滅。', count: 4 },
+        { id: 'mon_young_dragon', name: '幼龍', type: 'Monster', subTypes: ['Ancient', 'Dragon'], monster: { tier: 2, hp: 4, xpGain: 3, breachDamage: 3 }, desc: '雖然尚未成年，但其吐息的威力已足以融化鋼鐵與岩石。', count: 3 },
+        { id: 'mon_black_dragon', name: '大黑龍', type: 'Monster', subTypes: ['Ancient', 'Dragon'], monster: { tier: 3, hp: 8, xpGain: 6, breachDamage: 5 }, desc: '【戰鬥】僅魔法攻擊有效。<br>傳說中的災厄化身，其鱗片堅不可摧，唯有強大的魔法才能傷其分毫。', abilities: { battle: 'magic_only' }, count: 3 },
 
         // --- 群落 5: Goblin (哥布林) (v3.22.14) ---
-        { id: 'mon_goblin_grunt', name: '哥布林雜兵', type: 'Monster', subTypes: ['Goblin'], monster: { tier: 1, hp: 2, xpGain: 1, breachDamage: 1 }, desc: '【進場】破壞 1 張手牌', abilities: { onBreach: 'destroy_hand_1' }, count: 4 },
-        { id: 'mon_goblin_raider', name: '哥布林突襲者', type: 'Monster', subTypes: ['Goblin'], monster: { tier: 2, hp: 4, xpGain: 2, breachDamage: 2 }, desc: '【進場】破壞 2 張手牌', abilities: { onBreach: 'destroy_hand_2' }, count: 3 },
-        { id: 'mon_goblin_king', name: '哥布林王', type: 'Monster', subTypes: ['Goblin'], monster: { tier: 3, hp: 7, xpGain: 4, breachDamage: 3 }, desc: '【進場】破壞 2 張手牌 + 1 隨機物品', abilities: { onBreach: 'destroy_hand_2_plus_1' }, count: 3 },
+        { id: 'mon_goblin_grunt', name: '哥布林雜兵', type: 'Monster', subTypes: ['Goblin'], monster: { tier: 1, hp: 2, xpGain: 1, breachDamage: 1 }, desc: '【進場】破壞 1 張手牌。<br>狡猾且貪婪的小型亞人，擅長偷襲與破壞冒險者的補給。', abilities: { onBreach: 'destroy_hand_1' }, count: 4 },
+        { id: 'mon_goblin_raider', name: '哥布林突襲者', type: 'Monster', subTypes: ['Goblin'], monster: { tier: 2, hp: 4, xpGain: 2, breachDamage: 2 }, desc: '【進場】破壞 2 張手牌。<br>裝備更精良的哥布林精英，會優先攻擊攜帶物資的隊員。', abilities: { onBreach: 'destroy_hand_2' }, count: 3 },
+        { id: 'mon_goblin_king', name: '哥布林王', type: 'Monster', subTypes: ['Goblin'], monster: { tier: 3, hp: 7, xpGain: 4, breachDamage: 3 }, desc: '【進場】破壞 2 張手牌 + 1 隨機物品。<br>統率哥布林大軍的魁梧暴君，其麾下的掠奪行動將更加殘暴。', abilities: { onBreach: 'destroy_hand_2_plus_1' }, count: 3 },
 
         // --- 群落 6: Mire (泥漿類) (v3.22.14) ---
-        { id: 'mon_green_slime', name: '綠色泥糊', type: 'Monster', subTypes: ['Mire'], monster: { tier: 1, hp: 3, xpGain: 1, breachDamage: 2 }, desc: '有毒的綠色黏液', count: 4 },
-        { id: 'mon_black_slime', name: '黑色史萊姆', type: 'Monster', subTypes: ['Mire'], monster: { tier: 1, hp: 4, xpGain: 1, breachDamage: 2 }, desc: '吞噬一切的黑色泥漿', count: 3 },
-        { id: 'mon_red_gel', name: '紅色凝膠獸', type: 'Monster', subTypes: ['Mire'], monster: { tier: 2, hp: 6, xpGain: 2, breachDamage: 2 }, desc: '【持續】所有英雄攻擊力 -1', abilities: { aura: 'atk_minus_1' }, count: 3 }
+        { id: 'mon_green_slime', name: '綠色泥糊', type: 'Monster', subTypes: ['Mire'], monster: { tier: 1, hp: 3, xpGain: 1, breachDamage: 2 }, desc: '帶有強烈腐蝕性的酸性軟泥，散發著令人作嘔的惡臭。', count: 4 },
+        { id: 'mon_black_slime', name: '黑色史萊姆', type: 'Monster', subTypes: ['Mire'], monster: { tier: 1, hp: 4, xpGain: 1, breachDamage: 2 }, desc: '猶如焦油般黏稠的黑暗物質，能輕易困住大意的冒險者。', count: 3 },
+        { id: 'mon_red_gel', name: '紅色凝膠獸', type: 'Monster', subTypes: ['Mire'], monster: { tier: 2, hp: 6, xpGain: 2, breachDamage: 2 }, desc: '【持續】所有英雄攻擊力 -1。<br>外表晶瑩剔透但極度危險，能吸收衝擊力並削弱武器的鋒利度。', abilities: { aura: 'atk_minus_1' }, count: 3 }
     ],
 
 

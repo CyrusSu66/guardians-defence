@@ -385,10 +385,9 @@ export class UIManager {
                 <strong style="font-size: 1.2em; margin-left: 8px;">${monster.name}</strong>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                <div>❤️ 血量: ${monster.currentHP}/${monster.monster.hp}</div>
-                <div>⚡ 速度: ${monster.monster.speed}</div>
-                <div>⚠️ 突破傷害: -${monster.monster.breachDamage} HP</div>
-                <div>✨ 擊殺獎勵: +${monster.monster.xpGain} XP</div>
+                <div>❤️ 生命值: ${monster.currentHP}/${monster.monster.hp}</div>
+                <div>🛡️ 護盾損耗: -${monster.monster.breachDamage}</div>
+                <div style="grid-column: 1 / -1;">✨ 擊殺獎勵: +${monster.monster.xpGain} XP</div>
             </div>
             <p>${monster.monster.desc || '（無怪物描述）'}</p>
         `;
