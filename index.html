@@ -4,253 +4,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>守護者防線 - 核心系統 v1.0</title>
-    <link rel="stylesheet" href="style.css?v=3.26.0-beta.2">
+    <title>守護者防線 - Guardians Defence</title>
+    <link rel="stylesheet" href="style.css?v=3.26.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #131313;
+            color: #ecf0f1;
+            font-family: 'Inter', sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .landing-container {
+            max-width: 600px;
+            width: 100%;
+            background: #1e1e1e;
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            color: #f1c40f;
+            text-shadow: 0 0 10px rgba(241, 196, 15, 0.3);
+        }
+
+        p.subtitle {
+            color: #95a5a6;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+        }
+
+        .menu-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: #2c2c2c;
+            border: 1px solid #444;
+            color: #fff;
+            font-size: 1.1em;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .menu-btn:hover {
+            background: #3498db;
+            transform: translateY(-2px);
+            border-color: #3498db;
+        }
+
+        .menu-btn.dev {
+            background: #2c2c2c;
+            border: 1px dashed #555;
+            color: #aaa;
+        }
+
+        .menu-btn.dev:hover {
+            color: #fff;
+            border-color: #2ecc71;
+            background: #1e3a2f;
+        }
+
+        #devPanel,
+        #manualPanel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .panel-content {
+            background: #1e1e1e;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: left;
+            border: 1px solid #444;
+        }
+
+        .close-btn {
+            float: right;
+            cursor: pointer;
+            font-size: 1.5em;
+            color: #888;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="layout-grid">
-        <!-- 1. LEFT PANEL: Status (Desktop) / Top Bar (Mobile) -->
-        <aside id="statsPanel" class="panel-sidebar">
-            <div class="app-brand">
-                <h1>GD <span id="appVersion" style="font-size: 12px; color: #666; vertical-align: middle;"></span></h1>
-                <!-- Mobile Brand -->
-                <span class="desktop-title">Guardians Defence</span>
-            </div>
 
-            <div class="stats-container">
-                <!-- v3.23.4: Shield Redesign (Overlay Text) -->
-                <div class="stat-card shield-stat" style="display: flex; flex-direction: column; gap: 4px;">
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <span class="stat-icon">🛡️</span>
-                        <label style="margin: 0; font-size: 11px; color: #aaa;">魔法護罩</label>
-                    </div>
-                    <div class="progress-bar-container"
-                        style="position: relative; height: 18px; background: #222; border-radius: 4px; overflow: hidden; margin: 0;">
-                        <div class="progress-bar-fill" id="shieldBar"
-                            style="width: 100%; height: 100%; position: absolute; left: 0; top: 0; transition: width 0.3s;">
-                        </div>
-                        <span class="stat-value-text" id="villageHP"
-                            style="position: absolute; width: 100%; text-align: center; top: 0; line-height: 18px; font-size: 12px; z-index: 2; color: #fff; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">20</span>
-                    </div>
-                </div>
+    <div class="landing-container">
+        <h1>守護者防線</h1>
+        <p class="subtitle">Guardians Defence: Legacy of Thunder</p>
 
-                <div class="stat-card">
-                    <div class="stat-info">
-                        <label>回合</label>
-                        <span class="stat-value-text" id="turnNumber">1</span>
-                    </div>
-                </div>
+        <button class="menu-btn" onclick="window.location.href='game.html'">⚔️ 開始新戰局</button>
+        <button class="menu-btn" onclick="showManual()">📜 遊戲玩法介紹</button>
 
-                <div class="stat-card">
-                    <div class="stat-info">
-                        <label>經驗 / 戰果</label>
-                        <span class="stat-value-text"><span id="currentXP">0</span> XP | <span id="totalScore">0</span>
-                            VP</span>
-                    </div>
-                </div>
-            </div>
-        </aside>
+        <!-- Feature Flag: Dev Comm -->
+        <button class="menu-btn dev" id="btnDevComm" onclick="showDevComm()">🛠️ 開發用溝通區</button>
+    </div>
 
-        <!-- 2. CENTER PANEL: Main Stage -->
-        <main id="stageArea" class="main-stage">
-
-            <div id="headerActions" class="stage-section" style="text-align: center; margin-bottom: 20px;">
-                <button class="btn btn-primary btn-glow" id="startGameBtn">開始新戰局</button>
-            </div>
-
-            <!-- Dungeon Hall -->
-            <div id="dungeonPanel" class="stage-section panel-card">
-                <div class="panel-header">
-                    <h3>⚔️ 地城大廳</h3>
-                </div>
-                <div class="lane-display">
-                    <div class="lane-track" id="laneTrack">
-                        <div class="lane-village">🏰</div>
-                        <div class="dungeon-rank-slots" id="dungeonRankSlots"></div>
-                    </div>
-                </div>
-                <div id="debugDeckInspector"></div>
-            </div>
-
-            <!-- Action Selection -->
-            <div id="actionSelectPanel" class="stage-section panel-card action-panel">
-                <div class="panel-header">
-                    <h3>🚩 行動</h3>
-                </div>
-                <div class="action-buttons-grid">
-                    <button class="btn btn-action" id="btnVisitVillage">
-                        <span class="btn-icon">🏪</span> 造訪村莊
-                    </button>
-                    <button class="btn btn-action" id="btnRest">
-                        <span class="btn-icon">💤</span> 休息整補
-                    </button>
-                    <button class="btn btn-action btn-danger" id="btnEnterDungeon">
-                        <span class="btn-icon">⚔️</span> 進入地城
-                    </button>
-                </div>
-            </div>
-
-            <!-- Dynamic Panels (Combat / Rest) -->
-            <div id="dynamicPanels" class="stage-section">
-                <!-- Rest Panel -->
-                <div id="restPanel" class="panel-card active-mode-panel" style="display: none;">
-                    <div class="panel-header">
-                        <h3>💤 休息中</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div style="margin-bottom: 10px; color: #aaa;">已獲得 1 XP。點擊手牌可銷毀卡片。</div>
-                        <button class="btn btn-secondary" onclick="window.game.finishAction()">完成行動</button>
-                    </div>
-                </div>
-
-                <!-- Combat Panel -->
-                <div id="combatPanel" class="panel-card active-mode-panel" style="display: none;">
-                    <div class="panel-header">
-                        <h3>🗡️ 戰鬥指揮</h3>
-                    </div>
-                    <div id="combatHeroList" class="combat-hero-slots"
-                        style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
-                    <div id="combatSummary" class="combat-log" style="margin: 15px 0;">尚未部署英雄...</div>
-                    <div class="panel-actions" style="display: flex; gap: 10px; justify-content: flex-end;">
-                        <button class="btn btn-primary btn-glow" id="combatAttackBtn">執行攻擊</button>
-                        <button class="btn btn-secondary" onclick="window.game.finishAction()">撤退 / 結束</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Village / Market -->
-            <div id="villagePanel" class="stage-section panel-card village-panel">
-                <div class="panel-header">
-                    <h3>🏛️ 村莊市集</h3>
-                    <div class="coin-badge" style="background: #333; padding: 5px 10px; border-radius: 4px;">
-                        💰 <span id="plazaCoinDisplay">0</span>
-                    </div>
-                </div>
-                <!-- Controls for finishing village actions (hidden by default) -->
-                <div id="villageFinishControl"
-                    style="margin: 10px 0; display: none; justify-content: flex-end; gap: 10px;">
-                    <button class="btn btn-primary" onclick="window.game.finishAction()">結束村莊行動</button>
-                </div>
-
-                <!--
-                <div class="plaza-tabs" style="margin-bottom: 15px;">
-                    <button class="plaza-tab-btn active" id="tab-market">廣場市集</button>
-                </div>
-                -->
-                <!-- Market Content injected by JS -->
-                <div id="marketTab" class="plaza-content active">
-                    <div id="marketGrid" class="market-display-grid"></div>
-                </div>
-                <div id="trainingTab" class="plaza-content">
-                    <div id="trainingHeroes"></div>
-                </div>
-            </div>
-
-            <!-- Training Panel -->
-            <div id="trainingPanel" class="stage-section panel-card training-panel" style="display: none;">
-                <div class="panel-header">
-                    <h3>⚔️ 訓練場</h3>
-                </div>
-                <div id="trainingContent"></div>
-            </div>
-
-        </main>
-
-        <!-- 3. RIGHT PANEL: Log (Desktop) -->
-        <aside id="logPanel" class="panel-sidebar log-sidebar">
-            <div class="panel-header" style="border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 10px;">
-                <h3>📜 冒險日誌</h3>
-            </div>
-            <div class="log-content expanded-log" id="gameLog">
-                <div class="log-entry info">系統初始化完成...</div>
-            </div>
-        </aside>
-
-        <!-- 4. BOTTOM DOCK: Hand (Drawer on Mobile) -->
-        <div id="handDock" class="hand-dock">
-            <div class="dock-handle mobile-only" id="handDrawerHandle">
-                <span class="handle-bar" style="width: 40px; height: 4px; background: #555; border-radius: 2px;"></span>
-                <span class="hand-summary" style="margin-left: 10px; font-size: 12px;">手牌 (<span
-                        id="btnDeckCount">0</span>)</span>
-            </div>
-            <div class="dock-content">
-                <div class="hand-controls" style="margin-bottom: 10px; display: flex; justify-content: space-between;">
-                    <div class="panel-title desktop-only" style="display: flex; align-items: center; gap: 10px;">
-                        <span>🎴 戰略手牌</span>
-                        <button id="btnAutoActivate" class="btn btn-warning small"
-                            style="font-size: 10px; padding: 2px 8px; display: none;"
-                            onclick="window.game.villageEngine.activateAllResources()">⚡ 啟用資源</button>
-                    </div>
-                    <div class="deck-status" style="display: flex; gap: 10px;">
-                        <button class="btn btn-secondary" style="font-size: 10px; padding: 4px 8px;"
-                            onclick="window.ui.showDeck()">📚 牌庫 (<span id="btnDeckCountBtn">0</span>)</button>
-                        <button class="btn btn-secondary" style="font-size: 10px; padding: 4px 8px;"
-                            onclick="window.ui.showDiscard()">🗑️ 棄牌 (<span id="btnDiscardCountBtn">0</span>)</button>
-                    </div>
-                </div>
-                <div class="hand-area">
-                    <div id="playedCardsDisplay" class="played-cards-area" style="display: flex; gap: 5px;"></div>
-                    <div class="hand-cards" id="handDisplay" style="display: flex; gap: 10px;"></div>
-                </div>
+    <!-- Manual Modal -->
+    <div id="manualPanel">
+        <div class="panel-content">
+            <span class="close-btn" onclick="document.getElementById('manualPanel').style.display='none'">×</span>
+            <h2>遊戲玩法介紹</h2>
+            <div id="manualText">
+                <p>載入中...</p>
             </div>
         </div>
     </div>
 
-    <!-- Modals (Overlay) -->
-    <div id="deckModal" class="modal-overlay">
-        <div class="modal-content deck-view">
-            <h3 id="deckModalTitle">牌庫檢視</h3>
-            <div id="deckModalContent" class="deck-view-grid"
-                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px;"></div>
-            <div style="margin-top:20px; text-align:right;">
-                <button class="btn btn-secondary"
-                    onclick="document.getElementById('deckModal').classList.remove('active')">關閉</button>
+    <!-- Dev Comm Modal -->
+    <div id="devPanel">
+        <div class="panel-content">
+            <span class="close-btn" onclick="document.getElementById('devPanel').style.display='none'">×</span>
+            <h2>🛠️ 開發溝通紀錄</h2>
+            <div id="devText" style="white-space: pre-wrap; font-family: monospace; line-height: 1.6;">
+                正在讀取 DEV_RESPONSE.md ...
             </div>
         </div>
     </div>
 
-    <!-- Card Detail Modal -->
-    <div id="infoModal" class="modal-overlay">
-        <div class="modal-content deck-view">
-            <h3 id="infoModalTitle">卡牌詳情</h3>
-            <div id="infoModalContent" style="font-size: 14px; line-height: 1.6;"></div>
-            <div style="margin-top:20px; text-align:right;">
-                <button class="btn btn-secondary"
-                    onclick="document.getElementById('infoModal').classList.remove('active')">關閉</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- End Game Modal -->
-    <div class="modal" id="endGameModal">
-        <div class="modal-content">
-            <h2 id="endGameTitle">戰報</h2>
-            <p id="endGameMessage"></p>
-            <button class="btn btn-primary" style="margin-top: 20px;" onclick="location.reload()">重新啟動系統</button>
-        </div>
-    </div>
-
-    <script type="module" src="src/game.js?v=3.25.3"></script>
     <script>
-        // Start Game
-        const startBtn = document.getElementById('startGameBtn');
-        if (startBtn) {
-            startBtn.addEventListener('click', () => {
-                if (window.game) window.game.startNewGame();
-            });
+        // Check URL param or Branch logic? For now always show.
+        // Or check query string ?dev=true
+
+        function showManual() {
+            document.getElementById('manualPanel').style.display = 'block';
+            fetch('Game_Rule/Guardians_Defence_Refactored_GDD.md') // Or specific manual file
+                .then(r => r.text())
+                .then(text => document.getElementById('manualText').innerHTML = '<pre style="white-space: pre-wrap;">' + text.substring(0, 1000) + '... (完整版請見 GDD)</pre>');
         }
 
-        // Mobile Drawer Toggle
-        const handle = document.getElementById('handDrawerHandle');
-        const dock = document.getElementById('handDock');
-        if (handle && dock) {
-            handle.addEventListener('click', () => {
-                dock.classList.toggle('expanded');
-            });
+        function showDevComm() {
+            document.getElementById('devPanel').style.display = 'block';
+            fetch('DEV_RESPONSE.md')
+                .then(r => {
+                    if (!r.ok) throw new Error("無回應紀錄");
+                    return r.text();
+                })
+                .then(text => document.getElementById('devText').innerText = text)
+                .catch(e => document.getElementById('devText').innerText = "尚無回應紀錄 (DEV_RESPONSE.md Not Found)");
         }
     </script>
 </body>

@@ -393,6 +393,7 @@ class GuardiansDefenceGame {
     gameOver() {
         this.state = GameState.GAME_OVER;
         this.updateUI();
+        if (this.ui) this.ui.showGameOver(this.totalScore);
     }
 }
 

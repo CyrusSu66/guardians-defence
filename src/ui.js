@@ -409,6 +409,20 @@ export class UIManager {
         if (modal) modal.classList.add('active');
     }
 
+    showGameOver(score) {
+        const modal = document.getElementById('endGameModal');
+        const title = document.getElementById('endGameTitle');
+        const msg = document.getElementById('endGameMessage');
+
+        if (title) title.innerText = '💀 戰役結束';
+        if (msg) msg.innerHTML = `最終得分: <strong style="color:#ffd700; font-size:1.5em;">${score}</strong> VP<br><br>雖然此次防線失守，但您的英勇事蹟將被銘記。`;
+
+        if (modal) {
+            modal.style.display = 'flex'; // Use flex to center
+            modal.classList.add('active'); // Just in case CSS uses class
+        }
+    }
+
     showDeck() {
         console.log('[UI] showDeck clicked');
         if (!this.game.deck) {
