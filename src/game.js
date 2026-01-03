@@ -409,11 +409,17 @@ class GuardiansDefenceGame {
 
     addLog(msg, type) {
         this.log.push({ message: msg, type });
-        // if (this.log.length > 50) this.log.shift(); // Optional: limit log size but keep old ones for a bit? User said "scroll to old". Keep all? Or limit to 50? Current is 20.
-        // User said "can scroll to check old messages", implies persistence.
-        // Let's increase limit to 50 for now.
         if (this.log.length > 50) this.log.shift();
         this.updateUI();
+
+        // Auto-scroll to bottom
+        setTimeout(() => {
+            const el = document.getElementById('gameLog');
+            if (el && el.parentElement) {
+                // Scroll the parent container (which has overflow-y: auto)
+                el.parentElement.scrollTop = el.parentElement.scrollHeight;
+            }
+        }, 0);
     }
 
     updateUI() {
