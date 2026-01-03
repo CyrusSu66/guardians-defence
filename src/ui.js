@@ -369,9 +369,16 @@ export class UIManager {
     // v3.5 顯示怪物詳情 (Re-added v3.23.22)
     showMonsterDetail(monsterInstanceId) {
         console.log('[UI] showMonsterDetail', monsterInstanceId);
-        // 先嘗試從地城 slots 找
-        // 由於 currentMonsters 是在 engine 內部，我們嘗試遍歷所有來找到對應 ID
-        const monster = this.game.dungeon.currentMonsters.find(m => m && m.id === monsterInstanceId);
+        // 先嘗試從地城 slots 找 (dungeonHall)
+        let monster = null;
+        if (this.game.dungeonHall) {
+            monster = Object.values(this.game.dungeonHall).find(m => m && m.id === monsterInstanceId);
+        }
+
+        // Fallback: 如果不在場上 (可能剛死?)，試著從 monsterDeck 找 (如果是 Debug 用途)
+        if (!monster && this.game.monsterDeck) {
+            monster = this.game.monsterDeck.find(m => m.id === monsterInstanceId);
+        }
 
         if (!monster) {
             console.warn('Monster not found:', monsterInstanceId);
