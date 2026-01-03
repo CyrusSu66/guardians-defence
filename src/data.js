@@ -129,21 +129,21 @@ export const CARDPOOL = {
         {
             id: 'hero_loric_lv1', name: '羅域盜賊', type: 'Hero', subTypes: ['Thief'],
             cost: 4, vp: 1, goldValue: 0, light: 0,
-            desc: '【地下城】光照不足時，攻擊力+1',
+            desc: '【地下城】光照不足時，攻擊力+3',
             hero: { level: 1, series: 'Loric', magicAttack: 0, strength: 1, xpToUpgrade: 4, upgradeToId: 'hero_loric_lv2' },
             abilities: { onBattle: 'light_compensation_loric' }
         },
         {
             id: 'hero_loric_lv2', name: '羅域刺客', type: 'Hero', subTypes: ['Thief'],
             cost: 7, vp: 2, goldValue: 0, light: 0,
-            desc: '【地城】戰勝怪物後獲得 1 金幣；光照不足時攻擊力+2',
+            desc: '【地城】戰勝怪物後獲得 1 金幣；光照不足時攻擊力+4',
             hero: { level: 2, series: 'Loric', magicAttack: 0, strength: 2, xpToUpgrade: 6, upgradeToId: 'hero_loric_lv3' },
             abilities: { onVictory: 'gain_1gold', onBattle: 'light_compensation_loric_2' }
         },
         {
             id: 'hero_loric_lv3', name: '羅域暗影大師', type: 'Hero', subTypes: ['Thief'],
             cost: 10, vp: 3, goldValue: 0, light: 0,
-            desc: '【地城】戰勝怪物後獲得 2 金幣；光照不足時攻擊力+3',
+            desc: '【地城】戰勝怪物後獲得 2 金幣；光照不足時攻擊力+5',
             hero: { level: 3, series: 'Loric', magicAttack: 0, strength: 3, xpToUpgrade: 0 },
             abilities: { onVictory: 'gain_2gold', onBattle: 'light_compensation_loric_3' }
         },

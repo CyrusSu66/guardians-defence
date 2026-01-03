@@ -171,9 +171,9 @@ export class CombatEngine {
 
             // v3.22.14: 羅域 + 逆境 (光照不足)
             if ((effect.startsWith('light_compensation_loric')) && totalLight < lightReq) {
-                let bonus = 1;
-                if (effect.endsWith('_2')) bonus = 2;
-                if (effect.endsWith('_3')) bonus = 3;
+                let bonus = 3; // Lv1 Base: +3
+                if (effect.endsWith('_2')) bonus = 4; // Lv2: +4
+                if (effect.endsWith('_3')) bonus = 5; // Lv3: +5
                 physAtk += bonus;
                 bonuses.push(`逆境戰鬥(羅域): +${bonus} Atk`);
             }
