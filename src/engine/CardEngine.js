@@ -42,6 +42,9 @@ export class CardEngine {
                 // 強制設定數量，覆蓋 data.js 的預設值 (以防未來 data.js 修改但這裡沒變)
                 // T1: 4張, T2: 3張, T3: 3張
                 let count = tier === 1 ? 4 : 3;
+                // 初始牌庫：6 張民兵 + 4 張火把 = 10 張 (Draw 5 -> Leave 5)
+                for (let i = 0; i < 6; i++) this.deck.push({ ...this.game.data.cards.card_militia, id: `init_m_${i}` });
+                for (let i = 0; i < 4; i++) this.deck.push({ ...this.game.data.cards.card_torch, id: `init_t_${i}` }); // 生成唯一 ID
 
                 for (let i = 0; i < count; i++) {
                     const newMonster = JSON.parse(JSON.stringify(template));
