@@ -402,6 +402,52 @@ export class UIManager {
     }
 
     showDeck() {
+        if (!this.game.cardEngine.deck) return; // Safety check
+        const deck = this.game.cardEngine.deck;
+        this.showCardListModal('牌庫檢視', deck);
+    }
+
+    showDiscard() {
+        if (!this.game.cardEngine.discard) return;
+        const discard = this.game.cardEngine.discard;
+        this.showCardListModal('棄牌堆檢視', discard);
+    }
+
+    showCardListModal(title, cards) {
+        const modalTitle = document.getElementById('infoModalTitle');
+        const modalContent = document.getElementById('infoModalContent');
+        const modal = document.getElementById('infoModal');
+
+        if (modalTitle) modalTitle.innerText = title + ` (${cards.length})`;
+
+        if (!cards || cards.length === 0) {
+            modalContent.innerHTML = '<p style="padding: 20px; text-align: center; color: #888;">（空）</p>';
+        } else {
+            // Group cards by name
+            const groups = {};
+            cards.forEach(c => {
+                if (!groups[c.name]) groups[c.name] = { ...c, count: 0 };
+                groups[c.name].count++;
+            });
+
+            let html = '<div style="display: grid; gap: 10px;">';
+            for (const name in groups) {
+                const c = groups[name];
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 4px;">
+                        <span>${c.name}</span>
+                        <span>x${c.count}</span>
+                    </div>
+                `;
+            }
+            html += '</div>';
+            modalContent.innerHTML = html;
+        }
+
+        if (modal) modal.classList.add('active');
+    }
+
+    showDeck() {
         const deck = this.game.cardEngine.deck;
         this.showCardListModal('牌庫檢視', deck);
     }
