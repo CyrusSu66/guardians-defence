@@ -57,12 +57,12 @@ body {
    ========================================= */
 .layout-grid {
     display: grid;
-    grid-template-columns: var(--sidebar-width) 1fr var(--log-width);
+    grid-template-columns: var(--sidebar-width) 1fr;
     grid-template-rows: 1fr auto;
     /* Main Content + Dock */
     grid-template-areas:
-        "stats stage log"
-        "hand  hand  hand";
+        "stats stage"
+        "hand  hand";
     /* Hand Overlay logic might differ, but physically it's bottom */
     height: 100vh;
     width: 100vw;
@@ -342,10 +342,10 @@ body {
 }
 
 /* 3. Right Sidebar: Log */
+/* 3. Right Sidebar: Log (Moved to Stage v3.26) */
 #logPanel {
-    grid-area: log;
+    /* grid-area: log; REMOVED */
     background: var(--color-surface);
-    border-left: 1px solid var(--color-border);
     display: flex;
     flex-direction: column;
 }
@@ -717,11 +717,9 @@ body {
     #logPanel {
         display: block;
         /* Show log on mobile */
-        max-height: 300px;
-        overflow-y: auto;
+        /* max-height: 300px; Overridden by inline style in HTML */
         margin-bottom: 10px;
-        order: 10;
-        /* Put it near bottom of flow if flex */
+        /* order: 10; REMOVED to keep at top */
     }
 
     /* Could be Modal on Mobile */
