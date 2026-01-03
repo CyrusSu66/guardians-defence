@@ -393,10 +393,11 @@ body {
     overflow-x: auto;
     /* Enable horizontal scroll */
     padding-bottom: 5px;
-    padding-top: 30px;
-    /* Space for hover lift */
+    padding-top: 10px;
+    /* Reduced padding (v3.26) */
     /* Space for scrollbar */
-    min-height: 190px;
+    min-height: 200px;
+    /* Reduced min-height */
     /* Ensure height for cards */
     align-items: flex-start;
 }
@@ -445,10 +446,10 @@ body {
     padding: 6px;
     position: relative;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.1s;
     user-select: none;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-
+    /* No Zoom on default state */
     display: flex;
     flex-direction: column;
     /* justify-content: space-between; removed to allow stacking */
@@ -463,8 +464,6 @@ body {
 }
 
 .card:hover {
-    transform: translateY(-20px) scale(1.1);
-    z-index: 10;
     border-color: var(--color-text);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
 }
@@ -567,7 +566,7 @@ body {
 
 .market-item:hover {
     border-color: var(--color-accent);
-    transform: scale(1.05);
+    /* Removed transform scale */
 }
 
 /* Buttons Generic */
