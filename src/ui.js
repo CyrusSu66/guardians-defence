@@ -179,7 +179,16 @@ export class UIManager {
                 const hintEl = document.createElement('div');
                 hintEl.className = 'card-hint danger';
                 hintEl.innerHTML = '[點擊銷毀]';
+                hintEl.innerHTML = '[點擊銷毀]';
                 cardEl.appendChild(hintEl);
+            } else if (g.pendingGrailEffect) {
+                const hintEl = document.createElement('div');
+                hintEl.className = 'card-hint magic'; // New class or reuse/add style
+                hintEl.style.color = '#00e5ff';
+                hintEl.style.borderColor = '#00e5ff';
+                hintEl.innerHTML = '[聖杯銷毀]';
+                cardEl.appendChild(hintEl);
+                cardEl.style.border = '2px dashed #00e5ff';
             }
 
             if (g.currentAction === 'REST' && g.selectedDestroyIdx === idx) {

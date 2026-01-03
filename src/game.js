@@ -204,8 +204,14 @@ class GuardiansDefenceGame {
         this.endTurnWithAdvance();
     }
 
-    playCard(idx) {
-        const card = this.hand[idx];
+    playCard(handIdx) {
+        // v3.26: Intercept for Grail Knight Destroy Effect
+        if (this.pendingGrailEffect) {
+            this.resolveGrailDestroy(handIdx);
+            return;
+        }
+
+        const card = this.hand[handIdx];
         if (!card) return;
 
         if (this.currentAction === 'VILLAGE') {
@@ -242,13 +248,32 @@ class GuardiansDefenceGame {
         } else if (this.currentAction === 'REST') {
             if (this.hasDestroyed) return this.addLog('本回合休息已執行過銷毀。', 'warning');
             if (this.selectedDestroyIdx === idx) {
-                this.selectedDestroyIdx = null;
+                this.selectedDestroyIdx = null; // For REST action
+                this.pendingGrailEffect = false; // v3.26: For Grail Knight destroy effect
             } else {
                 this.selectedDestroyIdx = idx;
                 this.addLog(`已選取「${card.name}」，點擊下方確認按鈕以執行銷毀。`, 'info');
             }
             this.updateUI();
         }
+    }
+
+    // v3.26: Handle Grail Knight Destroy Selection
+    resolveGrailDestroy(handIdx) {
+        const card = this.hand[handIdx];
+        if (!card) return;
+
+        // Execute Destroy
+        this.hand.splice(handIdx, 1);
+        this.addLog(`✨ 聖杯儀式：已銷毀「${card.name}」。`, 'success');
+
+        // Execute Heal (Standard 1)
+        this.villageHP = Math.min(20, this.villageHP + 1);
+        this.addLog('🛡️ 魔法護罩修復 +1 (當前: ' + this.villageHP + ')', 'success');
+
+        // Reset State
+        this.pendingGrailEffect = false;
+        this.updateUI();
     }
 
     /**
@@ -295,6 +320,13 @@ class GuardiansDefenceGame {
             this.addLog(`✨ ${sourceName}：戰鬥經驗增加 1 XP。`, 'success');
         } else if (effectKey === 'buy_light') {
             this.addLog(`✨ ${sourceName}：戰勝獲得補給，本回合可額外購買光源道具（未實作連動）。`, 'info');
+        } else if (effectKey === 'heal_2') {
+            this.villageHP = Math.min(20, this.villageHP + 2);
+            this.addLog(`🛡️ ${sourceName}：護罩大幅修復 +2 (當前: ${this.villageHP})`, 'success');
+        } else if (effectKey === 'destroy_any_heal_1') {
+            this.pendingGrailEffect = true;
+            this.addLog(`✨ ${sourceName}：請點擊一張手牌進行銷毀與修復。`, 'action');
+            this.updateUI(); // To show hint in UI
         }
     }
 
