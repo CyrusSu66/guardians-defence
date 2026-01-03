@@ -1,5 +1,5 @@
 /**
- * 《守護者防線：雷霆遺產》UI 渲染模組 (v3.1.1)
+ * 《守護者防線：雷霆遺產》UI 渲染模組 (v3.24.0)
  * 實作規則：分區市集渲染、手動啟用卡片顯示、點擊啟用切換。
  */
 
@@ -76,10 +76,7 @@ export class UIManager {
         this.setText('appVersion', g.version);
 
         // v3.3: 標題不再顯示版號
-        /* 
-        const titleEl = document.getElementById('gameTitle');
-        if (titleEl) titleEl.innerText = `⚔️ 守護者防線 Guardians Defence`;
-        */
+
 
         const stateLabels = {
             [GameState.DRAW]: '🎲 抽牌與補給',
@@ -309,10 +306,7 @@ export class UIManager {
         return div;
     }
 
-    // Legacy support removal: getStatsHtml is no longer used by renderCard directly in this new layout, 
-    // but might be used by RenderPlayedCards? Let's check. 
-    // RenderPlayedCards usually uses simplified view. 
-    // I will keep getStatsHtml if it is used elsewhere, but renderCard now builds DOM directly.
+
 
     // v3.4 顯示卡牌詳情 Tooltip
     // v3.4 顯示卡牌詳情 Tooltip (Fixed v3.23.19)
