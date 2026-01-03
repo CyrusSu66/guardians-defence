@@ -6,7 +6,7 @@
 *   **分支名稱**: `main`
 *   **目前版本**: v3.25.3
 *   **功能狀態**: 穩定版 (Stable)
-*   **部署連結**: (請填入正式站網址，例如 https://your-game.app)
+*   **部署連結**: https://guardians-defence.vercel.app/
 
 ---
 
@@ -16,9 +16,10 @@
 *   **分支名稱**: `fix-monster-breach`
 *   **建立日期**: 2026-01-03
 *   **負責項目**:
-    *   修復 `mid-monster-breach` 邏輯未被呼叫的問題。
+    *   修復 `DungeonEngine.processBreach` 邏輯未被呼叫的問題。
     *   確保哥布林、蜈蚣等怪物進場時正確觸發異能。
-*   **預覽連結**: (推送後由 Hosting 服務生成，通常為 `<branch-name>.app` 或 `<project>-git-<branch>.app`)
+*   **預覽連結**: https://guardians-defence-git-fix-monster-breach-cyrussu66s-projects.vercel.app/
+    *(備註：這是自動生成的預覽連結，若無法存取，請至 Vercel 後台查看)*
 
 ---
 
