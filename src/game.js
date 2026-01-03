@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.25.1"; // Fix: Activate Button & Card Width
+        this.version = "v3.25.2"; // Fix: Remove Legacy Button
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);
