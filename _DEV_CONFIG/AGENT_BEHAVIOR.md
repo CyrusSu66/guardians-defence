@@ -27,5 +27,18 @@
     - 手機版 (<768px) 採用單欄垂直堆疊佈局。
     - 確保所有按鈕在觸控裝置上易於點擊。
 
+## 5. 部署架構與分支策略 (Deployment & Branching)
+- **平台架構 (Vercel Integration)**:
+    - 此專案與 **Vercel** 進行 CI/CD 整合，任何推送到 GitHub 的變更都會自動觸發 Vercel 建置。
+    - **正式站 (Production)**: 對應 `main` 分支 => `https://guardians-defence.vercel.app/`
+    - **預覽站 (Preview)**: 對應任何非 main 的分支 => Vercel 會自動生成獨立網址 (e.g., `*-git-<branch>-*.vercel.app`)。
+
+- **開發流程 (Feature Branch Workflow)**:
+    1. **建立分支**: 當開發重大功能或高風險重構時，請使用 `git checkout -b <branch-name>` 建立新分支。
+    2. **開發與推送**: 在新分支進行開發，完成後推送 (`git push origin <branch-name>`)。
+    3. **預覽確認**: 取得 Vercel 生成的預覽網址，提供給使用者測試。
+    4. **紀錄**: 更新 `_DEV_CONFIG/BRANCH_LOG.md` 以追蹤目前分支狀態。
+    5. **合併**: 確認無誤後，發起 Pull Request (PR) 或直接合併回 `main`。
+
 ---
-*Last Updated: v3.22 (2026-01-02)*
+*Last Updated: v3.26 (2026-01-03)*

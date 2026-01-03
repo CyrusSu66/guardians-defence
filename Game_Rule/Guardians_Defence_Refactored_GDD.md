@@ -190,4 +190,20 @@ Rank 1 (-1 Light), Rank 2 (-2 Light), Rank 3 (-3 Light)。
 - **最終計分**：`我的總 VP - 逃脫怪物總 VP`。
 
 ---
+
+## 7. 技術架構與開發流程 (Technical Note)
+
+本遊戲採用純前端架構 (HTML5 + Vanilla JS)，並通過 GitHub 與 Vercel 實現自動化部署。
+
+### 7.1 部署環境
+*   **Hosting**: Vercel (連接 GitHub Repository)
+*   **Production URL**: `https://guardians-defence.vercel.app/` (對應 `main` 分支)
+*   **Preview URLs**: Vercel 會自動為每個 Pull Request 與 Branch 生成獨立的測試網址，用於功能驗證。
+
+### 7.2 版本控制策略
+*   **Main**: 始終保持可遊玩的穩定版本。
+*   **Feature Branches**: 使用 `feature/xxx` 或 `fix/xxx` 命名分支進行開發，驗證後合併。
+*   **分支紀錄**: 詳見 `_DEV_CONFIG/BRANCH_LOG.md`。
+
+---
 **本企劃書由 Antigravity 整理編寫，旨在將雷霆之石的豐富內容轉化為可開發的電子版架構。**
