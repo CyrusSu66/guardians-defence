@@ -593,6 +593,10 @@ export class UIManager {
                         <div style="display: flex; justify-content: space-between; ${m.hasThunderstone ? 'color:#00e5ff; font-weight:bold; background: rgba(0,229,255,0.1);' : ''}">
                             <span>${deck.length - i}. ${m.name}${m.hasThunderstone ? ' 💠' : ''}</span>
                             <span style="opacity: 0.5;">(HP: ${m.monster.hp}⚔️${m.monster.breachDamage})</span>
+                        </div>
+                    `).reverse().join('')}
+                </div>
+            </div>
         `;
     }
 
