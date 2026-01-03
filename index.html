@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>守護者防線 - 核心系統 v1.0</title>
-    <link rel="stylesheet" href="style.css?v=3.24.12">
+    <link rel="stylesheet" href="style.css?v=3.25.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
@@ -180,7 +180,12 @@
             </div>
             <div class="dock-content">
                 <div class="hand-controls" style="margin-bottom: 10px; display: flex; justify-content: space-between;">
-                    <div class="panel-title desktop-only">🎴 戰略手牌</div>
+                    <div class="panel-title desktop-only" style="display: flex; align-items: center; gap: 10px;">
+                        <span>🎴 戰略手牌</span>
+                        <button id="btnAutoActivate" class="btn btn-warning small"
+                            style="font-size: 10px; padding: 2px 8px; display: none;"
+                            onclick="window.game.cardEngine.activateAllResources()">⚡ 啟用資源</button>
+                    </div>
                     <div class="deck-status" style="display: flex; gap: 10px;">
                         <button class="btn btn-secondary" style="font-size: 10px; padding: 4px 8px;"
                             onclick="window.ui.showDeck()">📚 牌庫 (<span id="btnDeckCountBtn">0</span>)</button>
@@ -230,7 +235,7 @@
         </div>
     </div>
 
-    <script type="module" src="src/game.js?v=3.24.12"></script>
+    <script type="module" src="src/game.js?v=3.25.0"></script>
     <script>
         // Start Game
         const startBtn = document.getElementById('startGameBtn');

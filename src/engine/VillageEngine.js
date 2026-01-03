@@ -86,7 +86,12 @@ export class VillageEngine {
 
         let activatedCount = 0;
         for (let i = g.hand.length - 1; i >= 0; i--) {
-            if (g.hand[i].goldValue > 0) {
+            const card = g.hand[i];
+            // Only activate pure resource cards (Value > 0 AND No onVillage Ability)
+            // This prevents auto-triggering cards that might need user decision (like Draw)
+            const isPureResource = card.goldValue > 0 && (!card.abilities || !card.abilities.onVillage);
+
+            if (isPureResource) {
                 g.playCard(i);
                 activatedCount++;
             }

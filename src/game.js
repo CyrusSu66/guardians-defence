@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.24.12"; // Fix: Deck Count Display ID Conflict
+        this.version = "v3.25.0"; // Feature: Village Workflow Refinement
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);
@@ -209,16 +209,36 @@ class GuardiansDefenceGame {
         if (!card) return;
 
         if (this.currentAction === 'VILLAGE') {
-            const played = this.hand.splice(idx, 1)[0];
-            this.playedCards.push(played);
-            if (played.goldValue) {
+            // Refactor v3.25: Strict Play Logic
+            const hasGold = (card.goldValue && card.goldValue > 0);
+            const hasAbility = (card.abilities && card.abilities.onVillage);
+
+            if (!hasGold && !hasAbility) {
+                // Case C: No Value, No Ability -> Do Nothing
+                return;
+            }
+
+            if (hasAbility) {
+                // Case A: Ability -> Confirm & Execute
+                if (confirm(`是否發動 ${card.name} 的效果？`)) {
+                    const played = this.hand.splice(idx, 1)[0];
+                    this.playedCards.push(played);
+                    this.triggerCardEffect(played.abilities.onVillage);
+                    this.updateUI();
+                }
+                return;
+            }
+
+            if (hasGold) {
+                // Case B: Value Only -> Move to Played & Add Gold
+                const played = this.hand.splice(idx, 1)[0];
+                this.playedCards.push(played);
                 this.currentGold += played.goldValue;
                 this.addLog(`啟動「${played.name}」，獲得 ${played.goldValue} 金幣。`, 'success');
+                this.updateUI();
+                return;
             }
-            if (played.abilities && played.abilities.onVillage) {
-                this.triggerCardEffect(played.abilities.onVillage);
-            }
-            this.updateUI();
+
         } else if (this.currentAction === 'REST') {
             if (this.hasDestroyed) return this.addLog('本回合休息已執行過銷毀。', 'warning');
             if (this.selectedDestroyIdx === idx) {
@@ -227,6 +247,29 @@ class GuardiansDefenceGame {
                 this.selectedDestroyIdx = idx;
                 this.addLog(`已選取「${card.name}」，點擊下方確認按鈕以執行銷毀。`, 'info');
             }
+            this.updateUI();
+        }
+    }
+
+    /**
+     * Revert a played card (Undo)
+     * Only for cards with Gold Value (no abilities)
+     */
+    unplayCard(playedIdx) {
+        const card = this.playedCards[playedIdx];
+        if (!card) return;
+
+        // Security Check: Cannot undo if ability was triggered (assumed complex state change)
+        // For now, if it has onVillage ability, we deny undo.
+        if (card.abilities && card.abilities.onVillage) {
+            return this.addLog('無法復原已發動效果的卡牌。', 'warning');
+        }
+
+        if (card.goldValue > 0) {
+            this.currentGold -= card.goldValue;
+            this.playedCards.splice(playedIdx, 1);
+            this.hand.push(card);
+            this.addLog(`已復原「${card.name}」，扣除 ${card.goldValue} 金幣。`, 'info');
             this.updateUI();
         }
     }

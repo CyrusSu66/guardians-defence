@@ -100,6 +100,8 @@ export class UIManager {
         this.show('villageFinishControl', g.currentAction === 'VILLAGE');
 
         // v3.22.9: 訓練場顯示控制
+        // v3.25: Auto Activate Button
+        this.show('btnAutoActivate', g.state === GameState.VILLAGE && g.currentAction === 'VILLAGE');
         const trainingPanel = document.getElementById('trainingPanel');
         if (trainingPanel) trainingPanel.style.display = (g.currentAction === 'VILLAGE') ? 'block' : 'none';
 
@@ -198,12 +200,16 @@ export class UIManager {
             return;
         }
 
-        this.game.playedCards.forEach(card => {
+        this.game.playedCards.forEach((c, i) => {
             const el = document.createElement('div');
-            el.className = 'card small active';
+            el.className = 'card small played';
+            el.title = '點擊還原 (僅限資源卡)';
+            el.style.cursor = 'pointer';
+            el.onclick = () => this.game.unplayCard(i);
             el.innerHTML = `
-                <div class="card-name" style="font-size:11px;">${card.name}</div>
-                <div class="card-stats" style="font-size:10px;">✅ 已啟用</div>
+                <div class="card-type-tag">${c.type}</div>
+                <div class="card-name">${c.name}</div>
+                <div class="card-val" style="color:#ffd700;">${c.goldValue ? '💰' + c.goldValue : ''}</div>
             `;
             container.appendChild(el);
         });
