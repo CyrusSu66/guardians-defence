@@ -708,9 +708,8 @@ body {
     #stageArea {
         flex: 1;
         /* Take remaining height */
-        padding: 15px 10px;
-        padding-bottom: 80px;
-        /* Space for Drawer Handle */
+        padding: 0;
+        /* Content padding moved to #stageContent */
     }
 
     /* 3. Hidden Desktop Panels */
