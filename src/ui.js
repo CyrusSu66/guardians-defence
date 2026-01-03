@@ -403,22 +403,22 @@ export class UIManager {
 
     showDeck() {
         console.log('[UI] showDeck clicked');
-        if (!this.game.cardEngine.deck) {
+        if (!this.game.deck) {
             console.error('[UI] Deck is undefined');
             return;
         }
-        const deck = this.game.cardEngine.deck;
+        const deck = this.game.deck;
         console.log('[UI] Deck count:', deck.length);
         this.showCardListModal('牌庫檢視', deck);
     }
 
     showDiscard() {
         console.log('[UI] showDiscard clicked');
-        if (!this.game.cardEngine.discard) {
+        if (!this.game.discard) {
             console.error('[UI] Discard is undefined');
             return;
         }
-        const discard = this.game.cardEngine.discard;
+        const discard = this.game.discard;
         console.log('[UI] Discard count:', discard.length);
         this.showCardListModal('棄牌堆檢視', discard);
     }

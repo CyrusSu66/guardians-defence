@@ -12,7 +12,7 @@ import { CardEngine } from './engine/CardEngine.js';
 
 class GuardiansDefenceGame {
     constructor() {
-        this.version = "v3.24.7"; // Fix: Button Bindings & GDD Sync
+        this.version = "v3.24.8"; // Fix: Viewer Property Access Error
 
         // 初始化引擎
         this.cardEngine = new CardEngine(this);
