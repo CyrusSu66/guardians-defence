@@ -69,20 +69,23 @@ export const CARDPOOL = {
         {
             id: 'hero_amazon_lv1', name: '亞馬遜弓箭手', type: 'Hero', subTypes: ['Fighter', 'Ranger'],
             cost: 5, vp: 1, goldValue: 0, light: 0,
-            desc: '【地下城】若裝備弓，攻擊力+1',
+            desc: '【地下城】若裝備獵弓，攻擊力+1；戰勝得 1 XP。',
             hero: { level: 1, series: 'Amazon', magicAttack: 0, strength: 2, xpToUpgrade: 4, upgradeToId: 'hero_amazon_lv2' },
-            abilities: { onBattle: 'synergy_bow' }
+            abilities: { onBattle: 'synergy_bow', onVictory: 'gain_1xp' }
         },
         {
             id: 'hero_amazon_lv2', name: '亞馬遜獵手', type: 'Hero', subTypes: ['Fighter', 'Ranger'],
             cost: 8, vp: 2, goldValue: 1, light: 0,
-            desc: '【地下城】若裝備弓，攻擊力+2',
+            desc: '【地下城】若裝備獵弓，攻擊力+2；戰勝得 1 XP。',
             hero: { level: 2, series: 'Amazon', magicAttack: 0, strength: 3, xpToUpgrade: 6, upgradeToId: 'hero_amazon_lv3' },
+            abilities: { onBattle: 'synergy_bow_2', onVictory: 'gain_1xp' }
+        },
+        {
             id: 'hero_amazon_lv3', name: '亞馬遜女王', type: 'Hero', subTypes: ['Archer'],
             cost: 10, vp: 3, goldValue: 0, light: 0,
-            desc: '【地城】進入時抽 2 張牌；戰勝得 1 XP。',
+            desc: '【地下城】若裝備獵弓，攻擊力+3；戰勝得 1 XP。',
             hero: { level: 3, series: 'Amazon', magicAttack: 0, strength: 4, xpToUpgrade: 0 },
-            abilities: { onDungeon: 'draw_2', onVictory: 'gain_1xp' }
+            abilities: { onBattle: 'synergy_bow_3', onVictory: 'gain_1xp' }
         },
         {
             id: 'hero_elf_lv1', name: '精靈術士', type: 'Hero', subTypes: ['Wizard'],
