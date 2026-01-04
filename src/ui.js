@@ -370,11 +370,9 @@ export class UIManager {
             </p>
 
             <!-- Special Abilities (abilities_desc) -->
-            <div style="margin-top:10px; border-top:1px solid #444; padding-top:10px;">
+            <div style="margin-top:10px; border-top:1px solid #444; padding-top:10px; text-align: left;">
                 <strong>特殊能力：</strong>
-                <div style="margin-top:5px; white-space: pre-wrap; line-height: 1.6; color: #ddd;">
-                    ${(card.abilities && card.abilities.abilities_desc) ? card.abilities.abilities_desc : '（無）'}
-                </div>
+                <div style="margin-top:5px; white-space: pre-wrap; line-height: 1.6; color: #ddd;">${(card.abilities && card.abilities.abilities_desc) ? card.abilities.abilities_desc : '（無）'}</div>
             </div>
         `;
 
