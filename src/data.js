@@ -19,7 +19,8 @@ export const CARDPOOL = {
         {
             id: 'basic_regular_army', name: '正規軍', type: 'Hero', subTypes: ['Fighter'],
             cost: 2, vp: 0, goldValue: 0, light: 0,
-            desc: '⚔️若裝備長矛，攻擊力+1',
+            desc: '⚔️ 戰鬥中：若裝備長矛，攻擊力+1',
+            flavor: '受過基礎訓練的民兵，隨時準備保衛家園。',
             hero: { level: 0, series: 'Regular', magicAttack: 0, strength: 1, xpToUpgrade: 1 },
             abilities: { onBattle: 'synergy_spear' }
         },
@@ -38,7 +39,8 @@ export const CARDPOOL = {
         {
             id: 'basic_rations', name: '乾糧', type: 'Food', subTypes: ['Supply'],
             cost: 1, vp: 0, goldValue: 1, light: 0,
-            desc: '⚔️裝備的英雄獲得力量+1',
+            desc: '⚔️ 戰鬥中：裝備的英雄獲得力量+1',
+            flavor: '方便攜帶的乾糧，冒險者補充體力的最愛。',
             abilities: { onBattle: 'boost_str_1' }
         }
     ],
@@ -48,42 +50,42 @@ export const CARDPOOL = {
         {
             id: 'hero_sevin_lv1', name: '塞維恩戰術家', type: 'Hero', subTypes: ['Fighter'],
             cost: 4, vp: 1, goldValue: 0, light: 0,
-            desc: '【地下城】手牌中有其他英雄時，攻擊力+1',
+            desc: '⚔️ 戰鬥中：手牌中有其他英雄時，攻擊力+1',
             hero: { level: 1, series: 'Sevin', magicAttack: 0, strength: 3, xpToUpgrade: 4, upgradeToId: 'hero_sevin_lv2' },
             abilities: { onBattle: 'synergy_hero_group' }
         },
         {
             id: 'hero_sevin_lv2', name: '塞維恩指揮官', type: 'Hero', subTypes: ['Fighter'],
             cost: 7, vp: 2, goldValue: 0, light: 1,
-            desc: '【地下城】手牌中有其他英雄時，攻擊力+3',
+            desc: '⚔️ 戰鬥中：手牌中有其他英雄時，攻擊力+3',
             hero: { level: 2, series: 'Sevin', magicAttack: 0, strength: 4, xpToUpgrade: 6, upgradeToId: 'hero_sevin_lv3' },
             abilities: { onBattle: 'synergy_hero_group_2' }
         },
         {
             id: 'hero_sevin_lv3', name: '塞維恩君主', type: 'Hero', subTypes: ['Fighter'],
             cost: 10, vp: 3, goldValue: 0, light: 2,
-            desc: '【地下城】手牌中有其他英雄時，攻擊力+5',
+            desc: '⚔️ 戰鬥中：手牌中有其他英雄時，攻擊力+5',
             hero: { level: 3, series: 'Sevin', magicAttack: 0, strength: 5, xpToUpgrade: 0 },
             abilities: { onBattle: 'synergy_hero_group_3' }
         },
         {
             id: 'hero_amazon_lv1', name: '亞馬遜弓箭手', type: 'Hero', subTypes: ['Fighter', 'Ranger'],
             cost: 5, vp: 1, goldValue: 0, light: 0,
-            desc: '【地下城】若裝備獵弓，攻擊力+1；戰勝得 1 XP。',
+            desc: '⚔️ 戰鬥中：若裝備獵弓，攻擊力+1\n🏆 戰勝後：戰勝怪物得 1 XP',
             hero: { level: 1, series: 'Amazon', magicAttack: 0, strength: 2, xpToUpgrade: 4, upgradeToId: 'hero_amazon_lv2' },
             abilities: { onBattle: 'synergy_bow', onVictory: 'gain_1xp' }
         },
         {
             id: 'hero_amazon_lv2', name: '亞馬遜獵手', type: 'Hero', subTypes: ['Fighter', 'Ranger'],
             cost: 8, vp: 2, goldValue: 1, light: 0,
-            desc: '【地下城】若裝備獵弓，攻擊力+2；戰勝得 1 XP。',
+            desc: '⚔️ 戰鬥中：若裝備獵弓，攻擊力+2\n🏆 戰勝後：戰勝怪物得 1 XP',
             hero: { level: 2, series: 'Amazon', magicAttack: 0, strength: 3, xpToUpgrade: 6, upgradeToId: 'hero_amazon_lv3' },
             abilities: { onBattle: 'synergy_bow_2', onVictory: 'gain_1xp' }
         },
         {
             id: 'hero_amazon_lv3', name: '亞馬遜女王', type: 'Hero', subTypes: ['Archer'],
             cost: 10, vp: 3, goldValue: 0, light: 0,
-            desc: '【地下城】若裝備獵弓，攻擊力+3；戰勝得 1 XP。',
+            desc: '⚔️ 戰鬥中：若裝備獵弓，攻擊力+3\n🏆 戰勝後：戰勝怪物得 1 XP',
             hero: { level: 3, series: 'Amazon', magicAttack: 0, strength: 4, xpToUpgrade: 0 },
             abilities: { onBattle: 'synergy_bow_3', onVictory: 'gain_1xp' }
         },
@@ -96,35 +98,35 @@ export const CARDPOOL = {
         {
             id: 'hero_elf_lv2', name: '精靈巫師', type: 'Hero', subTypes: ['Wizard'],
             cost: 7, vp: 2, goldValue: 0, light: 0,
-            desc: '【地城】進入時抽 1 張牌。',
+            desc: '🌲 地城入口：抽 1 張牌',
             hero: { level: 2, series: 'Elf', magicAttack: 2, strength: 2, xpToUpgrade: 6, upgradeToId: 'hero_elf_lv3' },
             abilities: { onDungeon: 'draw_1' }
         },
         {
             id: 'hero_elf_lv3', name: '精靈大魔導', type: 'Hero', subTypes: ['Wizard'],
             cost: 10, vp: 3, goldValue: 0, light: 0,
-            desc: '【地城】進入時抽 2 張牌；戰勝得 1 XP。',
+            desc: '🌲 地城入口：抽 2 張牌\n🏆 戰勝後：戰勝怪物得 1 XP',
             hero: { level: 3, series: 'Elf', magicAttack: 3, strength: 3, xpToUpgrade: 0 },
             abilities: { onDungeon: 'draw_2', onVictory: 'gain_1xp' }
         },
         {
             id: 'hero_dwarf_lv1', name: '矮人守護者', type: 'Hero', subTypes: ['Fighter'],
             cost: 4, vp: 1, goldValue: 0, light: 0,
-            desc: '【地下城】若有裝備武器，攻擊力+1',
+            desc: '⚔️ 戰鬥中：若有裝備武器，攻擊力+1',
             hero: { level: 1, series: 'Dwarf', magicAttack: 0, strength: 2, xpToUpgrade: 4, upgradeToId: 'hero_dwarf_lv2' },
             abilities: { onBattle: 'dwarf_weapon_bonus' }
         },
         {
             id: 'hero_dwarf_lv2', name: '矮人戰士', type: 'Hero', subTypes: ['Fighter'],
             cost: 7, vp: 2, goldValue: 0, light: 0,
-            desc: '【能力】若有裝備，額外 Attack+2',
-            hero: { level: 2, series: 'Dwarf', magicAttack: 0, strength: 3, xpToUpgrade: 6, upgradeToId: 'hero_dwarf_lv3' },
+            desc: '⚔️ 戰鬥中：若有裝備武器，攻擊力+2',
+            hero: { level: 2, series: 'Dwarf', magicAttack: 0, strength: 3, xpToUpgrade: 6, upgradeToId: 'hero_dwarf_lv2' },
             abilities: { onBattle: 'dwarf_weapon_bonus_2' }
         },
         {
             id: 'hero_dwarf_lv3', name: '矮人領主', type: 'Hero', subTypes: ['Fighter'],
             cost: 10, vp: 3, goldValue: 0, light: 0,
-            desc: '【能力】若有裝備，額外 Attack+3',
+            desc: '⚔️ 戰鬥中：若有裝備武器，攻擊力+3',
             hero: { level: 3, series: 'Dwarf', magicAttack: 0, strength: 4, xpToUpgrade: 0 },
             abilities: { onBattle: 'dwarf_weapon_bonus_3' }
         },
@@ -132,21 +134,21 @@ export const CARDPOOL = {
         {
             id: 'hero_loric_lv1', name: '羅域盜賊', type: 'Hero', subTypes: ['Thief'],
             cost: 4, vp: 1, goldValue: 0, light: 0,
-            desc: '【地下城】光照不足時，攻擊力+2',
+            desc: '⚔️ 戰鬥中：光照不足時，攻擊力+2',
             hero: { level: 1, series: 'Loric', magicAttack: 0, strength: 1, xpToUpgrade: 4, upgradeToId: 'hero_loric_lv2' },
             abilities: { onBattle: 'light_compensation_loric' }
         },
         {
             id: 'hero_loric_lv2', name: '羅域刺客', type: 'Hero', subTypes: ['Thief'],
             cost: 7, vp: 2, goldValue: 0, light: 0,
-            desc: '【地城】光照不足時攻擊力+3',
+            desc: '⚔️ 戰鬥中：光照不足時，攻擊力+3',
             hero: { level: 2, series: 'Loric', magicAttack: 0, strength: 2, xpToUpgrade: 6, upgradeToId: 'hero_loric_lv3' },
             abilities: { onBattle: 'light_compensation_loric_2' }
         },
         {
             id: 'hero_loric_lv3', name: '羅域暗影大師', type: 'Hero', subTypes: ['Thief'],
             cost: 10, vp: 3, goldValue: 0, light: 0,
-            desc: '【地城】光照不足時攻擊力+4',
+            desc: '⚔️ 戰鬥中：光照不足時，攻擊力+4',
             hero: { level: 3, series: 'Loric', magicAttack: 0, strength: 3, xpToUpgrade: 0 },
             abilities: { onBattle: 'light_compensation_loric_3' }
         },
@@ -154,21 +156,21 @@ export const CARDPOOL = {
         {
             id: 'hero_grail_lv1', name: '聖杯探求者', type: 'Hero', subTypes: ['Cleric'],
             cost: 4, vp: 1, goldValue: 0, light: 0,
-            desc: '【村莊】摧毀一張疾病卡。',
+            desc: '🏠 村莊中：摧毀一張疾病卡',
             hero: { level: 1, series: 'Grail', magicAttack: 1, strength: 1, xpToUpgrade: 4, upgradeToId: 'hero_grail_lv2' },
             abilities: { onVillage: 'destroy_disease' }
         },
         {
             id: 'hero_grail_lv2', name: '聖杯騎士', type: 'Hero', subTypes: ['Cleric'],
             cost: 7, vp: 2, goldValue: 0, light: 1,
-            desc: '【村莊】摧毀任意一張卡；修復 1 點魔法護罩',
+            desc: '🏠 村莊中：摧毀任意一張卡\n🏠 村莊中：修復 1 點魔法護罩',
             hero: { level: 2, series: 'Grail', magicAttack: 2, strength: 2, xpToUpgrade: 6, upgradeToId: 'hero_grail_lv3' },
             abilities: { onVillage: 'destroy_any_heal_1' }
         },
         {
             id: 'hero_grail_lv3', name: '聖杯守護者', type: 'Hero', subTypes: ['Cleric'],
             cost: 10, vp: 3, goldValue: 0, light: 2,
-            desc: '【村莊】修復 2 點魔法護罩',
+            desc: '🏠 村莊中：修復 2 點魔法護罩',
             hero: { level: 3, series: 'Grail', magicAttack: 3, strength: 3, xpToUpgrade: 0 },
             abilities: { onVillage: 'heal_2' }
         }
@@ -232,7 +234,7 @@ export const CARDPOOL = {
         {
             id: 'spell_fireball', name: '火球', type: 'Spell', subTypes: ['Fire'],
             cost: 5, vp: 0, goldValue: 1, light: 1,
-            desc: '【地城】增加 1 點照明，對目標造成 2 點傷害（計算照明懲罰）',
+            desc: '⚔️ 戰鬥中：對目標造成 2 點傷害\n💡 增加 1 點照明',
             equipment: { attack: 0, magicAttack: 2, weight: 0 }
         }
     ],
@@ -240,7 +242,7 @@ export const CARDPOOL = {
         {
             id: 'item_antidote', name: '解毒劑', type: 'Item', subTypes: ['Potion'],
             cost: 3, vp: 0, goldValue: 1, light: 0,
-            desc: '【使用】移除疾病並抽 1 張牌',
+            desc: '🏠 村莊中：移除疾病並抽 1 張牌',
             abilities: { onVillage: 'destroy_disease' }
         },
         // Moved from basic cards (User Request)

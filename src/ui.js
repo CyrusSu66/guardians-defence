@@ -297,29 +297,68 @@ export class UIManager {
         }
 
         if (card.abilities) {
-            // One line per ability type as requested
-            if (card.abilities.onVillage) lines.push('🏠');
-            if (card.abilities.onDungeon) lines.push('🌲');
-            // if (card.abilities.onBattle) lines.push('⚔️'); // Replaced by text desc below
-            if (card.abilities.onVictory) lines.push('🏆');
+            // Icons are now embedded in desc text, but we can keep top-right icons if desired.
+            // User requested "Don't show function code", focused on text.
+            // Let's rely on the text description for ability info.
         }
 
-        statsRow.innerHTML = lines.join('<br>'); // Multi-line layout
+        const lines = []; // Used for stats now
 
-        // Desc Row (v3.26)
+        // Stats Row: Standardized for Hero/Weapon
+        if (card.type === 'Hero') {
+            lines.push(`💪 ${card.hero.strength} | 🪄 ${card.hero.magicAttack}`);
+        } else if (card.type === 'Weapon') {
+            lines.push(`⚔️ ${card.equipment.attack} | 🪄 ${card.equipment.magicAttack} | ⚖️ ${card.equipment.weight}`);
+        } else if (card.goldValue > 0 && !card.cost) { // Gold cards without cost? Or just resources
+            // lines.push(`🪙 +${card.goldValue}`);
+        }
+        if (card.goldValue > 0) {
+            // Maybe show gold value in stats row?
+            // lines.push(`🪙 +${card.goldValue}`);
+        }
+
+        statsRow.innerHTML = lines.join('<br>');
+
+        // Append Stats Row
+        div.append(topRow, nameDiv, statsRow);
+
+        // Description Row (Effect Text)
         if (card.desc) {
             const descEl = document.createElement('div');
+            descEl.className = 'card-desc-text'; // New class for styling
             descEl.style.fontSize = '9px';
             descEl.style.color = '#ccc';
             descEl.style.textAlign = 'center';
-            descEl.style.marginTop = '2px';
-            descEl.style.lineHeight = '1.1';
-            descEl.style.maxHeight = '32px';
-            descEl.style.overflow = 'hidden';
+            descEl.style.marginTop = '4px';
+            descEl.style.lineHeight = '1.2';
+            descEl.style.whiteSpace = 'pre-wrap'; // Handle \n
             descEl.textContent = card.desc;
-            div.append(topRow, nameDiv, statsRow, descEl);
+            div.appendChild(descEl);
+        }
+
+        // Market Price (Only if in Market)
+        if (isMarket) {
+            const priceEl = document.createElement('div');
+            priceEl.className = 'card-price-tag';
+            priceEl.style.marginTop = 'auto'; // Push to bottom
+            priceEl.style.textAlign = 'center';
+            priceEl.style.color = '#ffd700';
+            priceEl.style.fontSize = '12px';
+            priceEl.style.fontWeight = 'bold';
+            priceEl.innerHTML = `💰 ${card.cost}`;
+            div.appendChild(priceEl);
         } else {
-            div.append(topRow, nameDiv, statsRow);
+            // For Hand cards, maybe just Gold Value at bottom if resource?
+            if (card.goldValue > 0) {
+                const valEl = document.createElement('div');
+                valEl.style.marginTop = 'auto';
+                valEl.style.textAlign = 'center';
+                valEl.style.color = '#e74c3c'; // Gold color/Coin color
+                valEl.style.color = '#f1c40f';
+                valEl.style.fontSize = '10px';
+                valEl.innerHTML = `🪙 ${card.goldValue}`;
+                div.appendChild(valEl);
+            }
         }
 
         div.onclick = onClick;
@@ -339,28 +378,25 @@ export class UIManager {
                 <span class="badge badge-primary">${card.type}</span>
                 <strong style="font-size: 1.2em; margin-left: 8px;">${card.name}</strong>
             </div>
-            <p>${card.desc || card.description || '（無特殊效果說明）'}</p>
+            
+            <!-- Flavor Text -->
+            <p style="color: #888; font-style: italic; margin-bottom: 10px; font-size: 0.9em;">
+                ${card.flavor || card.description || '（無描述）'}
+            </p>
+
+            <!-- Special Abilities (Effect Text) -->
+            ${card.desc ? `
+            <div style="margin-top:10px; border-top:1px solid #444; padding-top:10px;">
+                <strong>特殊能力：</strong>
+                <div style="margin-top:5px; white-space: pre-wrap; line-height: 1.6; color: #ddd;">${card.desc}</div>
+            </div>
+            ` : ''}
         `;
 
-        if (card.abilities) {
-            content += '<div style="margin-top:10px; border-top:1px solid #444; padding-top:10px;"><strong>特殊能力：</strong><br>';
-
-            const isIncomplete = (text) => text.includes('開發中') || text.includes('待實作');
-            const getStyledSkill = (icon, label, text) => {
-                const style = isIncomplete(text) ? 'color: #ff5a59; font-weight: bold;' : '';
-                return `<span style="${style}">${icon} ${label}：${text}</span><br>`;
-            };
-
-            if (card.abilities.onVillage) content += getStyledSkill('🏠', '於村莊', card.abilities.onVillage);
-            if (card.abilities.onDungeon) content += getStyledSkill('🌲', '入地城', card.abilities.onDungeon);
-            if (card.abilities.onBattle) content += getStyledSkill('⚔️', '戰鬥中', card.abilities.onBattle);
-            if (card.abilities.onVictory) content += getStyledSkill('🏆', '戰勝後', card.abilities.onVictory);
-            content += '</div>';
-        }
-
-        // Generate stats HTML (Appended to content instead of ttStats)
+        // Generate stats HTML
         let statsHtml = '<div style="margin-top:10px; border-top:1px solid #444; padding-top:10px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">';
         if (card.hero) {
+            statsHtml += `<div>💪 力量: ${card.hero.strength}</div><div>🪄 魔攻: ${card.hero.magicAttack}</div>`;
         } else if (card.equipment) {
             statsHtml += `<div>⚔️ 攻擊: ${card.equipment.attack}</div><div>🪄 魔攻: ${card.equipment.magicAttack}</div>`;
             if (card.equipment.weight !== undefined) statsHtml += `<div>⚖️ 負重: ${card.equipment.weight}</div>`;
