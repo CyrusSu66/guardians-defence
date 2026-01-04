@@ -19,7 +19,7 @@ export const CARDPOOL = {
         {
             id: 'basic_regular_army', name: '正規軍', type: 'Hero', subTypes: ['Fighter'],
             cost: 2, vp: 0, goldValue: 0, light: 0,
-            desc: '【地下城】若裝備長矛，攻擊力+1',
+            desc: '⚔️若裝備長矛，攻擊力+1',
             hero: { level: 0, series: 'Regular', magicAttack: 0, strength: 1, xpToUpgrade: 1 },
             abilities: { onBattle: 'synergy_spear' }
         },
@@ -38,7 +38,7 @@ export const CARDPOOL = {
         {
             id: 'basic_rations', name: '乾糧', type: 'Food', subTypes: ['Supply'],
             cost: 1, vp: 0, goldValue: 1, light: 0,
-            desc: '【地下城】額外 STR+1 (同時提升負重與傷害)',
+            desc: '⚔️裝備的英雄獲得力量+1',
             abilities: { onBattle: 'boost_str_1' }
         }
     ],

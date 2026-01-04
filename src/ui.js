@@ -59,12 +59,10 @@ export class UIManager {
         this.setText('turnNumber', g.turn);
         this.setText('plazaCoinDisplay', g.currentGold);
 
-        // v3.3: 修正計數器刷新 (全面同步)
+        // v3.3: 修正計數器刷新 (Hand Count toggled off by user request v3.26)
         this.setText('deckCount', g.deck.length);
         this.setText('discardCount', g.discard.length);
-        this.setText('btnDeckCount', g.deck.length);
         this.setText('btnDeckCountBtn', g.deck.length);
-        this.setText('btnDiscardCount', g.discard.length); // Assuming handle doesn't have discard count, wait check index.html
         this.setText('btnDiscardCountBtn', g.discard.length);
 
         // v3.21.2: 控制村莊核心(Market)顯示，僅在閒置(選擇行動)或造訪村莊時顯示
@@ -302,22 +300,27 @@ export class UIManager {
             // One line per ability type as requested
             if (card.abilities.onVillage) lines.push('🏠');
             if (card.abilities.onDungeon) lines.push('🌲');
-            if (card.abilities.onBattle) lines.push('⚔️');
+            // if (card.abilities.onBattle) lines.push('⚔️'); // Replaced by text desc below
             if (card.abilities.onVictory) lines.push('🏆');
         }
 
         statsRow.innerHTML = lines.join('<br>'); // Multi-line layout
 
-        // Bottom Row: Cost | Gold Value
-        const bottomRow = document.createElement('div');
-        bottomRow.className = 'card-bottom-row';
-
-        const costHtml = isMarket ? `<span class="val-cost">💰${card.cost}</span>` : '<span></span>';
-        const goldHtml = (card.goldValue > 0) ? `<span class="val-gold">🪙${card.goldValue}</span>` : '<span></span>';
-
-        bottomRow.innerHTML = `${costHtml}${goldHtml}`;
-
-        div.append(topRow, nameDiv, statsRow, bottomRow);
+        // Desc Row (v3.26)
+        if (card.desc) {
+            const descEl = document.createElement('div');
+            descEl.style.fontSize = '9px';
+            descEl.style.color = '#ccc';
+            descEl.style.textAlign = 'center';
+            descEl.style.marginTop = '2px';
+            descEl.style.lineHeight = '1.1';
+            descEl.style.maxHeight = '32px';
+            descEl.style.overflow = 'hidden';
+            descEl.textContent = card.desc;
+            div.append(topRow, nameDiv, statsRow, descEl);
+        } else {
+            div.append(topRow, nameDiv, statsRow);
+        }
 
         div.onclick = onClick;
         return div;
@@ -360,6 +363,7 @@ export class UIManager {
         if (card.hero) {
         } else if (card.equipment) {
             statsHtml += `<div>⚔️ 攻擊: ${card.equipment.attack}</div><div>🪄 魔攻: ${card.equipment.magicAttack}</div>`;
+            if (card.equipment.weight !== undefined) statsHtml += `<div>⚖️ 負重: ${card.equipment.weight}</div>`;
         }
         if (card.cost) statsHtml += `<div>💰 費用: ${card.cost}</div>`;
         if (card.goldValue) statsHtml += `<div>🪙 價值: ${card.goldValue}</div>`;
