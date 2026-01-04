@@ -280,28 +280,6 @@ export class UIManager {
         const statsRow = document.createElement('div');
         statsRow.className = 'card-stats-row';
 
-        let lines = [];
-
-        // Line 1: Basic Stats (Icons Only - Combined)
-        if (card.type === 'Hero') {
-            lines.push(`💪${card.hero.strength} 🪄${card.hero.magicAttack}`);
-        } else if (card.type === 'Weapon') {
-            lines.push(`🗡️${card.equipment.attack} 🪄${card.equipment.magicAttack}`);
-        } else if (card.type === 'Spell') {
-            lines.push(`✨`);
-        }
-
-        // Subsequent Lines: Light & Abilities (One per line)
-        if (card.light > 0) {
-            lines.push(`💡${card.light}`);
-        }
-
-        if (card.abilities) {
-            // Icons are now embedded in desc text, but we can keep top-right icons if desired.
-            // User requested "Don't show function code", focused on text.
-            // Let's rely on the text description for ability info.
-        }
-
         const lines = []; // Used for stats now
 
         // Stats Row: Standardized for Hero/Weapon
