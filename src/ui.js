@@ -281,36 +281,45 @@ export class UIManager {
         statsRow.className = 'card-stats-row';
 
         const lines = []; // Used for stats now
-
-        // Stats Row: Standardized for Hero/Weapon
+        // Line 1: Basic Stats (Icons Only - Combined)
         if (card.type === 'Hero') {
-            lines.push(`💪 ${card.hero.strength} | 🪄 ${card.hero.magicAttack}`);
+            lines.push(`💪${card.hero.strength} 🪄${card.hero.magicAttack}`);
         } else if (card.type === 'Weapon') {
-            lines.push(`⚔️ ${card.equipment.attack} | 🪄 ${card.equipment.magicAttack} | ⚖️ ${card.equipment.weight}`);
-        } else if (card.goldValue > 0 && !card.cost) { // Gold cards without cost? Or just resources
-            // lines.push(`🪙 +${card.goldValue}`);
+            lines.push(`⚔️${card.equipment.attack} 🪄${card.equipment.magicAttack} ⚖️${card.equipment.weight}`);
+        } else if (card.type === 'Spell') {
+            // Spells usually just have magic attack or effect.
+            if (card.equipment) {
+                lines.push(`🪄${card.equipment.magicAttack}`);
+            } else {
+                lines.push(`✨`);
+            }
         }
-        if (card.goldValue > 0) {
-            // Maybe show gold value in stats row?
-            // lines.push(`🪙 +${card.goldValue}`);
-        }
+        // If card has light, show it
+        if (card.light > 0) lines.push(`💡${card.light}`);
 
-        statsRow.innerHTML = lines.join('<br>');
+        statsRow.innerHTML = lines.join(' '); // Single line for stats
 
         // Append Stats Row
         div.append(topRow, nameDiv, statsRow);
 
-        // Description Row (Effect Text)
-        if (card.desc) {
+        // Description Row (Effect Text OR Flavor Fallback)
+        let descText = '';
+        if (card.abilities && card.abilities.abilities_desc) {
+            descText = card.abilities.abilities_desc;
+        } else if (card.desc) {
+            descText = card.desc;
+        }
+
+        if (descText) {
             const descEl = document.createElement('div');
-            descEl.className = 'card-desc-text'; // New class for styling
+            descEl.className = 'card-desc-text';
             descEl.style.fontSize = '9px';
             descEl.style.color = '#ccc';
             descEl.style.textAlign = 'center';
             descEl.style.marginTop = '4px';
             descEl.style.lineHeight = '1.2';
-            descEl.style.whiteSpace = 'pre-wrap'; // Handle \n
-            descEl.textContent = card.desc;
+            descEl.style.whiteSpace = 'pre-wrap';
+            descEl.textContent = descText;
             div.appendChild(descEl);
         }
 
@@ -326,12 +335,10 @@ export class UIManager {
             priceEl.innerHTML = `💰 ${card.cost}`;
             div.appendChild(priceEl);
         } else {
-            // For Hand cards, maybe just Gold Value at bottom if resource?
             if (card.goldValue > 0) {
                 const valEl = document.createElement('div');
                 valEl.style.marginTop = 'auto';
                 valEl.style.textAlign = 'center';
-                valEl.style.color = '#e74c3c'; // Gold color/Coin color
                 valEl.style.color = '#f1c40f';
                 valEl.style.fontSize = '10px';
                 valEl.innerHTML = `🪙 ${card.goldValue}`;
@@ -357,18 +364,18 @@ export class UIManager {
                 <strong style="font-size: 1.2em; margin-left: 8px;">${card.name}</strong>
             </div>
             
-            <!-- Flavor Text -->
+            <!-- Flavor Text (desc) -->
             <p style="color: #888; font-style: italic; margin-bottom: 10px; font-size: 0.9em;">
-                ${card.flavor || card.description || '（無描述）'}
+                ${card.desc || '（無描述）'}
             </p>
 
-            <!-- Special Abilities (Effect Text) -->
-            ${card.desc ? `
+            <!-- Special Abilities (abilities_desc) -->
             <div style="margin-top:10px; border-top:1px solid #444; padding-top:10px;">
                 <strong>特殊能力：</strong>
-                <div style="margin-top:5px; white-space: pre-wrap; line-height: 1.6; color: #ddd;">${card.desc}</div>
+                <div style="margin-top:5px; white-space: pre-wrap; line-height: 1.6; color: #ddd;">
+                    ${(card.abilities && card.abilities.abilities_desc) ? card.abilities.abilities_desc : '（無）'}
+                </div>
             </div>
-            ` : ''}
         `;
 
         // Generate stats HTML
