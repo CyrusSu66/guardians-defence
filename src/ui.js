@@ -419,19 +419,28 @@ export class UIManager {
             return;
         }
 
-        let content = `
-            <div style="margin-bottom: 10px;">
-                <span class="badge badge-danger">MONSTER</span>
-                <strong style="font-size: 1.2em; margin-left: 8px;">${monster.name}</strong>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                <div>❤️ 生命值: ${monster.currentHP}/${monster.monster.hp}</div>
-                <div>🛡️ 護盾損耗: -${monster.monster.breachDamage}</div>
-                <div style="grid-column: 1 / -1;">✨ 擊殺獎勵: +${monster.monster.xpGain} XP</div>
-            </div>
-            <p>${monster.desc || '（無怪物描述）'}</p>
-        `;
+        const hpColor = monster.currentHP <= monster.monster.hp / 4 ? '#e74c3c' : '#2ecc71';
+        const content = `
+            <div style="text-align: center;">
+                <h3 style="color: #ff5a59; margin-bottom: 10px;">${monster.name}</h3>
+                <div style="font-size: 1.2em; margin-bottom: 15px;">
+                    <div>❤️ 生命: <span style="color:${hpColor}">${monster.currentHP}/${monster.monster.hp}</span></div>
+                    <div style="color: #ff9800;">🛡️ 護盾傷害: -${monster.monster.breachDamage}</div>
+                    <div style="color: #2ecc71;">✨ 擊殺獎勵: +${monster.monster.xpGain} XP</div>
+                </div>
+                
+                <!-- Special Abilities -->
+                <div style="margin-top:15px; border-top:1px solid #444; padding-top:10px; text-align: left;">
+                    <strong>特殊能力：</strong>
+                    <div style="margin-top:5px; white-space: pre-wrap; line-height: 1.6; color: #ddd;">${(monster.abilities && monster.abilities.abilities_desc) ? monster.abilities.abilities_desc : '（無）'}</div>
+                </div>
 
+                <!-- Flavor Text -->
+                <p style="color: #888; font-style: italic; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px; font-size: 0.9em; text-align: left;">
+                    ${monster.desc || '（無描述）'}
+                </p>
+            </div>
+        `;
         const modalTitle = document.getElementById('infoModalTitle');
         const modalContent = document.getElementById('infoModalContent');
         const modal = document.getElementById('infoModal');
@@ -651,14 +660,20 @@ export class UIManager {
                 const tsMarker = monster.hasThunderstone ? '<span class="ts-icon">💠</span>' : '';
 
                 contentHtml = `
-                    <div class="rank-placeholder monster-active">
-                        <div class="monster-mini-card">
-                            <div class="monster-name">${tsMarker} ${monster.name}</div>
-                            <div class="monster-hp" style="color:${hpColor}">❤️ ${monster.currentHP}/${monster.monster.hp}</div>
-                            <div class="monster-stats">
-                                <span class="breach-dmg">⚠️ -${monster.monster.breachDamage || 1} 🛡️</span>
-                                <span class="xp-gain">✨ +${monster.monster.xpGain} XP</span>
+                    <div class="rank-placeholder monster-active" style="flex-direction: column; justify-content: flex-start; padding: 4px;">
+                        <div class="monster-mini-card" style="width: 100%; text-align: center;">
+                            <div class="monster-name" style="margin-bottom: 2px;">${tsMarker} ${monster.name}</div>
+                            
+                            <!-- Stacked Stats -->
+                            <div style="font-size: 10px; line-height: 1.2; color:${hpColor};">❤️ ${monster.currentHP}/${monster.monster.hp}</div>
+                            <div style="font-size: 10px; line-height: 1.2; color: #ff5a59;">🛡️ -${monster.monster.breachDamage || 1}</div>
+                            <div style="font-size: 10px; line-height: 1.2; color: #2ecc71;">✨ +${monster.monster.xpGain} XP</div>
+
+                            <!-- Ability or Flavor -->
+                            <div style="font-size: 9px; color: #ccc; margin-top: 4px; line-height: 1.1; white-space: pre-wrap; overflow: hidden; height: 32px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">
+                                ${(monster.abilities && monster.abilities.abilities_desc) ? monster.abilities.abilities_desc : (monster.desc || '')}
                             </div>
+
                             <div class="info-icon" onclick="event.stopPropagation(); window.ui.showMonsterDetail('${monster.id}')">ⓘ</div>
                         </div>
                     </div>
