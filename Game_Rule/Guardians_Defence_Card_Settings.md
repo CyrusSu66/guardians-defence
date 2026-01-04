@@ -22,15 +22,15 @@
 - **Lv2 騎士**: ATK +3, STR 5, Light +1, Cost 7 | 效果: 光源懲罰時 Magic+1
 - **Lv3 君主**: ATK +3, STR 6, Light +2, Cost 10 | 效果: 光源懲罰時 Magic+2; 戰勝可買光源物品
 
-### B. 亞馬遜 (Archer - 穩定抽牌)
-- **Lv1 弓箭手**: ATK +1, STR 3, Cost 4
-- **Lv2 女獵人**: ATK +2, STR 3, Cost 7 | 效果: 地城行動抽 1 張牌
-- **Lv3 女王**: ATK +3, STR 3, Cost 10 | 效果: 地城行動抽 2 張牌; 戰勝獲得額外 1 XP
+### B. 亞馬遜 (Archer - 穩定抽牌 與 勝利點數)
+- **Lv1 弓箭手**: ATK +1, STR 3, Cost 4 | 效果: 戰勝獲得額外 1 VP
+- **Lv2 女獵人**: ATK +2, STR 3, Cost 7 | 效果: 戰勝獲得額外 2 VP
+- **Lv3 女王**: ATK +3, STR 3, Cost 10 | 效果: 戰勝獲得額外 3 VP
 
-### C. 精靈 (Wizard - 魔法核心)
-- **Lv1 術士**: MagicATK +1, STR 2, Cost 4
-- **Lv2 巫師**: MagicATK +2, STR 2, Cost 7 | 效果: 地城行動抽 1 張牌
-- **Lv3 大法師**: MagicATK +3, STR 2, Cost 10 | 效果: 地城行動抽 2 張牌; 戰勝可直購法術
+### C. 精靈 (Wizard - 魔法核心 與 經驗值)
+- **Lv1 術士**: MagicATK +1, STR 2, Cost 4 | 效果: 戰勝獲得額外 1 XP
+- **Lv2 巫師**: MagicATK +2, STR 2, Cost 7 | 效果: 戰勝獲得額外 2 XP
+- **Lv3 大法師**: MagicATK +3, STR 2, Cost 10 | 效果: 戰勝獲得額外 3 XP
 
 ### D. 聖杯 (Cleric - 淨化與防禦)
 - **Lv1 探求者**: MagicATK +1, STR 3, Cost 4 | 效果: 村莊行動摧毀 1 張「疾病」
