@@ -218,7 +218,7 @@ export const CARDPOOL = {
             equipment: { attack: 1, magicAttack: 0, weight: 2 }
         },
         {
-            id: 'weap_short_bow', name: '短弓', type: 'Weapon', subTypes: ['Bow', 'Ranged'],
+            id: 'weap_short_bow', name: '獵弓', type: 'Weapon', subTypes: ['Bow', 'Ranged'],
             cost: 3, vp: 0, goldValue: 1, light: 0,
             desc: '輕便的遠程武器',
             equipment: { attack: 1, magicAttack: 0, weight: 1 }
