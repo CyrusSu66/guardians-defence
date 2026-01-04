@@ -82,8 +82,13 @@ export class CombatEngine {
             }
             // v3.22: 輔助卡若有勝利效果 (目前無，預留)
 
+            // v3.26: Base Reward Rule (User Request)
+            // Defeating a monster grants 1 VP (Score) by default.
+            // XP is determined by monster stats (xpGain).
             g.currentXP += monster.monster.xpGain;
-            g.totalScore += (monster.vp || 0);
+            g.totalScore += 1 + (monster.vp || 0);
+
+            g.addLog(`🎉 獲得 ${monster.monster.xpGain} XP 與 1 VP！`, 'success');
             g.dungeonHall[`rank${g.combat.targetRank}`] = null;
 
             if (monster.hasThunderstone) {

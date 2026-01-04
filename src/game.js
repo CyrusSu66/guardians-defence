@@ -318,6 +318,15 @@ class GuardiansDefenceGame {
         } else if (effectKey === 'gain_1xp') {
             this.currentXP += 1;
             this.addLog(`✨ ${sourceName}：戰鬥經驗增加 1 XP。`, 'success');
+        } else if (effectKey === 'gain_2xp') {
+            this.currentXP += 2;
+            this.addLog(`✨ ${sourceName}：戰鬥經驗增加 2 XP。`, 'success');
+        } else if (effectKey === 'gain_3xp') {
+            this.currentXP += 3;
+            this.addLog(`✨ ${sourceName}：戰鬥經驗增加 3 XP。`, 'success');
+        } else if (effectKey === 'gain_1vp') {
+            this.totalScore += 1;
+            this.addLog(`✨ ${sourceName}：獲得 1 VP (勝利點數)。`, 'success');
         } else if (effectKey === 'heal_2') {
             this.villageHP = Math.min(20, this.villageHP + 2);
             this.addLog(`🛡️ ${sourceName}：護罩大幅修復 +2 (當前: ${this.villageHP})`, 'success');

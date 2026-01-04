@@ -71,41 +71,42 @@ export const CARDPOOL = {
             cost: 5, vp: 1, goldValue: 0, light: 0,
             desc: '來自密林的矯健射手，精通弓術。',
             hero: { level: 1, series: 'Amazon', magicAttack: 0, strength: 2, xpToUpgrade: 4, upgradeToId: 'hero_amazon_lv2' },
-            abilities: { abilities_desc: '⚔️ 戰鬥中：若裝備獵弓，攻擊力+1\n🏆 戰勝後：戰勝怪物得 1 XP', onBattle: 'synergy_bow', onVictory: 'gain_1xp' }
+            abilities: { abilities_desc: '⚔️ 戰鬥中：若裝備獵弓，攻擊力+1\n🏆 戰勝後：戰勝怪物得 1 VP', onBattle: 'synergy_bow', onVictory: 'gain_1vp' }
         },
         {
             id: 'hero_amazon_lv2', name: '亞馬遜獵手', type: 'Hero', subTypes: ['Fighter', 'Ranger'],
             cost: 8, vp: 2, goldValue: 1, light: 0,
             desc: '狩獵技巧已臻化境，能精準命中目標。',
             hero: { level: 2, series: 'Amazon', magicAttack: 0, strength: 3, xpToUpgrade: 6, upgradeToId: 'hero_amazon_lv3' },
-            abilities: { abilities_desc: '⚔️ 戰鬥中：若裝備獵弓，攻擊力+2\n🏆 戰勝後：戰勝怪物得 1 XP', onBattle: 'synergy_bow_2', onVictory: 'gain_1xp' }
+            abilities: { abilities_desc: '⚔️ 戰鬥中：若裝備獵弓，攻擊力+2\n🏆 戰勝後：戰勝怪物得 1 VP', onBattle: 'synergy_bow_2', onVictory: 'gain_1vp' }
         },
         {
             id: 'hero_amazon_lv3', name: '亞馬遜女王', type: 'Hero', subTypes: ['Archer'],
             cost: 10, vp: 3, goldValue: 0, light: 0,
             desc: '亞馬遜部落的女王，她的箭矢如同審判之光。',
             hero: { level: 3, series: 'Amazon', magicAttack: 0, strength: 4, xpToUpgrade: 0 },
-            abilities: { abilities_desc: '⚔️ 戰鬥中：若裝備獵弓，攻擊力+3\n🏆 戰勝後：戰勝怪物得 1 XP', onBattle: 'synergy_bow_3', onVictory: 'gain_1xp' }
+            abilities: { abilities_desc: '⚔️ 戰鬥中：若裝備獵弓，攻擊力+3\n🏆 戰勝後：戰勝怪物得 1 VP', onBattle: 'synergy_bow_3', onVictory: 'gain_1vp' }
         },
         {
             id: 'hero_elf_lv1', name: '精靈術士', type: 'Hero', subTypes: ['Wizard'],
             cost: 4, vp: 1, goldValue: 0, light: 0,
             desc: '操縱自然魔力的精靈，體質較為纖弱。',
-            hero: { level: 1, series: 'Elf', magicAttack: 1, strength: 1, xpToUpgrade: 4, upgradeToId: 'hero_elf_lv2' }
+            hero: { level: 1, series: 'Elf', magicAttack: 1, strength: 1, xpToUpgrade: 4, upgradeToId: 'hero_elf_lv2' },
+            abilities: { abilities_desc: '🏆 戰勝後：戰勝怪物得 1 XP', onVictory: 'gain_1xp' }
         },
         {
             id: 'hero_elf_lv2', name: '精靈巫師', type: 'Hero', subTypes: ['Wizard'],
             cost: 7, vp: 2, goldValue: 0, light: 0,
             desc: '掌握了更深奧的秘法，能感知地城的流動。',
             hero: { level: 2, series: 'Elf', magicAttack: 2, strength: 2, xpToUpgrade: 6, upgradeToId: 'hero_elf_lv3' },
-            abilities: { abilities_desc: '🌲 地城入口：抽 1 張牌', onDungeon: 'draw_1' }
+            abilities: { abilities_desc: '� 戰勝後：戰勝怪物得 2 XP', onVictory: 'gain_2xp' }
         },
         {
             id: 'hero_elf_lv3', name: '精靈大魔導', type: 'Hero', subTypes: ['Wizard'],
             cost: 10, vp: 3, goldValue: 0, light: 0,
             desc: '魔力充盈的大魔導師，智慧照亮前路。',
             hero: { level: 3, series: 'Elf', magicAttack: 3, strength: 3, xpToUpgrade: 0 },
-            abilities: { abilities_desc: '🌲 地城入口：抽 2 張牌\n🏆 戰勝後：戰勝怪物得 1 XP', onDungeon: 'draw_2', onVictory: 'gain_1xp' }
+            abilities: { abilities_desc: '🏆 戰勝後：戰勝怪物得 3 XP', onVictory: 'gain_3xp' }
         },
         {
             id: 'hero_dwarf_lv1', name: '矮人守護者', type: 'Hero', subTypes: ['Fighter'],

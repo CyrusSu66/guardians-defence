@@ -201,7 +201,7 @@ body {
 /* Dungeon Slot/Card Placeholder (Redesign v3.23.1) */
 .dungeon-rank-slots {
     display: flex;
-    gap: 12px;
+    gap: 10px;
 }
 
 .dungeon-rank-wrapper {
@@ -222,7 +222,7 @@ body {
 
 .rank-placeholder {
     width: 100%;
-    height: 117px;
+    height: 127px;
     /* Reduced from 130px */
     border-radius: 8px;
     position: relative;
