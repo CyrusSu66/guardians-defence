@@ -78,14 +78,14 @@ export const CARDPOOL = {
             cost: 8, vp: 2, goldValue: 1, light: 0,
             desc: '狩獵技巧已臻化境，能精準命中目標。',
             hero: { level: 2, series: 'Amazon', magicAttack: 0, strength: 3, xpToUpgrade: 6, upgradeToId: 'hero_amazon_lv3' },
-            abilities: { abilities_desc: '⚔️ 戰鬥中：若裝備獵弓，攻擊力+2\n🏆 戰勝後：戰勝怪物得 1 VP', onBattle: 'synergy_bow_2', onVictory: 'gain_1vp' }
+            abilities: { abilities_desc: '⚔️ 戰鬥中：若裝備獵弓，攻擊力+2\n🏆 戰勝後：戰勝怪物得 2 VP', onBattle: 'synergy_bow_2', onVictory: 'gain_2vp' }
         },
         {
             id: 'hero_amazon_lv3', name: '亞馬遜女王', type: 'Hero', subTypes: ['Archer'],
             cost: 10, vp: 3, goldValue: 0, light: 0,
             desc: '亞馬遜部落的女王，她的箭矢如同審判之光。',
             hero: { level: 3, series: 'Amazon', magicAttack: 0, strength: 4, xpToUpgrade: 0 },
-            abilities: { abilities_desc: '⚔️ 戰鬥中：若裝備獵弓，攻擊力+3\n🏆 戰勝後：戰勝怪物得 1 VP', onBattle: 'synergy_bow_3', onVictory: 'gain_1vp' }
+            abilities: { abilities_desc: '⚔️ 戰鬥中：若裝備獵弓，攻擊力+3\n🏆 戰勝後：戰勝怪物得 3 VP', onBattle: 'synergy_bow_3', onVictory: 'gain_3vp' }
         },
         {
             id: 'hero_elf_lv1', name: '精靈術士', type: 'Hero', subTypes: ['Wizard'],

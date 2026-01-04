@@ -327,6 +327,12 @@ class GuardiansDefenceGame {
         } else if (effectKey === 'gain_1vp') {
             this.totalScore += 1;
             this.addLog(`✨ ${sourceName}：獲得 1 VP (勝利點數)。`, 'success');
+        } else if (effectKey === 'gain_2vp') {
+            this.totalScore += 2;
+            this.addLog(`✨ ${sourceName}：獲得 2 VP (勝利點數)。`, 'success');
+        } else if (effectKey === 'gain_3vp') {
+            this.totalScore += 3;
+            this.addLog(`✨ ${sourceName}：獲得 3 VP (勝利點數)。`, 'success');
         } else if (effectKey === 'heal_2') {
             this.villageHP = Math.min(20, this.villageHP + 2);
             this.addLog(`🛡️ ${sourceName}：護罩大幅修復 +2 (當前: ${this.villageHP})`, 'success');
