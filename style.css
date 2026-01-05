@@ -66,7 +66,8 @@ body {
         "hand";
     height: 100vh;
     width: 100%;
-    max-width: 1920px;
+    max-width: 1680px;
+    /* Reduced from 1920px (User Request) */
     margin: 0 auto;
     background-color: #1a1a1a;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
@@ -118,28 +119,35 @@ body {
     /* Remove old margin */
 }
 
-.stat-card {
-    background: var(--color-surface-light);
-    border-radius: var(--radius-standard);
-    padding: 8px 15px;
-    border-left: 3px solid var(--color-primary);
-    display: flex;
-    /* Flex for contents */
-    align-items: center;
-    gap: 10px;
-    height: 50px;
-}
-
+/* Shield Stat (Horizontal Inline) */
 .stat-card.shield-stat {
-    border-color: var(--color-magic);
+    display: flex;
+    flex-direction: row;
+    /* One Line */
+    align-items: center;
+    gap: 8px;
+    /* Space between Label and Bar */
+    padding: 8px 15px;
 }
 
-.stat-info label {
-    font-size: 10px;
+.shield-label-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.stat-info label,
+.shield-label-group label {
+    font-size: 11px;
     text-transform: uppercase;
     color: var(--color-text-muted);
     margin: 0;
     line-height: 1;
+    white-space: nowrap;
+}
+
+.shield-label-group .stat-icon {
+    font-size: 14px;
 }
 
 .stat-value-text {
@@ -149,24 +157,57 @@ body {
     line-height: 1;
 }
 
-/* Progress Bar (Compact for Top Bar) */
+/* Progress Bar (Compact 70px) */
 .progress-bar-container {
-    height: 12px;
-    width: 150px;
-    /* Widened from 80px (User Request) */
-    background: #444;
-    border-radius: 3px;
+    height: 18px;
+    /* Slightly taller to fit text */
+    width: 70px;
+    /* User Request: 70px */
+    background: #222;
+    border-radius: 4px;
     margin: 0;
     overflow: hidden;
     position: relative;
     display: flex;
+    /* Ensure centering works */
     align-items: center;
+    justify-content: center;
 }
 
 .progress-bar-fill {
     height: 100%;
     background: linear-gradient(90deg, var(--color-magic), #8e44ad);
     transition: width 0.3s ease;
+    position: absolute;
+    /* Behind text */
+    left: 0;
+    top: 0;
+}
+
+.progress-bar-container .stat-value-text {
+    position: relative;
+    /* Above bar */
+    z-index: 2;
+    font-size: 12px;
+    color: #fff;
+    font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    display: block;
+    width: 100%;
+    text-align: center;
+    line-height: 18px;
+}
+
+/* Other Stat Cards */
+.stat-card:not(.shield-stat) {
+    background: var(--color-surface-light);
+    border-radius: var(--radius-standard);
+    padding: 8px 15px;
+    border-left: 3px solid var(--color-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 50px;
 }
 
 /* 2. Center Stage (Default Mobile: Column / Stacked) */
