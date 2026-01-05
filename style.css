@@ -152,13 +152,15 @@ body {
 /* Progress Bar (Compact for Top Bar) */
 .progress-bar-container {
     height: 12px;
-    width: 80px;
-    /* Fixed width for top bar */
+    width: 150px;
+    /* Widened from 80px (User Request) */
     background: #444;
     border-radius: 3px;
     margin: 0;
     overflow: hidden;
     position: relative;
+    display: flex;
+    align-items: center;
 }
 
 .progress-bar-fill {
@@ -167,16 +169,61 @@ body {
     transition: width 0.3s ease;
 }
 
-/* 2. Center Stage */
+/* 2. Center Stage (Default Mobile: Column / Stacked) */
 #stageArea {
     grid-area: stage;
-    padding: 20px;
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    overflow: hidden;
+    height: 100%;
     position: relative;
     background: radial-gradient(circle at center, #1f1f1f 0%, #131313 100%);
+}
+
+#logPanel {
+    flex-shrink: 0;
+    height: 150px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid #333;
+    padding: 10px;
+    margin: 0;
+}
+
+#gameLog {
+    padding: 0;
+    font-size: 12px;
+}
+
+#stageContent {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    padding-bottom: 80px;
+}
+
+/* Desktop Split Layout (Min-Width 1024px) */
+@media (min-width: 1024px) {
+    #stageArea {
+        flex-direction: row;
+        /* Split Left/Right */
+    }
+
+    #logPanel {
+        width: 300px;
+        /* Fixed Width Log */
+        height: 100%;
+        border-bottom: none;
+        border-right: 1px solid #333;
+    }
+
+    #stageContent {
+        flex: 1;
+        /* Take remaining width */
+        height: 100%;
+        padding-bottom: 10px;
+        /* No need for huge padding on desktop if hand is separate */
+    }
 }
 
 .stage-section {
