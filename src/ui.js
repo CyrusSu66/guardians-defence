@@ -670,9 +670,7 @@ export class UIManager {
                             <div class="monster-xp" style="font-size: 10px; line-height: 1.2; color: #2ecc71; flex-shrink: 0; margin-bottom: 4px;">✨ +${monster.monster.xpGain} XP</div>
 
                             <!-- Ability or Flavor (Fill Remaining Space) -->
-                            <div style="font-size: 9px; color: #ccc; line-height: 1.1; white-space: pre-wrap; overflow: hidden; flex-grow: 1; display: flex; align-items: flex-start; justify-content: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2px;">
-                                ${(monster.abilities && monster.abilities.abilities_desc) ? monster.abilities.abilities_desc : (monster.desc || '')}
-                            </div>
+                            <div style="font-size: 9px; color: #ccc; line-height: 1.1; white-space: pre-wrap; overflow: hidden; flex-grow: 1; display: flex; align-items: flex-start; justify-content: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2px;">${(monster.abilities && monster.abilities.abilities_desc) ? monster.abilities.abilities_desc : (monster.desc || '')}</div>
 
                             <div class="info-icon" style="flex-shrink: 0;" onclick="event.stopPropagation(); window.ui.showMonsterDetail('${monster.id}')">ⓘ</div>
                         </div>

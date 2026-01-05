@@ -406,8 +406,8 @@ body {
     right: 4px;
     font-size: 10px;
     color: #666;
-    cursor: zoom-in;
-    /* User Request: Zoom-in cursor */
+    cursor: pointer;
+    /* User Request: Finger icon */
 }
 
 .info-icon:hover {
@@ -601,7 +601,8 @@ body {
     border: 1px solid #666;
     color: #aaa;
     font-size: 10px;
-    cursor: alias;
+    cursor: pointer;
+    /* User Request: Finger icon */
     z-index: 5;
 }
 
@@ -907,7 +908,9 @@ body {
     .mobile-only {
         display: flex;
     }
-}@media (min-width: 1024px) {
+}
+
+@media (min-width: 1024px) {
     #stageArea {
         flex-direction: row;
         /* Split Left/Right */
