@@ -232,11 +232,18 @@ body {
     gap: 2px;
 }
 
-/* Turn Stat: Narrow */
+/* Turn Stat: Narrow and Stacked (Mobile) */
 .stat-card.turn-stat {
     padding: 8px 10px;
     /* User Req: Reduce width (-5px from 15) */
     flex-grow: 0;
+}
+
+.stat-card.turn-stat .stat-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
 }
 
 /* 2. Center Stage (Default Mobile: Column / Stacked) */
@@ -1035,8 +1042,9 @@ body {
         height: 18px;
     }
 
-    /* XP Stat Desktop Override (Inline) */
-    .stat-card.xp-stat .stat-info {
+    /* XP & Turn Stats Desktop Override (Inline) */
+    .stat-card.xp-stat .stat-info,
+    .stat-card.turn-stat .stat-info {
         flex-direction: row;
         gap: 10px;
     }
