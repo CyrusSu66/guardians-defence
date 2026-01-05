@@ -269,6 +269,60 @@ body {
         padding-bottom: 10px;
         /* No need for huge padding on desktop if hand is separate */
     }
+
+    /* 3. Dungeon Rank Slots (Desktop: 2x Width) */
+    .dungeon-rank-wrapper {
+        width: 170px;
+        /* 85px * 2 */
+    }
+
+    .rank-placeholder {
+        height: 160px;
+        /* Slightly taller to accommodate text */
+    }
+
+    .monster-mini-card .monster-name {
+        font-size: 14px;
+        height: auto;
+        margin-bottom: 8px;
+    }
+
+    .monster-mini-card .monster-hp,
+    .monster-mini-card .monster-stats div {
+        font-size: 12px !important;
+    }
+
+    /* 4. Village Market (Desktop: 1.5x Width, 4 per row) */
+    .market-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+
+    .market-grid .card {
+        width: 100%;
+        /* Fill the grid column */
+        height: auto;
+        min-height: 220px;
+        /* Taller */
+        font-size: 16px;
+        /* Base font increase */
+    }
+
+    .market-grid .card-name {
+        font-size: 16px;
+    }
+
+    .market-grid .card-type {
+        font-size: 12px;
+    }
+
+    .market-grid .card-stats-row {
+        font-size: 14px;
+    }
+
+    .market-grid .card-desc {
+        font-size: 12px;
+    }
 }
 
 .stage-section {
