@@ -248,88 +248,6 @@ body {
 }
 
 /* Desktop Split Layout (Min-Width 1024px) */
-@media (min-width: 1024px) {
-    #stageArea {
-        flex-direction: row;
-        /* Split Left/Right */
-    }
-
-    #logPanel {
-        width: 300px;
-        /* Fixed Width Log */
-        height: 100%;
-        border-bottom: none;
-        border-right: 1px solid #333;
-    }
-
-    #stageContent {
-        flex: 1;
-        /* Take remaining width */
-        height: 100%;
-        padding-bottom: 10px;
-        /* No need for huge padding on desktop if hand is separate */
-    }
-
-    /* 3. Dungeon Rank Slots (Desktop: 2x Width) */
-    .dungeon-rank-wrapper {
-        width: 170px;
-        /* 85px * 2 */
-    }
-
-    .rank-placeholder {
-        height: 160px;
-        /* Slightly taller to accommodate text */
-    }
-
-    .monster-mini-card .monster-name {
-        font-size: 14px;
-        height: auto;
-        margin-bottom: 8px;
-    }
-
-    .monster-mini-card .monster-hp,
-    .monster-mini-card .monster-breach,
-    .monster-mini-card .monster-xp {
-        font-size: 12px !important;
-    }
-
-    /* 4. Village Market (Desktop: 1.5x Width, 4 per row) */
-    .market-display-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
-    }
-
-    .market-display-grid .card {
-        width: 100%;
-        /* Fill the grid column */
-        height: auto;
-        min-height: 220px;
-        /* Taller */
-        font-size: 16px;
-        /* Base font increase */
-    }
-
-    .market-display-grid .card-name {
-        font-size: 16px;
-    }
-
-    .market-display-grid .card-type {
-        font-size: 12px;
-    }
-
-    .market-display-grid .card-stats-row {
-        font-size: 14px;
-    }
-
-    .market-display-grid .card-desc {
-        font-size: 12px;
-    }
-
-    /* Remove width constraint on desktop to allow full grid expansion */
-    .stage-section {
-        max-width: none;
-    }
-}
 
 .stage-section {
     max-width: 900px;
@@ -988,5 +906,86 @@ body {
 @media (max-width: 768px) {
     .mobile-only {
         display: flex;
+    }
+}@media (min-width: 1024px) {
+    #stageArea {
+        flex-direction: row;
+        /* Split Left/Right */
+    }
+
+    #logPanel {
+        width: 300px;
+        /* Fixed Width Log */
+        height: 100%;
+        border-bottom: none;
+        border-right: 1px solid #333;
+    }
+
+    #stageContent {
+        flex: 1;
+        /* Take remaining width */
+        height: 100%;
+        padding-bottom: 10px;
+        /* No need for huge padding on desktop if hand is separate */
+    }
+
+    /* 3. Dungeon Rank Slots (Desktop: 2x Width) */
+    .dungeon-rank-wrapper {
+        width: 170px;
+        /* 85px * 2 */
+    }
+
+    .rank-placeholder {
+        height: 160px;
+        /* Slightly taller to accommodate text */
+    }
+
+    .monster-mini-card .monster-name {
+        font-size: 14px;
+        height: auto;
+        margin-bottom: 8px;
+    }
+
+    .monster-mini-card .monster-hp,
+    .monster-mini-card .monster-breach,
+    .monster-mini-card .monster-xp {
+        font-size: 12px !important;
+    }
+
+    /* 4. Village Market (Desktop: 1.5x Width, 4 per row) */
+    .market-display-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+
+    .market-display-grid .card {
+        width: 100%;
+        /* Fill the grid column */
+        height: auto;
+        min-height: 220px;
+        /* Taller */
+        font-size: 16px;
+        /* Base font increase */
+    }
+
+    .market-display-grid .card-name {
+        font-size: 16px;
+    }
+
+    .market-display-grid .card-type {
+        font-size: 12px;
+    }
+
+    .market-display-grid .card-stats-row {
+        font-size: 14px;
+    }
+
+    .market-display-grid .card-desc {
+        font-size: 12px;
+    }
+
+    /* Remove width constraint on desktop to allow full grid expansion */
+    .stage-section {
+        max-width: none;
     }
 }
