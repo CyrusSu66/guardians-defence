@@ -49,7 +49,7 @@ class GuardiansDefenceGame {
 
         this.marketItems = { basics: [], heroes: [], items: [], spells: [] };
         this.log = [];
-        // v3.22: 3欄位戰鬥配置
+        // Combat Slots: Hero, Weapon, Aux, Target
         this.combat = { targetRank: null, selectedHeroIdx: null, selectedDamageIdx: null, selectedAuxIdx: null };
 
         this.currentAction = null;
@@ -57,7 +57,6 @@ class GuardiansDefenceGame {
         this.hasDestroyed = false;
         this.selectedDestroyIdx = null;
 
-        // v3.23.5: Ensure UI reflects Initial State (Hidden Panels)
         if (this.ui) this.ui.updateUI();
     }
 

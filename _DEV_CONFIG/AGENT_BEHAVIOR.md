@@ -27,9 +27,9 @@
 ## 4. 程式碼風格與專案結構
 - **風格**: 保持模組化 (`src/engine/` 分離)，加上清晰的版本與功能註解 (e.g., `// v3.22: RWD Update`).
 - **UI 規範**: 
-    - 桌面版 (>1200px) 採用三欄式 Grid 佈局。
-    - 手機版 (<768px) 採用單欄垂直堆疊佈局。
-    - 確保所有按鈕在觸控裝置上易於點擊。
+    - 桌面版 (Desktop): 寬度限制 (max-width: 1280px)，採用 Split View (左紀錄、右舞台) 與 Top Bar 狀態列。
+    - 行動版 (Mobile): 單欄垂直堆疊佈局，優化手指點擊區域，狀態數值採堆疊顯示 (Stacked Stats) 以節省空間。
+    - 確保所有按鈕在觸控裝置上易於點擊 (最小高度 44px)。
 
 ## 5. 部署架構與分支策略 (Deployment & Branching)
 - **平台架構 (Vercel Integration)**:
@@ -45,4 +45,4 @@
     5. **合併**: 確認無誤後，發起 Pull Request (PR) 或直接合併回 `main`。
 
 ---
-*Last Updated: v3.26 (2026-01-03)*
+*Last Updated: v3.26.14 (2026-01-05)*

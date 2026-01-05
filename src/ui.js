@@ -28,7 +28,6 @@ export class UIManager {
         document.getElementById('btnEnterDungeon').onclick = () => this.game.enterDungeonAction();
         document.getElementById('combatAttackBtn').onclick = () => this.game.performCombat();
 
-        // v3.3: 偵測階段按鈕如果還在
         const nextPhaseBtn = document.getElementById('nextPhaseBtn');
         if (nextPhaseBtn) nextPhaseBtn.onclick = () => this.game.nextPhase ? this.game.nextPhase() : null;
     }
@@ -47,7 +46,7 @@ export class UIManager {
         this.setText('villageHP', g.villageHP);
         document.getElementById('villageHP')?.classList.toggle('danger', g.villageHP <= 5);
 
-        // v3.23: Shield Progress Bar
+        // Shield Progress Bar
         const barEl = document.getElementById('shieldBar');
         if (barEl) {
             const pct = Math.max(0, Math.min(100, (g.villageHP / 20) * 100));
@@ -59,24 +58,19 @@ export class UIManager {
         this.setText('turnNumber', g.turn);
         this.setText('plazaCoinDisplay', g.currentGold);
 
-        // v3.3: 修正計數器刷新 (Hand Count toggled off by user request v3.26)
         this.setText('deckCount', g.deck.length);
         this.setText('discardCount', g.discard.length);
         this.setText('btnDeckCountBtn', g.deck.length);
         this.setText('btnDiscardCountBtn', g.discard.length);
 
-        // v3.21.2: 控制村莊核心(Market)顯示，僅在閒置(選擇行動)或造訪村莊時顯示
+        // Control Panel Visibility
         const plazaPanel = document.querySelector('.village-plaza');
         if (plazaPanel) {
             const shouldShow = (!g.currentAction || g.currentAction === 'VILLAGE');
             plazaPanel.style.display = shouldShow ? 'block' : 'none';
         }
 
-        // v3.23.2: 版號移至左上角
         this.setText('appVersion', g.version);
-
-        // v3.3: 標題不再顯示版號
-
 
         const stateLabels = {
             [GameState.DRAW]: '🎲 抽牌與補給',
@@ -85,9 +79,7 @@ export class UIManager {
             [GameState.MONSTER_ADVANCE]: '⚠️ 敵軍推進',
             [GameState.GAME_OVER]: '💀 戰役結束'
         };
-        // gameState display removed per user request
 
-        // v3.3: 面板與啟動按鈕顯示邏輯
         const isIdle = g.state === GameState.IDLE || g.state === GameState.GAME_OVER;
         this.show('startGameBtn', isIdle);
         this.show('headerActions', isIdle);
@@ -97,8 +89,7 @@ export class UIManager {
         this.show('restPanel', g.currentAction === 'REST');
         this.show('villageFinishControl', g.currentAction === 'VILLAGE');
 
-        // v3.22.9: 訓練場顯示控制
-        // v3.25: Auto Activate Button
+        // Auto Activate Button & Training Panel
         this.show('btnAutoActivate', g.state === GameState.VILLAGE && g.currentAction === 'VILLAGE');
         const trainingPanel = document.getElementById('trainingPanel');
         if (trainingPanel) trainingPanel.style.display = (g.currentAction === 'VILLAGE') ? 'block' : 'none';
