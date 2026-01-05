@@ -44,5 +44,10 @@
     4. **紀錄**: 更新 `_DEV_CONFIG/BRANCH_LOG.md` 以追蹤目前分支狀態。
     5. **合併**: 確認無誤後，發起 Pull Request (PR) 或直接合併回 `main`。
 
+## 6. 資料同步規範
+- **Google Sheets**: 卡牌數值維護於外部試算表。
+- **Trigger**: 收到「同步 data」指令時，應參照 `_DEV_CONFIG/DATA_SYNC_GUIDE.md` 執行更新。
+- **Source of Truth**: 更新後，以 `src/data/*.js` 為最終執行依據。
+
 ---
 *Last Updated: v3.26.14 (2026-01-05)*
