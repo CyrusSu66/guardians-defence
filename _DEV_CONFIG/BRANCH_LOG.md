@@ -4,8 +4,8 @@
 
 ## 🚀 主線版本 (Main/Master)
 *   **分支名稱**: `main`
-*   **目前版本**: v3.26.14 (Merged `fix-monster-breach`)
-*   **功能狀態**: 穩定版 (Stable) - 包含 Mobile/Desktop UI 分流、新架構
+*   **目前版本**: v3.26 Final
+*   **功能狀態**: 穩定版 (Major Release) - Complete UI Overhaul & Architecture Refactor
 *   **部署連結**: https://guardians-defence.vercel.app/
 
 ---
