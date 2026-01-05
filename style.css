@@ -323,6 +323,11 @@ body {
     .market-grid .card-desc {
         font-size: 12px;
     }
+
+    /* Remove width constraint on desktop to allow full grid expansion */
+    .stage-section {
+        max-width: none;
+    }
 }
 
 .stage-section {
@@ -482,11 +487,14 @@ body {
     right: 4px;
     font-size: 10px;
     color: #666;
-    cursor: pointer;
+    cursor: zoom-in;
+    /* User Request: Zoom-in cursor */
 }
 
 .info-icon:hover {
     color: #fff;
+    transform: scale(1.2);
+    /* Added slight zoom effect */
 }
 
 /* Action Grid */
