@@ -201,17 +201,34 @@ body {
     line-height: 18px;
 }
 
-/* Other Stat Cards */
+/* Other Stat Cards (Generic) */
 .stat-card:not(.shield-stat) {
     background: var(--color-surface-light);
     border-radius: var(--radius-standard);
-    padding: 8px 25px;
-    /* Increased padding (+10px visual width) */
+    padding: 8px 20px;
+    /* Default Padding */
     border-left: 3px solid var(--color-primary);
     display: flex;
     align-items: center;
     gap: 10px;
     height: 50px;
+    white-space: nowrap;
+    /* Prevent stacking */
+}
+
+/* XP Stat: Wide */
+.stat-card.xp-stat {
+    padding: 8px 35px;
+    /* User Req: Text width increase (+10px from 25) */
+    flex-grow: 1;
+    /* Allow it to take available space */
+}
+
+/* Turn Stat: Narrow */
+.stat-card.turn-stat {
+    padding: 8px 10px;
+    /* User Req: Reduce width (-5px from 15) */
+    flex-grow: 0;
 }
 
 /* 2. Center Stage (Default Mobile: Column / Stacked) */
