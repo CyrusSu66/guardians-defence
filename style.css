@@ -126,7 +126,8 @@ body {
     /* Mobile: Stacked */
     align-items: center;
     gap: 4px;
-    padding: 8px 15px;
+    padding: 8px 10px;
+    /* Reduced padding 5px */
     /* Base Card Styles Restored */
     background: var(--color-surface-light);
     border-radius: var(--radius-standard);
@@ -163,8 +164,8 @@ body {
 /* Progress Bar (Mobile: Compact) */
 .progress-bar-container {
     height: 16px;
-    width: 60px;
-    /* User Req: Not too long */
+    width: 50px;
+    /* User Req: Smaller width (was 60) */
     background: #222;
     border-radius: 4px;
     margin: 0;
@@ -204,7 +205,8 @@ body {
 .stat-card:not(.shield-stat) {
     background: var(--color-surface-light);
     border-radius: var(--radius-standard);
-    padding: 8px 15px;
+    padding: 8px 25px;
+    /* Increased padding (+10px visual width) */
     border-left: 3px solid var(--color-primary);
     display: flex;
     align-items: center;
@@ -655,11 +657,10 @@ body {
     color: #ffd700;
 }
 
-/* Market Grid */
 .market-display-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    /* User Req: 1.5x of 120px = 180px */
+    grid-template-columns: repeat(2, 1fr);
+    /* Mobile: 2 Cards per row */
     gap: 15px;
 }
 
@@ -1000,6 +1001,8 @@ body {
     .stat-card.shield-stat {
         flex-direction: row;
         gap: 8px;
+        padding: 8px 15px;
+        /* Restore desktop padding */
     }
 
     .progress-bar-container {
