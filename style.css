@@ -219,8 +219,8 @@ body {
 /* XP Stat: Wide */
 /* XP Stat: Wide and Stacked (Mobile) */
 .stat-card.xp-stat {
-    padding: 8px 35px;
-    /* User Req: Text width increase (+10px from 25) */
+    padding: 8px 30px;
+    /* User Req: Reduced by 5px (was 35) */
     flex-grow: 1;
     /* Allow it to take available space */
 }
