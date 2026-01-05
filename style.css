@@ -221,8 +221,8 @@ body {
 .stat-card.xp-stat {
     padding: 8px 25px;
     /* User Req: Reduced to 25px */
-    flex-grow: 1;
-    /* Allow it to take available space */
+    flex-grow: 0;
+    /* Removed flex-grow to shrink to content */
 }
 
 .stat-card.xp-stat .stat-info {
