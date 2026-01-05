@@ -66,8 +66,8 @@ body {
         "hand";
     height: 100vh;
     width: 100%;
-    max-width: 1680px;
-    /* Reduced from 1920px (User Request) */
+    max-width: 1280px;
+    /* Reduced to 1280px (User Request) */
     margin: 0 auto;
     background-color: #1a1a1a;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
@@ -128,6 +128,10 @@ body {
     gap: 8px;
     /* Space between Label and Bar */
     padding: 8px 15px;
+    /* Base Card Styles Restored */
+    background: var(--color-surface-light);
+    border-radius: var(--radius-standard);
+    border-left: 3px solid var(--color-magic);
 }
 
 .shield-label-group {
