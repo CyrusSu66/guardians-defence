@@ -665,9 +665,9 @@ export class UIManager {
                             <div class="monster-name" style="margin-bottom: 2px; flex-shrink: 0;">${tsMarker} ${monster.name}</div>
                             
                             <!-- Stacked Stats -->
-                            <div style="font-size: 10px; line-height: 1.2; color:${hpColor}; flex-shrink: 0;">❤️ ${monster.currentHP}/${monster.monster.hp}</div>
-                            <div style="font-size: 10px; line-height: 1.2; color: #ff5a59; flex-shrink: 0;">🛡️ -${monster.monster.breachDamage || 1}</div>
-                            <div style="font-size: 10px; line-height: 1.2; color: #2ecc71; flex-shrink: 0; margin-bottom: 4px;">✨ +${monster.monster.xpGain} XP</div>
+                            <div class="monster-hp" style="font-size: 10px; line-height: 1.2; color:${hpColor}; flex-shrink: 0;">❤️ ${monster.currentHP}/${monster.monster.hp}</div>
+                            <div class="monster-breach" style="font-size: 10px; line-height: 1.2; color: #ff5a59; flex-shrink: 0;">🛡️ -${monster.monster.breachDamage || 1}</div>
+                            <div class="monster-xp" style="font-size: 10px; line-height: 1.2; color: #2ecc71; flex-shrink: 0; margin-bottom: 4px;">✨ +${monster.monster.xpGain} XP</div>
 
                             <!-- Ability or Flavor (Fill Remaining Space) -->
                             <div style="font-size: 9px; color: #ccc; line-height: 1.1; white-space: pre-wrap; overflow: hidden; flex-grow: 1; display: flex; align-items: flex-start; justify-content: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2px;">

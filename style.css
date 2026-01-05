@@ -288,17 +288,18 @@ body {
     }
 
     .monster-mini-card .monster-hp,
-    .monster-mini-card .monster-stats div {
+    .monster-mini-card .monster-breach,
+    .monster-mini-card .monster-xp {
         font-size: 12px !important;
     }
 
     /* 4. Village Market (Desktop: 1.5x Width, 4 per row) */
-    .market-grid {
+    .market-display-grid {
         grid-template-columns: repeat(4, 1fr);
         gap: 20px;
     }
 
-    .market-grid .card {
+    .market-display-grid .card {
         width: 100%;
         /* Fill the grid column */
         height: auto;
@@ -308,19 +309,19 @@ body {
         /* Base font increase */
     }
 
-    .market-grid .card-name {
+    .market-display-grid .card-name {
         font-size: 16px;
     }
 
-    .market-grid .card-type {
+    .market-display-grid .card-type {
         font-size: 12px;
     }
 
-    .market-grid .card-stats-row {
+    .market-display-grid .card-stats-row {
         font-size: 14px;
     }
 
-    .market-grid .card-desc {
+    .market-display-grid .card-desc {
         font-size: 12px;
     }
 
