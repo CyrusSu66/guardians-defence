@@ -145,8 +145,19 @@
     </div>
 
     <script>
-        // Check URL param or Branch logic? For now always show.
-        // Or check query string ?dev=true
+        // Feature Flag: Show Dev Comm only on Localhost or via ?dev=true
+        function checkDevMode() {
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const forceDev = new URLSearchParams(window.location.search).has('dev');
+
+            const btn = document.getElementById('btnDevComm');
+            if (isLocal || forceDev) {
+                btn.style.display = 'block';
+            }
+        }
+
+        // Init
+        checkDevMode();
 
         function showManual() {
             document.getElementById('manualPanel').style.display = 'block';
