@@ -119,14 +119,13 @@ body {
     /* Remove old margin */
 }
 
-/* Shield Stat (Horizontal Inline) */
+/* Shield Stat (Mobile Default: Column) */
 .stat-card.shield-stat {
     display: flex;
-    flex-direction: row;
-    /* One Line */
+    flex-direction: column;
+    /* Mobile: Stacked */
     align-items: center;
-    gap: 8px;
-    /* Space between Label and Bar */
+    gap: 4px;
     padding: 8px 15px;
     /* Base Card Styles Restored */
     background: var(--color-surface-light);
@@ -161,12 +160,11 @@ body {
     line-height: 1;
 }
 
-/* Progress Bar (Compact 70px) */
+/* Progress Bar (Mobile: Compact) */
 .progress-bar-container {
-    height: 18px;
-    /* Slightly taller to fit text */
-    width: 70px;
-    /* User Request: 70px */
+    height: 16px;
+    width: 60px;
+    /* User Req: Not too long */
     background: #222;
     border-radius: 4px;
     margin: 0;
@@ -660,8 +658,14 @@ body {
 /* Market Grid */
 .market-display-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    /* User Req: 1.5x of 120px = 180px */
     gap: 15px;
+}
+
+.market-display-grid .card {
+    width: 100%;
+    /* Ensure card fills the new wider slot */
 }
 
 .market-item {
@@ -990,5 +994,16 @@ body {
     /* Remove width constraint on desktop to allow full grid expansion */
     .stage-section {
         max-width: none;
+    }
+
+    /* Shield Stat Desktop Override (Inline) */
+    .stat-card.shield-stat {
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .progress-bar-container {
+        width: 70px;
+        height: 18px;
     }
 }
