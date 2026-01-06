@@ -66,3 +66,13 @@ export const CARDPOOL = {
     // --- 特殊 ---
     special: SPECIAL_DATA
 };
+
+export function getCardById(id) {
+    const all = [
+        ...HEROES_DATA,
+        ...MONSTERS_DATA,
+        ...ITEMS_DATA,
+        ...SPECIAL_DATA
+    ];
+    return all.find(c => c.id === id);
+}

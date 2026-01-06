@@ -3,7 +3,7 @@
  * 實作規則：架構重構為 Controller-Engine 模式，提升模組化程度。
  */
 
-import { CARDPOOL, GameState } from './data.js';
+import { CARDPOOL, GameState, getCardById } from './data.js';
 import { UIManager } from './ui.js';
 import { CombatEngine } from './engine/CombatEngine.js';
 import { VillageEngine } from './engine/VillageEngine.js';
@@ -433,6 +433,16 @@ class GuardiansDefenceGame {
             this.addLog(`💰 ${sourceName}：請點擊一張手牌進行非法交易 (銷毀換取金幣)。`, 'action');
             this.updateUI();
         }
+    }
+
+    getCardPoolItem(id) {
+        const item = getCardById(id);
+        if (!item) {
+            console.error(`[Game] getCardPoolItem: Cannot find card with ID '${id}'`);
+            return null;
+        }
+        // Return a Deep Copy to prevent reference sharing issues
+        return JSON.parse(JSON.stringify(item));
     }
 
     // --- 實用工具 ---

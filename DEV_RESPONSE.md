@@ -1,13 +1,20 @@
-# 版本發布：v3.26 Final
+# 🛠️ System Status & Version Check
 
-已正式將專案標記為 **v3.26 Final** 並推送到主線。
+**Current Version**: `v3.27.1 (Hotfix)`
+**Branch**: `feature-card-stat-adjustments`
+**Last Updated**: 2026-01-06
 
-### 🚀 版本摘要
-這是一個重大的里程碑版本，包含了：
-1.  **全新 UI 架構**: 完整的 Desktop/Mobile 響應式分流。
-2.  **系統重構**: Controller-Engine 模組化設計。
-3.  **體驗優化**: Landing Page、開發溝通工具、完整的遊戲手冊。
+## 📋 Recent Changes
+1.  **Fixed** `getCardPoolItem` error:
+    - Added `getCardById` to `src/data.js`.
+    - Implemented `getCardPoolItem` in `src/game.js`.
+2.  **Tools**:
+    - `csv_manager.mjs`: Added Export capability & new fields (`onVictory`, `onDungeon`).
+    - `Remote Bridge`: Tunnel testing successful (Port 8888).
 
-### 📋 下一步
-準備建立新分支進行 **卡牌數值平衡 (Card Balancing)**。
-當您準備好時，請告訴我分支名稱 (例如 `feature-balance-tuning`)，我們隨時開始！
+## 🚀 Deployment Status
+- **GitHub**: Pushing changes...
+- **Local Server**: Running on Port 8080.
+- **Bridge**: Active on Port 8888.
+
+Ready for next tasks!
