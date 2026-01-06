@@ -91,7 +91,8 @@ class GuardiansDefenceGame {
             this.monsterDeck = this.cardEngine.createMonsterDeck();
 
             this.addLog('正在偵測地城前線...', 'info');
-            this.dungeonEngine.spawn();
+            // v3.27: Initial spawn is now handled by nextTurn()
+            // this.dungeonEngine.spawn();
 
             this.addLog('守護者防線 v3.6.1 模組化引擎全面啟動！', 'success');
             this.refreshMarket();

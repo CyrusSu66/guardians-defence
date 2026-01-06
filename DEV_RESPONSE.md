@@ -29,5 +29,6 @@
 - 修正 `calculateCombatStats` is not a function 錯誤，已將 `game.js` 的轉接方法名稱與參數修正為對應 `CombatEngine.calculateStats`。
 - 修正 `resolveCombat` is not a function 錯誤，已將 `game.js` 的呼叫修正為 `CombatEngine.perform`。
 - **機制優化**：調整回合流程為 **Split Phase (分段生成)**。將怪物生成 (`spawn`) 從回合結束移至新回合開始 (`nextTurn`) 之後。確保「進場棄牌」等效果能正確打擊玩家的新手牌，而非無效的舊手牌。
+- 修正 **第一回合雙重生成** 問題：移除初始化時多餘的 `spawn` 呼叫，解決 Rank 2 異常出現怪物的問題。
 
 Ready for next tasks!
