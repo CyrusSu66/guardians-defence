@@ -147,6 +147,28 @@ class GuardiansDefenceGame {
     // --- 動作觸發 ---
     // ... (omitted) ...
 
+    visitVillageAction() {
+        if (this.state !== GameState.DRAW && this.state !== GameState.VILLAGE) return;
+
+        this.state = GameState.VILLAGE;
+        this.currentAction = 'VILLAGE';
+        this.addLog('隊伍進入了村莊市集。', 'info');
+        this.updateUI();
+    }
+
+    restAction() {
+        if (this.state !== GameState.DRAW && this.state !== GameState.VILLAGE) return;
+
+        this.state = GameState.VILLAGE; // Recycle Village UI for Rest (showing Hand)
+        this.currentAction = 'REST';
+
+        // Grant Rest Reward
+        this.currentXP += 1;
+        this.addLog('全軍休整：精力恢復，獲得 1 XP。', 'success');
+        this.addLog('您現在可以銷毀這回合的一張手牌，或者點擊「完成」結束回合。', 'info');
+        this.updateUI();
+    }
+
     enterDungeonAction() {
         this.state = GameState.COMBAT;
         this.currentAction = 'DUNGEON';
