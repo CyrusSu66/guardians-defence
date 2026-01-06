@@ -80,6 +80,16 @@ export class CombatEngine {
             if (hero.abilities && hero.abilities.onVictory) {
                 g.triggerCardEffect(hero.abilities.onVictory, hero.name);
             }
+
+            // v3.26: Treasure Map Logic
+            // Scan hand for maps.
+            const maps = g.hand.filter(c => c.id === 'item_treasure_map');
+            if (maps.length > 0) {
+                const bonusGold = maps.length * 2;
+                g.currentGold += bonusGold;
+                g.addLog(`📜 藏寶圖生效：發現了額外 ${bonusGold} 金幣！`, 'success');
+            }
+
             // v3.22: 輔助卡若有勝利效果 (目前無，預留)
 
             // v3.26: Base Reward Rule (User Request)
@@ -138,7 +148,12 @@ export class CombatEngine {
 
         // 輔助加成 (v3.22)
         if (auxItem && auxItem.abilities && auxItem.abilities.onBattle === 'boost_str_1') {
-            bonuses.push('乾糧補給: 力量 +1');
+            // Already handled in pre-calc, but adding log/tag here if needed
+            bonuses.push(`輔助(${auxItem.name}): 力量 +1`);
+        }
+        if (auxItem && auxItem.abilities && auxItem.abilities.onBattle === 'boost_str_2') {
+            const addedAmt = 2; // handled in pre-calc
+            bonuses.push(`輔助(${auxItem.name}): 力量 +${addedAmt}`);
         }
 
         // 英雄戰鬥技能
@@ -158,11 +173,7 @@ export class CombatEngine {
                 bonuses.push(`亞馬遜弓術: +${bonus} Atk`);
             }
 
-            // v3.22.14: 精靈 + 法術 連動 (加魔攻)
-            if (effect === 'synergy_spell' && damageItem && damageItem.type === 'Spell') {
-                magAtk += 1;
-                bonuses.push('精靈法術協同: +1 Mag');
-            }
+
 
             // v3.22.14: 塞維恩 + 隊伍協同
             if ((effect.startsWith('synergy_hero_group'))) {
@@ -203,16 +214,68 @@ export class CombatEngine {
                     bonuses.push(`騎士信仰(光照補償): +${totalLight} Atk`);
                 }
             }
+            // v3.26: Paladin (Undead/Demon Synergy)
+            // Checks if CURRENT monster has 'Undead' or 'Demon' subtype
+            if (effect.startsWith('synergy_undead_demon') && monster && monster.subTypes) {
+                if (monster.subTypes.includes('Undead') || monster.subTypes.includes('Demon')) {
+                    let bonus = 1;
+                    if (effect.endsWith('_2')) bonus = 3;
+                    if (effect.endsWith('_3')) bonus = 5;
+                    physAtk += bonus;
+                    bonuses.push(`神聖審判(聖騎士): +${bonus} Atk`);
+                }
+            }
+
+            // v3.26: Alchemist (Item Synergy 2x)
+            if (effect.startsWith('synergy_item_2x') && damageItem && damageItem.equipment) {
+                const eqAtk = damageItem.equipment.attack || 0;
+                const eqMag = damageItem.equipment.magicAttack || 0;
+                physAtk += eqAtk; // Add it AGAIN (so it becomes 2x total)
+                magAtk += eqMag;
+                bonuses.push(`鍊金轉化: 裝備數值翻倍 (+${eqAtk} Atk / +${eqMag} Mag)`);
+
+                // Bonus for Lv2/Lv3
+                if (effect.endsWith('_plus_1')) { magAtk += 1; bonuses.push('鍊金精通: +1 Mag'); }
+                if (effect.endsWith('_plus_2')) { magAtk += 2; bonuses.push('賢者智慧: +2 Mag'); }
+            }
+
+            // v3.26: Bard (Scale with Rank)
+            if (effect.startsWith('scale_with_rank')) {
+                const rankVal = this.game.combat.targetRank || 1; // 1, 2, or 3
+                let bonus = rankVal;
+                if (effect.endsWith('plus_1')) bonus += 1;
+                if (effect.endsWith('plus_2')) bonus += 2;
+                physAtk += bonus;
+                bonuses.push(`英雄史詩(Rank ${rankVal}): +${bonus} Atk`);
+            }
+
+            // v3.26: Monk (Ignore Immunity)
+            // Implementation note: We handle the logic flag here, effect applied below
+            if (effect.startsWith('ignore_immunity')) {
+                bonuses.push('氣功: 無視物理/魔法免疫');
+                if (effect.endsWith('_bonus_1')) { physAtk += 1; bonuses.push('氣功強化: +1 Atk'); }
+                if (effect.endsWith('_bonus_2')) { physAtk += 2; bonuses.push('武神霸氣: +2 Atk'); }
+            }
+
         }
 
         // 怪物免疫
         let filteredPhys = physAtk;
         let filteredMag = magAtk;
 
-        if (monster && monster.abilities) {
+        // v3.26: Monk's Ignore Immunity Check
+        let ignoreImmunity = false;
+        if (hero.abilities && hero.abilities.onBattle && hero.abilities.onBattle.startsWith('ignore_immunity')) {
+            ignoreImmunity = true;
+        }
+
+        if (monster && monster.abilities && !ignoreImmunity) {
             if (monster.abilities.battle === 'phys_immune') {
                 filteredPhys = 0;
                 bonuses.push('物理免疫: 物理傷害歸零');
+            } else if (monster.abilities.battle === 'magic_immune') {
+                filteredMag = 0;
+                bonuses.push('魔法免疫: 魔法傷害歸零');
             } else if (monster.abilities.battle === 'magic_only') {
                 filteredPhys = 0;
                 bonuses.push('魔法限定: 物理傷害歸零');

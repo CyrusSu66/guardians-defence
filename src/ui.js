@@ -63,6 +63,15 @@ export class UIManager {
         this.setText('btnDeckCountBtn', g.deck.length);
         this.setText('btnDiscardCountBtn', g.discard.length);
 
+        // v3.26: Bag of Holding Viewer
+        const bagBtn = document.getElementById('btnBagViewer');
+        if (bagBtn) {
+            const bagCount = (g.savedCards || []).length;
+            bagBtn.style.display = bagCount > 0 ? 'inline-block' : 'none';
+            bagBtn.innerText = `🎒 背包 (${bagCount})`;
+            bagBtn.onclick = () => this.showBagContent();
+        }
+
         // Control Panel Visibility
         const plazaPanel = document.querySelector('.village-plaza');
         if (plazaPanel) {
@@ -146,7 +155,7 @@ export class UIManager {
                     if (card.type === 'Hero') {
                         g.combat.selectedHeroIdx = (g.combat.selectedHeroIdx === idx) ? null : idx;
                     }
-                    else if (card.type === 'Weapon' || card.type === 'Spell') {
+                    else if (card.type === 'Weapon' || card.type === 'MagicBook') {
                         g.combat.selectedDamageIdx = (g.combat.selectedDamageIdx === idx) ? null : idx;
                     }
                     else if (card.type === 'Item' || card.type === 'Food') {
@@ -227,6 +236,8 @@ export class UIManager {
             }
         } else if (card.type === 'Weapon') {
             stats = `<div class="card-stats">⚔️ ${card.equipment.attack} | 🪄 ${card.equipment.magicAttack} | ⚖️ ${card.equipment.weight}</div>`;
+        } else if (card.type === 'MagicBook') {
+            stats = `<div class="card-stats">🪄 ${card.equipment.magicAttack} (MagicBook)</div>`;
         } else if (card.goldValue) {
             stats = `<div class="card-stats">🪙 +${card.goldValue}</div>`;
         }
@@ -277,13 +288,12 @@ export class UIManager {
             lines.push(`💪${card.hero.strength} 🪄${card.hero.magicAttack}`);
         } else if (card.type === 'Weapon') {
             lines.push(`⚔️${card.equipment.attack} 🪄${card.equipment.magicAttack} ⚖️${card.equipment.weight}`);
+        } else if (card.type === 'MagicBook') {
+            lines.push(`🪄${card.equipment.magicAttack}`);
         } else if (card.type === 'Spell') {
             // Spells usually just have magic attack or effect.
-            if (card.equipment) {
-                lines.push(`🪄${card.equipment.magicAttack}`);
-            } else {
-                lines.push(`✨`);
-            }
+            // Since v3.27, Spell are Utility, no combat stats shown here usually.
+            lines.push(`✨`);
         }
         // If card has light, show it
         if (card.light > 0) lines.push(`💡${card.light}`);
@@ -475,6 +485,12 @@ export class UIManager {
         const discard = this.game.discard;
         console.log('[UI] Discard count:', discard.length);
         this.showCardListModal('棄牌堆檢視', discard);
+    }
+
+    // v3.26: Show Bag Content
+    showBagContent() {
+        const bag = this.game.savedCards || [];
+        this.showCardListModal('次元背包 (暫存區)', bag);
     }
 
     showCardListModal(title, cards) {
@@ -732,6 +748,7 @@ export class UIManager {
         // v3.22.13: 計算 HeroStr (包含 Aux 和 Aura) 以傳遞給 CombatEngine
         let heroStr = hero ? hero.hero.strength : 0;
         if (auxItem && auxItem.abilities && auxItem.abilities.onBattle === 'boost_str_1') heroStr += 1;
+        if (auxItem && auxItem.abilities && auxItem.abilities.onBattle === 'boost_str_2') heroStr += 2;
         const activeAurasStruct = this.game.getActiveAuras();
         heroStr += (activeAurasStruct.strMod || 0);
 
@@ -815,7 +832,7 @@ export class UIManager {
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 10px;">
                 ${renderSlot('🟢 輔助物品', auxItem, '選擇食物/道具')}
                 ${renderSlot('🔴 英雄', hero, '選擇英雄')}
-                ${renderSlot('🔵 傷害裝備', damageItem, '選擇武器/法術')}
+                ${renderSlot('🔵 傷害裝備', damageItem, '選擇武器/魔導書')}
             </div>
         `;
 

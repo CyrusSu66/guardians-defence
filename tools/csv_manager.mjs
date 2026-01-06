@@ -188,6 +188,8 @@ function mapToItem(row) {
     if (row.Ability_Text) item.abilities.abilities_desc = row.Ability_Text;
     if (row.Ability_Key_Battle) item.abilities.onBattle = row.Ability_Key_Battle;
     if (row.Ability_Key_Village) item.abilities.onVillage = row.Ability_Key_Village;
+    if (row.Ability_Key_Victory) item.abilities.onVictory = row.Ability_Key_Victory;
+    if (row.Ability_Key_Dungeon) item.abilities.onDungeon = row.Ability_Key_Dungeon;
 
     if (Object.keys(item.abilities).length === 0) delete item.abilities;
 
@@ -245,10 +247,88 @@ async function syncData() {
     console.log('🎉 Sync Complete!');
 }
 
+async function exportData() {
+    console.log('📤 Starting Data Export...');
+
+    // Helper to escape CSV values
+    const escape = (val) => {
+        if (val === null || val === undefined) return '';
+        const str = String(val);
+        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+            return `"${str.replace(/"/g, '""')}"`;
+        }
+        return str;
+    };
+
+    // 1. Heroes
+    try {
+        const { HEROES_DATA } = await import('../src/data/heroes.js');
+        const headers = ['ID', 'Name', 'Type', 'SubTypes', 'Cost', 'VP', 'Gold', 'Light', 'Desc', 'Hero_Level', 'Hero_Series', 'Hero_MagATK', 'Hero_STR', 'Hero_XP_Cost', 'Hero_Upgrade_ID', 'Ability_Text', 'Ability_Key_Battle', 'Ability_Key_Victory', 'Ability_Key_Village'];
+
+        let csv = headers.join(',') + '\n';
+        HEROES_DATA.forEach(h => {
+            const row = [
+                h.id, h.name, h.type, h.subTypes.join(', '), h.cost, h.vp, h.goldValue, h.light, h.desc,
+                h.hero.level, h.hero.series, h.hero.magicAttack, h.hero.strength, h.hero.xpToUpgrade, h.hero.upgradeToId,
+                h.abilities?.abilities_desc, h.abilities?.onBattle, h.abilities?.onVictory, h.abilities?.onVillage
+            ];
+            csv += row.map(escape).join(',') + '\n';
+        });
+        fs.writeFileSync('csv_heroes.csv', csv);
+        console.log(`✅ Exported csv_heroes.csv (${HEROES_DATA.length})`);
+    } catch (e) {
+        console.error('❌ Export Heroes Failed:', e);
+    }
+
+    // 2. Monsters
+    try {
+        const { MONSTERS_DATA } = await import('../src/data/monsters.js');
+        const headers = ['ID', 'Name', 'Type', 'SubTypes', 'Count', 'Cost', 'VP', 'Gold', 'Light', 'Desc', 'Mon_Tier', 'Mon_HP', 'Mon_XP', 'Mon_Breach', 'Ability_Text', 'Ability_Key_Breach', 'Ability_Key_Aura', 'Ability_Key_Battle'];
+
+        let csv = headers.join(',') + '\n';
+        MONSTERS_DATA.forEach(m => {
+            const row = [
+                m.id, m.name, m.type, m.subTypes.join(', '), m.count, m.cost, m.vp, m.goldValue, m.light, m.desc,
+                m.monster.tier, m.monster.hp, m.monster.xpGain, m.monster.breachDamage,
+                m.abilities?.abilities_desc, m.abilities?.onBreach, m.abilities?.aura, m.abilities?.battle
+            ];
+            csv += row.map(escape).join(',') + '\n';
+        });
+        fs.writeFileSync('csv_monsters.csv', csv);
+        console.log(`✅ Exported csv_monsters.csv (${MONSTERS_DATA.length})`);
+    } catch (e) {
+        console.error('❌ Export Monsters Failed:', e);
+    }
+
+    // 3. Items
+    try {
+        const { ITEMS_DATA, SPECIAL_DATA } = await import('../src/data/items.js');
+        const allItems = [...ITEMS_DATA, ...SPECIAL_DATA];
+        const headers = ['ID', 'Name', 'Type', 'SubTypes', 'Cost', 'VP', 'Gold', 'Light', 'Desc', 'Equip_ATK', 'Equip_MagATK', 'Equip_Weight', 'Ability_Text', 'Ability_Key_Battle', 'Ability_Key_Village', 'Ability_Key_Victory', 'Ability_Key_Dungeon'];
+
+        let csv = headers.join(',') + '\n';
+        allItems.forEach(i => {
+            const eq = i.equipment || {};
+            const row = [
+                i.id, i.name, i.type, i.subTypes.join(', '), i.cost, i.vp, i.goldValue, i.light, i.desc,
+                eq.attack, eq.magicAttack, eq.weight,
+                i.abilities?.abilities_desc, i.abilities?.onBattle, i.abilities?.onVillage, i.abilities?.onVictory, i.abilities?.onDungeon
+            ];
+            csv += row.map(escape).join(',') + '\n';
+        });
+        fs.writeFileSync('csv_items.csv', csv);
+        console.log(`✅ Exported csv_items.csv (${allItems.length})`);
+    } catch (e) {
+        console.error('❌ Export Items Failed:', e);
+    }
+}
+
 // --- Execution ---
 const args = process.argv.slice(2);
 if (args[0] === 'sync') {
     syncData();
+} else if (args[0] === 'export') {
+    exportData();
 } else {
-    console.log('Usage: node tools/csv_manager.mjs sync');
+    console.log('Usage: node tools/csv_manager.mjs [sync|export]');
 }

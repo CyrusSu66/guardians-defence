@@ -40,7 +40,7 @@ export const HEROES_DATA = [
             "level": 1,
             "series": "Sevin",
             "magicAttack": 0,
-            "strength": 3,
+            "strength": 2,
             "xpToUpgrade": 4,
             "upgradeToId": "hero_sevin_lv2"
         },
@@ -65,7 +65,7 @@ export const HEROES_DATA = [
             "level": 2,
             "series": "Sevin",
             "magicAttack": 0,
-            "strength": 4,
+            "strength": 3,
             "xpToUpgrade": 6,
             "upgradeToId": "hero_sevin_lv3"
         },
@@ -90,7 +90,7 @@ export const HEROES_DATA = [
             "level": 3,
             "series": "Sevin",
             "magicAttack": 0,
-            "strength": 5,
+            "strength": 4,
             "xpToUpgrade": 0,
             "upgradeToId": null
         },
@@ -194,7 +194,7 @@ export const HEROES_DATA = [
         "hero": {
             "level": 1,
             "series": "Elf",
-            "magicAttack": 1,
+            "magicAttack": 2,
             "strength": 1,
             "xpToUpgrade": 4,
             "upgradeToId": "hero_elf_lv2"
@@ -219,7 +219,7 @@ export const HEROES_DATA = [
         "hero": {
             "level": 2,
             "series": "Elf",
-            "magicAttack": 2,
+            "magicAttack": 3,
             "strength": 2,
             "xpToUpgrade": 6,
             "upgradeToId": "hero_elf_lv3"
@@ -244,7 +244,7 @@ export const HEROES_DATA = [
         "hero": {
             "level": 3,
             "series": "Elf",
-            "magicAttack": 3,
+            "magicAttack": 4,
             "strength": 3,
             "xpToUpgrade": 0,
             "upgradeToId": null
@@ -478,5 +478,117 @@ export const HEROES_DATA = [
             "abilities_desc": "🏠 村莊中：修復 2 點魔法護罩",
             "onVillage": "heal_2"
         }
+    },
+    // --- Paladin Series (聖騎士) ---
+    {
+        "id": "hero_paladin_lv1",
+        "name": "告解者",
+        "type": "Hero", "subTypes": ["Cleric", "Fighter"],
+        "cost": 4, "vp": 1, "goldValue": 0, "light": 0,
+        "desc": "發誓剷除邪惡的信徒，對不死生物毫不留情。",
+        "hero": { "level": 1, "series": "Paladin", "magicAttack": 1, "strength": 2, "xpToUpgrade": 4, "upgradeToId": "hero_paladin_lv2" },
+        "abilities": { "abilities_desc": "⚔️ 戰鬥中：對不死/惡魔系怪物攻擊力+1", "onBattle": "synergy_undead_demon" }
+    },
+    {
+        "id": "hero_paladin_lv2",
+        "name": "審判官",
+        "type": "Hero", "subTypes": ["Cleric", "Fighter"],
+        "cost": 7, "vp": 2, "goldValue": 0, "light": 1,
+        "desc": "執行神聖審判的騎士，他的存在本身就是一種光芒。",
+        "hero": { "level": 2, "series": "Paladin", "magicAttack": 2, "strength": 3, "xpToUpgrade": 6, "upgradeToId": "hero_paladin_lv3" },
+        "abilities": { "abilities_desc": "⚔️ 戰鬥中：對不死/惡魔系怪物攻擊力+3", "onBattle": "synergy_undead_demon_2" }
+    },
+    {
+        "id": "hero_paladin_lv3",
+        "name": "聖十字軍",
+        "type": "Hero", "subTypes": ["Cleric", "Fighter"],
+        "cost": 10, "vp": 3, "goldValue": 0, "light": 2,
+        "desc": "被聖光環繞的傳奇英雄，任何邪惡都無法在他面前遁形。",
+        "hero": { "level": 3, "series": "Paladin", "magicAttack": 3, "strength": 4, "xpToUpgrade": 0, "upgradeToId": null },
+        "abilities": { "abilities_desc": "⚔️ 戰鬥中：對不死/惡魔系怪物攻擊力+5", "onBattle": "synergy_undead_demon_3" }
+    },
+    // --- Monk Series (武道家) ---
+    {
+        "id": "hero_monk_lv1",
+        "name": "武僧",
+        "type": "Hero", "subTypes": ["Fighter"],
+        "cost": 4, "vp": 1, "goldValue": 0, "light": 0,
+        "desc": "修煉身心的武者，他的拳頭能擊穿盔甲與靈體。",
+        "hero": { "level": 1, "series": "Monk", "magicAttack": 0, "strength": 2, "xpToUpgrade": 4, "upgradeToId": "hero_monk_lv2" },
+        "abilities": { "abilities_desc": "⚔️ 戰鬥中：無視怪物的免疫屬性 (物理/魔法)", "onBattle": "ignore_immunity" }
+    },
+    {
+        "id": "hero_monk_lv2",
+        "name": "拳法家",
+        "type": "Hero", "subTypes": ["Fighter"],
+        "cost": 7, "vp": 2, "goldValue": 0, "light": 0,
+        "desc": "精通氣功的高手，任何防禦在他眼中都如同薄紙。",
+        "hero": { "level": 2, "series": "Monk", "magicAttack": 1, "strength": 3, "xpToUpgrade": 6, "upgradeToId": "hero_monk_lv3" },
+        "abilities": { "abilities_desc": "⚔️ 戰鬥中：無視免疫，且額外+1 攻擊力", "onBattle": "ignore_immunity_bonus_1" }
+    },
+    {
+        "id": "hero_monk_lv3",
+        "name": "武神",
+        "type": "Hero", "subTypes": ["Fighter"],
+        "cost": 10, "vp": 3, "goldValue": 0, "light": 0,
+        "desc": "武道的極致，他的每一擊都蘊含著破壞法則的力量。",
+        "hero": { "level": 3, "series": "Monk", "magicAttack": 2, "strength": 4, "xpToUpgrade": 0, "upgradeToId": null },
+        "abilities": { "abilities_desc": "⚔️ 戰鬥中：無視免疫，且額外+2 攻擊力", "onBattle": "ignore_immunity_bonus_2" }
+    },
+    // --- Alchemist Series (鍊金術士) ---
+    {
+        "id": "hero_alchemist_lv1",
+        "name": "鍊金學徒",
+        "type": "Hero", "subTypes": ["Wizard"],
+        "cost": 4, "vp": 1, "goldValue": 0, "light": 0,
+        "desc": "熱衷於研究物品性質的學者，能發揮道具的最大效能。",
+        "hero": { "level": 1, "series": "Alchemist", "magicAttack": 1, "strength": 1, "xpToUpgrade": 4, "upgradeToId": "hero_alchemist_lv2" },
+        "abilities": { "abilities_desc": "⚔️ 戰鬥中：裝備的道具數值加倍 (X2)", "onBattle": "synergy_item_2x" }
+    },
+    {
+        "id": "hero_alchemist_lv2",
+        "name": "鍊金師",
+        "type": "Hero", "subTypes": ["Wizard"],
+        "cost": 7, "vp": 2, "goldValue": 0, "light": 0,
+        "desc": "能瞬間轉化物質結構，將普通的劍變成神兵利器。",
+        "hero": { "level": 2, "series": "Alchemist", "magicAttack": 2, "strength": 2, "xpToUpgrade": 6, "upgradeToId": "hero_alchemist_lv3" },
+        "abilities": { "abilities_desc": "⚔️ 戰鬥中：裝備道具數值加倍，且自身魔力+1", "onBattle": "synergy_item_2x_plus_1" }
+    },
+    {
+        "id": "hero_alchemist_lv3",
+        "name": "賢者",
+        "type": "Hero", "subTypes": ["Wizard"],
+        "cost": 10, "vp": 3, "goldValue": 0, "light": 1,
+        "desc": "解開了真理的智者，萬物在他手中皆可化為奇蹟。",
+        "hero": { "level": 3, "series": "Alchemist", "magicAttack": 3, "strength": 2, "xpToUpgrade": 0, "upgradeToId": null },
+        "abilities": { "abilities_desc": "⚔️ 戰鬥中：裝備道具數值加倍，且自身魔力+2", "onBattle": "synergy_item_2x_plus_2" }
+    },
+    // --- Bard Series (吟遊詩人) ---
+    {
+        "id": "hero_bard_lv1",
+        "name": "詩人",
+        "type": "Hero", "subTypes": ["Thief"], // Use Thief for high DEX/CHA flavor
+        "cost": 4, "vp": 1, "goldValue": 0, "light": 0,
+        "desc": "流浪的歌者，他的歌聲能隨著敵人的強大而越發激昂。",
+        "hero": { "level": 1, "series": "Bard", "magicAttack": 1, "strength": 1, "xpToUpgrade": 4, "upgradeToId": "hero_bard_lv2" },
+        "abilities": { "abilities_desc": "⚔️ 戰鬥中：攻擊力增加量 = 當前地城階級 (Rank)", "onBattle": "scale_with_rank" }
+    },
+    {
+        "id": "hero_bard_lv2",
+        "name": "吟遊詩人",
+        "type": "Hero", "subTypes": ["Thief"],
+        "cost": 7, "vp": 2, "goldValue": 0, "light": 1,
+        "desc": "他的英雄史詩能激勵人心，面對越強的地城，戰力越高。",
+        "hero": { "level": 2, "series": "Bard", "magicAttack": 1, "strength": 2, "xpToUpgrade": 6, "upgradeToId": "hero_bard_lv3" },
+        "abilities": { "abilities_desc": "⚔️ 戰鬥中：攻擊力增加量 = 地城階級 (Rank) + 1", "onBattle": "scale_with_rank_plus_1" }
+    },
+    {
+        "id": "hero_bard_lv3",
+        "name": "藝術家",
+        "type": "Hero", "subTypes": ["Thief"],
+        "cost": 10, "vp": 3, "goldValue": 0, "light": 1,
+        "desc": "傳說中的演奏家，連巨龍都會被他的樂曲所震撼。",
+        "hero": { "level": 3, "series": "Bard", "magicAttack": 2, "strength": 2, "xpToUpgrade": 0, "upgradeToId": null },
+        "abilities": { "abilities_desc": "⚔️ 戰鬥中：攻擊力增加量 = 地城階級 (Rank) + 2", "onBattle": "scale_with_rank_plus_2" }
     }
 ];

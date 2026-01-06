@@ -11,9 +11,16 @@
 ---
 
 ## 🚧 進行中的開發分支 (Active Features)
-*(暫無)*
+### 1. 卡牌數值調整與正規化 (Card Stat Adjustments)
+*   **分支名稱**: `feature-card-stat-adjustments`
+*   **建立日期**: 2026-01-05
+*   **狀態**: Development
+*   **實作功能**:
+    *   **Data Refactor**: 模組化資料結構 (`src/data/*.js`)。
+    *   **Normalization**: 資料欄位正規化 (Schema v3.27)。
+    *   **CSV Sync**: 整合 Google Sheets 同步工具 (`tools/csv_manager.mjs`)。
+*   **預覽連結**: https://guardians-defence-git-feature-card-s-46f360-cyrussu66s-projects.vercel.app
 
----
 
 ## ✅ 已合併/封存 (Merged/Archived)
 ### 1. 修復怪物進場效果 & 新架構 (Fix Breach & UI Refactor)

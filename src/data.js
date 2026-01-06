@@ -36,11 +36,11 @@ const marketHeroes = HEROES_DATA.filter(c => c.id !== 'basic_regular_army');
 
 // Items: All except basics
 const marketAttackItems = ITEMS_DATA.filter(c =>
-    (c.type === 'Weapon' || c.type === 'Spell') && c.id !== 'basic_spear'
+    (c.type === 'Weapon' || c.type === 'MagicBook') && c.id !== 'basic_spear'
 );
 
 const marketVillageItems = ITEMS_DATA.filter(c =>
-    (c.type === 'Item' || c.type === 'LightItem' || c.type === 'Food') &&
+    (c.type === 'Item' || c.type === 'LightItem' || c.type === 'Food' || c.type === 'Spell') &&
     c.id !== 'basic_torch' && c.id !== 'basic_rations' && c.id !== 'basic_spear'
 );
 

@@ -86,9 +86,12 @@ export class DungeonEngine {
         this.game.addLog(`⚠️ ${monster.name} 進場發動突襲！`, 'warning');
         const effect = monster.abilities.onBreach;
 
-        if (effect === 'gain_disease') {
+        if (effect === 'gain_disease' || effect === 'add_disease_1') {
             const disease = g.getCardPoolItem('spec_disease');
-            if (disease) g.discard.push(disease);
+            if (disease) {
+                g.discard.push(disease);
+                g.addLog(`🤢 ${monster.name}：散播了疾病！(疾病卡已加入棄牌堆)`, 'danger');
+            }
         } else if (effect === 'discard_1') {
             g.forcePlayerDiscard(1);
         } else if (effect === 'discard_magic_or_item') {
