@@ -27,5 +27,6 @@
 - 修正 `dungeonEngine.getActiveAuras` is not a function 錯誤，並校正資料結構 Key 值 (`aura` vs `onAura`)。
 - **架構優化**：移除針對「自動衛哨」與「藏寶圖」的硬編碼 (Hardcoded) 邏輯，改為通用的資料驅動 (Data-Driven) 觸發機制 (`turret_damage_1`, `gain_2_gold`)。
 - 修正 `calculateCombatStats` is not a function 錯誤，已將 `game.js` 的轉接方法名稱與參數修正為對應 `CombatEngine.calculateStats`。
+- 修正 `resolveCombat` is not a function 錯誤，已將 `game.js` 的呼叫修正為 `CombatEngine.perform`。
 
 Ready for next tasks!

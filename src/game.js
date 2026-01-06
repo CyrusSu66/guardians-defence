@@ -193,7 +193,7 @@ class GuardiansDefenceGame {
     }
 
     performCombat() {
-        this.combatEngine.resolveCombat();
+        this.combatEngine.perform();
     }
 
     // --- Data Accessors for UI ---
