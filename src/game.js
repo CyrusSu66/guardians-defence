@@ -202,8 +202,8 @@ class GuardiansDefenceGame {
         return this.dungeonEngine.getActiveAuras();
     }
 
-    calculateHeroCombatStats(heroCard, weaponCard, items, targetMonster, lightLevel) {
-        return this.combatEngine.calculateCombatStats(heroCard, weaponCard, items, targetMonster, lightLevel);
+    calculateHeroCombatStats(...args) {
+        return this.combatEngine.calculateStats(...args);
     }
 
     enterDungeonAction() {
