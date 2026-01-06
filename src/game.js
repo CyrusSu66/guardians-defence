@@ -213,35 +213,11 @@ class GuardiansDefenceGame {
         this.addLog('進入地城！正在準備戰鬥...', 'info');
 
         // v3.26: Sentry Turret Logic (Auto Damage Rank 1)
-        const sentries = this.hand.filter(c => c.id === 'device_sentry_turret');
-        if (sentries.length > 0 && this.dungeonHall.rank1) {
-            const dmg = sentries.length;
-            const monster = this.dungeonHall.rank1;
-            monster.currentHP -= dmg;
-            this.addLog(`🛡️ 自動衛哨：對 Rank 1 怪物 (${monster.name}) 造成 ${dmg} 點傷害！`, 'success');
-
-            // v3.26 Refinement: Auto-Kill Check
-            if (monster.currentHP <= 0) {
-                this.addLog(`☠️ Rank 1 ${monster.name} 已被衛哨殲滅！`, 'success');
-
-                // Grant Rewards (XP + 1 VP)
-                // Note: Standard kill logic in CombatEngine is more complex (handles Thunderstone etc). 
-                // We replicate basic reward logic here.
-                this.currentXP += monster.monster.xpGain;
-                this.totalScore += 1 + (monster.vp || 0);
-                this.addLog(`🎉 獲得 ${monster.monster.xpGain} XP 與 1 VP！`, 'success');
-
-                // Clear Slot (DO NOT ADVANCE as per user request)
-                this.dungeonHall.rank1 = null;
-            }
-        }
-
+        // v3.26: Data-Driven Dungeon Entry Effects
+        // Optimized: Scans for 'onDungeon' ability regardless of card ID.
         this.hand.forEach(card => {
             if (card.abilities && card.abilities.onDungeon) {
-                // Turret is handled above explicitly due to specific targeting needs, but generic hook remains
-                if (card.id !== 'device_sentry_turret') {
-                    this.triggerCardEffect(card.abilities.onDungeon, card.name);
-                }
+                this.triggerCardEffect(card.abilities.onDungeon, card.name);
             }
         });
         this.updateUI();
@@ -534,6 +510,30 @@ class GuardiansDefenceGame {
             this.pendingMerchantTrade = true;
             this.addLog(`💰 ${sourceName}：請點擊一張手牌進行非法交易 (銷毀換取金幣)。`, 'action');
             this.updateUI();
+
+        } else if (effectKey === 'turret_damage_1') {
+            const monster = this.dungeonHall.rank1;
+            if (monster) {
+                const dmg = 1;
+                monster.currentHP -= dmg;
+                this.addLog(`🛡️ ${sourceName}：對 Rank 1 怪物 (${monster.name}) 造成 ${dmg} 點傷害！`, 'success');
+
+                // Auto-Kill Check (Similar to original logic, simplified)
+                if (monster.currentHP <= 0) {
+                    this.addLog(`☠️ Rank 1 ${monster.name} 已被 ${sourceName} 殲滅！`, 'success');
+                    this.currentXP += monster.monster.xpGain;
+                    this.totalScore += 1 + (monster.vp || 0);
+                    this.addLog(`🎉 獲得 ${monster.monster.xpGain} XP 與 1 VP！`, 'success');
+                    this.dungeonHall.rank1 = null;
+                }
+            } else {
+                // No Rank 1 monster, do nothing or log info
+                // this.addLog(`🛡️ ${sourceName}：偵測範圍內無敵軍。`, 'info');
+            }
+
+        } else if (effectKey === 'gain_2_gold') {
+            this.currentGold += 2;
+            this.addLog(`📜 ${sourceName}生效：獲得額外 2 金幣！`, 'success');
         }
     }
 

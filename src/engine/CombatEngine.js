@@ -81,14 +81,13 @@ export class CombatEngine {
                 g.triggerCardEffect(hero.abilities.onVictory, hero.name);
             }
 
-            // v3.26: Treasure Map Logic
-            // Scan hand for maps.
-            const maps = g.hand.filter(c => c.id === 'item_treasure_map');
-            if (maps.length > 0) {
-                const bonusGold = maps.length * 2;
-                g.currentGold += bonusGold;
-                g.addLog(`📜 藏寶圖生效：發現了額外 ${bonusGold} 金幣！`, 'success');
-            }
+            // v3.26: Generic OnVictory Logic (Supports Treasure Map etc.)
+            g.hand.forEach(card => {
+                // Ensure we don't trigger the Hero again (already triggered above)
+                if (card !== hero && card.abilities && card.abilities.onVictory) {
+                    g.triggerCardEffect(card.abilities.onVictory, card.name);
+                }
+            });
 
             // v3.22: 輔助卡若有勝利效果 (目前無，預留)
 
