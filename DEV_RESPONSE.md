@@ -24,5 +24,6 @@
 - **全面檢測與修復**：掃描 UI 呼叫並補齊了所有遺失的 Engine 委派方法（含 `confirmRestAndDestroy`, `buyCard`, `performCombat` 等 7 個方法），解決所有 "is not a function" 潛在錯誤。
 - 修正 `endTurnWithAdvance` 遺失問題，確保回合結束與怪物推移邏輯正常執行。
 - 修正 **戰鬥部署失效**：在 `playCard` 中實作了 `DUNGEON` 模式的邏輯，現在點擊英雄、武器或道具可以正確切換選取狀態。
+- 修正 `dungeonEngine.getActiveAuras` is not a function 錯誤，並校正資料結構 Key 值 (`aura` vs `onAura`)。
 
 Ready for next tasks!

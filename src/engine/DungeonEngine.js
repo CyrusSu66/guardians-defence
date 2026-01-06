@@ -105,4 +105,28 @@ export class DungeonEngine {
             g.forcePlayerDestroy(1, ['Item', 'Weapon', 'Food', 'LightItem', 'Spell']);
         }
     }
+
+    /**
+     * 獲取目前場上怪物的所有光環效果 (v3.26)
+     */
+    getActiveAuras() {
+        const auras = {
+            reduceLight: 0,
+            increaseCost: 0,
+            strMod: 0
+        };
+
+        const ranks = ['rank1', 'rank2', 'rank3'];
+        ranks.forEach(r => {
+            const m = this.game.dungeonHall[r];
+            if (m && m.abilities && m.abilities.aura) {
+                const effect = m.abilities.aura;
+                if (effect === 'aura_darkness_1') auras.reduceLight += 1;
+                if (effect === 'aura_darkness_2') auras.reduceLight += 2;
+                if (effect === 'aura_fear_cost_1') auras.increaseCost += 1;
+                if (effect === 'aura_weakness_1') auras.strMod -= 1;
+            }
+        });
+        return auras;
+    }
 }
