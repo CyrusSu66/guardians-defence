@@ -169,6 +169,43 @@ class GuardiansDefenceGame {
         this.updateUI();
     }
 
+    // --- Delegated Actions (Village & Rest) ---
+
+    confirmRestAndDestroy() {
+        this.villageEngine.confirmRest();
+    }
+
+    buyCard(cardId, cost) {
+        this.villageEngine.buy(cardId, cost);
+    }
+
+    promoteRegularArmy(handIdx, marketHeroId) {
+        this.villageEngine.promoteRegular(handIdx, marketHeroId);
+    }
+
+    // --- Delegated Actions (Combat & Dungeon) ---
+
+    selectCombatTarget(rank) {
+        // Simple state update, handled here or in CombatEngine if complex
+        if (this.currentAction !== 'DUNGEON') return;
+        this.combat.targetRank = rank;
+        this.updateUI();
+    }
+
+    performCombat() {
+        this.combatEngine.resolveCombat();
+    }
+
+    // --- Data Accessors for UI ---
+
+    getActiveAuras() {
+        return this.dungeonEngine.getActiveAuras();
+    }
+
+    calculateHeroCombatStats(heroCard, weaponCard, items, targetMonster, lightLevel) {
+        return this.combatEngine.calculateCombatStats(heroCard, weaponCard, items, targetMonster, lightLevel);
+    }
+
     enterDungeonAction() {
         this.state = GameState.COMBAT;
         this.currentAction = 'DUNGEON';
