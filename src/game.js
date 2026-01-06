@@ -116,6 +116,9 @@ class GuardiansDefenceGame {
         this.addLog(`【第 ${this.turn} 回合】開始`, 'info');
         this.drawCards(6);
 
+        // v3.27: Spawn monster AFTER drawing cards, so breach effects hit the correct hand
+        this.dungeonEngine.spawn();
+
         setTimeout(() => {
             this.state = GameState.VILLAGE;
             this.updateUI();

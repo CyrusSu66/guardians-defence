@@ -61,7 +61,9 @@ export class DungeonEngine {
         g.dungeonHall.rank3 = null;
 
         // 補充新怪物
-        this.spawn();
+        // v3.27 Optimization: Spawn is moved to nextTurn() start
+        // to ensure breach effects target the NEW hand.
+        // this.spawn();
         g.updateUI();
 
         if (g.villageHP <= 0) {
