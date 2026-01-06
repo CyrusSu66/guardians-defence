@@ -17,4 +17,8 @@
 - **Local Server**: Running on Port 8080.
 - **Bridge**: Active on Port 8888.
 
+## 📢 更新說明
+- 修正首頁「遊戲玩法介紹」按鈕的手冊路徑，改為 `Game_Rule/Game_Manual_v3.26.md`。
+- 已提交並推送至 `feature-card-stat-adjustments` 分支。
+
 Ready for next tasks!
