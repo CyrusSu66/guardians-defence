@@ -317,6 +317,45 @@ class GuardiansDefenceGame {
                 return;
             }
 
+        } else if (this.currentAction === 'DUNGEON') {
+            // v3.26: Combat Slot Selection Logic
+
+            // 1. Hero Selection
+            if (card.hero) {
+                if (this.combat.selectedHeroIdx === handIdx) {
+                    this.combat.selectedHeroIdx = null; // Toggle Off
+                } else {
+                    this.combat.selectedHeroIdx = handIdx; // Select
+                }
+                this.updateUI();
+                return;
+            }
+
+            // 2. Damage Source Selection (Weapon or Spell)
+            if (card.equipment || card.type === 'Spell' || card.type === 'MagicBook') {
+                if (this.combat.selectedDamageIdx === handIdx) {
+                    this.combat.selectedDamageIdx = null;
+                } else {
+                    this.combat.selectedDamageIdx = handIdx;
+                }
+                this.updateUI();
+                return;
+            }
+
+            // 3. Aux/Item Selection (Food, Potion, etc.)
+            // Assuming everything else is an Item/Aux for now, or strictly check types
+            if (card.type === 'Item' || card.type === 'Food' || card.type === 'Potion') {
+                if (this.combat.selectedAuxIdx === handIdx) {
+                    this.combat.selectedAuxIdx = null;
+                } else {
+                    this.combat.selectedAuxIdx = handIdx;
+                }
+                this.updateUI();
+                return;
+            }
+
+            this.addLog('此卡片無法在戰鬥中使用。', 'warning');
+
         } else if (this.currentAction === 'REST') {
             if (this.hasDestroyed) return this.addLog('本回合休息已執行過銷毀。', 'warning');
             if (this.selectedDestroyIdx === handIdx) {
