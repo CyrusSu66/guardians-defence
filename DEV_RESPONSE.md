@@ -22,5 +22,6 @@
 - 已提交並推送至 `feature-card-stat-adjustments` 分支。
 - 修正 `visitVillageAction` 與 `restAction` 遺失的問題，確保點擊「進入村莊」與「休息」按鈕正常運作。
 - **全面檢測與修復**：掃描 UI 呼叫並補齊了所有遺失的 Engine 委派方法（含 `confirmRestAndDestroy`, `buyCard`, `performCombat` 等 7 個方法），解決所有 "is not a function" 潛在錯誤。
+- 修正 `endTurnWithAdvance` 遺失問題，確保回合結束與怪物推移邏輯正常執行。
 
 Ready for next tasks!

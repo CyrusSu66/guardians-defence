@@ -254,6 +254,10 @@ class GuardiansDefenceGame {
         this.endTurnWithAdvance();
     }
 
+    endTurnWithAdvance() {
+        this.dungeonEngine.advance();
+    }
+
     playCard(handIdx) {
         // v3.26: Intercept for Merchant Trade Effect
         if (this.pendingMerchantTrade) {
