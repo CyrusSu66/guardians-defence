@@ -91,7 +91,7 @@ class GuardiansDefenceGame {
             this.monsterDeck = this.cardEngine.createMonsterDeck();
 
             this.addLog('正在偵測地城前線...', 'info');
-            this.spawnNextMonster();
+            this.dungeonEngine.spawn();
 
             this.addLog('守護者防線 v3.6.1 模組化引擎全面啟動！', 'success');
             this.refreshMarket();
@@ -443,6 +443,12 @@ class GuardiansDefenceGame {
         }
         // Return a Deep Copy to prevent reference sharing issues
         return JSON.parse(JSON.stringify(item));
+    }
+
+    refreshMarket() {
+        this.addLog('正在刷新契約與物資...', 'info');
+        this.marketItems = this.cardEngine.refreshMarket();
+        this.updateUI();
     }
 
     // --- 實用工具 ---
