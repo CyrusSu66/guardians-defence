@@ -21,6 +21,15 @@
     *   **CSV Sync**: 整合 Google Sheets 同步工具 (`tools/csv_manager.mjs`)。
 *   **預覽連結**: https://guardians-defence-git-feature-card-s-46f360-cyrussu66s-projects.vercel.app
 
+### 2. 用戶反饋與環境確認 (User Feedback & Setup)
+*   **分支名稱**: `feature-user-feedback`
+*   **建立日期**: 2026-01-07
+*   **狀態**: Active / Development
+*   **實作功能**:
+    *   **Env Check**: 確認開發流程與伺服器狀態。
+    *   **Docs Update**: 更新 `DEV_RESPONSE.md` 與 `BRANCH_LOG.md`。
+*   **預覽連結**: https://guardians-defence-git-feature-user-feedback-cyrussu66s-projects.vercel.app
+
 
 ## ✅ 已合併/封存 (Merged/Archived)
 ### 1. 修復怪物進場效果 & 新架構 (Fix Breach & UI Refactor)

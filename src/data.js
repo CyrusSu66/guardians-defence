@@ -35,14 +35,25 @@ const rations = find(ITEMS_DATA, 'basic_rations');
 const marketHeroes = HEROES_DATA.filter(c => c.id !== 'basic_regular_army');
 
 // Items: All except basics
+// Items: All except basics
+// 1. Attack: Weapon, MagicBook
 const marketAttackItems = ITEMS_DATA.filter(c =>
     (c.type === 'Weapon' || c.type === 'MagicBook') && c.id !== 'basic_spear'
 );
 
-const marketVillageItems = ITEMS_DATA.filter(c =>
-    (c.type === 'Item' || c.type === 'LightItem' || c.type === 'Food' || c.type === 'Spell') &&
+// 2. Dungeon Support: Food, LightItem
+const marketDungeonSupport = ITEMS_DATA.filter(c =>
+    (c.type === 'Food' || c.type === 'LightItem') &&
+    c.id !== 'basic_torch' && c.id !== 'basic_rations'
+);
+
+// 3. Other Support: Item, Spell, NPC, Wonder, Device, MagicTool
+const marketOtherSupport = ITEMS_DATA.filter(c =>
+    ['Item', 'Spell', 'NPC', 'Wonder', 'Device', 'MagicTool', 'Debuff'].includes(c.type) &&
     c.id !== 'basic_torch' && c.id !== 'basic_rations' && c.id !== 'basic_spear'
 );
+
+console.log('[Data DEBUG] Market Pools Init:', marketAttackItems.length, marketDungeonSupport.length, marketOtherSupport.length);
 
 export const CARDPOOL = {
     // --- 基礎卡牌 ---
@@ -61,7 +72,8 @@ export const CARDPOOL = {
 
     // --- 物品與裝備 ---
     attackItems: marketAttackItems,
-    villageItems: marketVillageItems,
+    dungeonSupport: marketDungeonSupport,
+    otherSupport: marketOtherSupport,
 
     // --- 特殊 ---
     special: SPECIAL_DATA

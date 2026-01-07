@@ -3,12 +3,12 @@
  * 實作規則：架構重構為 Controller-Engine 模式，提升模組化程度。
  */
 
-import { CARDPOOL, GameState, getCardById } from './data.js';
-import { UIManager } from './ui.js';
-import { CombatEngine } from './engine/CombatEngine.js';
-import { VillageEngine } from './engine/VillageEngine.js';
-import { DungeonEngine } from './engine/DungeonEngine.js';
-import { CardEngine } from './engine/CardEngine.js';
+import { CARDPOOL, GameState, getCardById } from './data.js?v=3.29';
+import { UIManager } from './ui.js?v=3.29';
+import { CombatEngine } from './engine/CombatEngine.js?v=3.29';
+import { VillageEngine } from './engine/VillageEngine.js?v=3.29';
+import { DungeonEngine } from './engine/DungeonEngine.js?v=3.29';
+import { CardEngine } from './engine/CardEngine.js?v=3.29';
 
 class GuardiansDefenceGame {
     constructor() {

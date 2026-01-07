@@ -12,6 +12,19 @@
 ## 2. 開發流程與版本控制 (Development Workflow)
 - **核心原則**: `main` 分支永遠保持為「穩定可釋出 (Stable Release)」狀態。所有新功能開發、Bug 修復或重構，**必須**在獨立的分支上進行。
 
+## 3. 遠端連結與橋接器 (Remote Access & Bridge)
+- **專案主程式 (Game App)**:
+    - 啟動指令: `python3 -m http.server 8080`
+    - Cloudflare Tunnel: `cloudflared tunnel --url http://localhost:8080`
+    - 用途: 外部測試 RWD、遊戲功能驗證。
+
+- **Antigravity 遠端橋接器 (Remote Bridge)**:
+    - 檔案位置: `tools/remote_bridge/bridge.py`
+    - 啟動指令: `python3 tools/remote_bridge/bridge.py` (Port: 8888)
+    - Cloudflare Tunnel: `cloudflared tunnel --url http://localhost:8888`
+    - 用途: **專用於** 讓使用者從外部網路發送文字指令回 Agent 對話框。
+    - **注意**: 這與遊戲主程式分開運作，請勿混淆。橋接器僅為輔助溝通工具。
+
 - **標準作業流程 (SOP)**:
     1.  **建立分支 (Branching)**:
         -   依據任務類型命名：`feature-<name>`, `fix-<bug>`, `refactor-<scope>`。
@@ -27,12 +40,7 @@
         -   指令: `git checkout main` -> `git merge feature-new-mechanic` -> `git push origin main`
     5.  **紀錄**: 若有重大變更，更新 `_DEV_CONFIG/BRANCH_LOG.md`。
 
-## 3. 遠端開發橋接 (Remote Bridge)
-- **目標**: 允許使用者從外部網絡透過手機或瀏覽器控制主要開發環境。
-- **啟動檢查流程**:
-    1. **Tunnel 檢查**: 確認 `cloudflared` 進程是否活躍。
-    2. **Tunnel 網址**: 若使用者詢問或環境重啟，請使用 `grep` 或 `cat` 查找 `tunnel.log` 或終端機輸出來找回公開網址。
-    3. **指令**: `chmod +x cloudflared && ./cloudflared tunnel --url http://localhost:8080 > tunnel.log 2>&1 &`
+
 
 ## 4. 程式碼風格與專案結構
 - **風格**: 保持模組化 (`src/engine/` 分離)，加上清晰的版本與功能註解 (e.g., `// v3.22: RWD Update`).

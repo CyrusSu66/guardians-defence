@@ -122,8 +122,52 @@ export class UIManager {
         this.renderDungeonRanks();
         this.renderMarket();
         this.renderTraining();
+        this.renderTraining();
         this.renderLog();
         this.updateCombatSummary();
+        this.updateMobileNav();
+    }
+
+    // v3.27: Dynamic Mobile Nav
+    updateMobileNav() {
+        const nav = document.getElementById('mobileNav');
+        if (!nav) return;
+
+        const g = this.game;
+        let buttons = [];
+
+        // Helper
+        const createBtn = (id, icon, title, color = '') => {
+            return `<button class="nav-btn" data-target="${id}" title="${title}" style="${color ? 'color:' + color : ''}" onclick="document.getElementById('${id}').scrollIntoView({behavior:'smooth', block:'start'})"><span class="icon">${icon}</span></button>`;
+        };
+
+        // 1. Common: Dungeon is always useful to see status
+        const btnDungeon = createBtn('dungeonPanel', '⚔️', '地城大廳');
+        const btnMarket = createBtn('villagePanel', '🏛️', '村莊市集');
+
+        if (g.state === 'COMBAT') {
+            // Battle: Dungeon, Combat, Market
+            buttons.push(btnDungeon);
+            buttons.push(createBtn('combatPanel', '🗡️', '戰鬥指揮', '#ff5a59'));
+            buttons.push(btnMarket);
+        } else if (g.currentAction === 'REST') {
+            // Rest: Dungeon, Rest, Market
+            buttons.push(btnDungeon);
+            buttons.push(createBtn('restPanel', '💤', '休息區', '#4facfe'));
+            buttons.push(btnMarket);
+        } else if (g.currentAction === 'VILLAGE') {
+            // Village: Dungeon, Market, Training
+            buttons.push(btnDungeon);
+            buttons.push(btnMarket); // Focus on Market
+            buttons.push(createBtn('trainingPanel', '🏋️', '訓練場'));
+        } else {
+            // Default (Idle/Draw/Selection): Dungeon, Action, Market
+            buttons.push(btnDungeon);
+            buttons.push(createBtn('actionSelectPanel', '🚩', '行動選擇'));
+            buttons.push(btnMarket);
+        }
+
+        nav.innerHTML = buttons.join('');
     }
 
     renderHand() {
@@ -535,25 +579,48 @@ export class UIManager {
         marketGrid.innerHTML = '';
         const g = this.game;
 
-        const allItems = [
-            ...g.marketItems.heroes,
-            ...g.marketItems.items,
-            ...g.marketItems.basics,
-            ...(g.marketItems.spells || [])
-        ];
+        const renderSection = (title, items) => {
+            if (!items || items.length === 0) return;
 
-        allItems.forEach(card => {
-            const canAfford = g.currentGold >= card.cost;
-            const onClick = () => {
-                if (canAfford && !g.hasBought) this.game.buyCard(card.id, card.cost);
-            };
+            // Section Header
+            const header = document.createElement('h4');
+            header.className = 'market-section-title';
+            header.style.gridColumn = '1 / -1'; // Full width
+            header.style.marginTop = '15px';
+            header.style.marginBottom = '5px';
+            header.style.color = '#aaa';
+            header.style.fontSize = '14px';
+            header.textContent = title;
+            marketGrid.appendChild(header);
 
-            const cardEl = this.renderCard(card, onClick, false, true);
-            if (!canAfford) cardEl.classList.add('disabled');
-            if (g.hasBought) cardEl.classList.add('bought');
+            items.forEach(card => {
+                const canAfford = g.currentGold >= card.cost;
+                const onClick = () => {
+                    if (canAfford && !g.hasBought) this.game.buyCard(card.id, card.cost);
+                };
 
-            marketGrid.appendChild(cardEl);
-        });
+                const cardEl = this.renderCard(card, onClick, false, true);
+                if (!canAfford) cardEl.classList.add('disabled');
+                if (g.hasBought) cardEl.classList.add('bought');
+
+                marketGrid.appendChild(cardEl);
+            });
+        };
+
+        // 1. Heroes
+        renderSection('🛡️ 契約英雄', g.marketItems.heroes);
+
+        // 2. Attack
+        renderSection('⚔️ 攻擊裝備', g.marketItems.attackItems);
+
+        // 3. Dungeon Support
+        renderSection('🎒 探險補給', g.marketItems.dungeonItems);
+
+        // 4. Others
+        renderSection('🔮 特殊道具', g.marketItems.otherItems);
+
+        // 5. Basics (Moved to bottom)
+        renderSection('📦 基礎物資', g.marketItems.basics);
     }
 
     renderTraining() {

@@ -1,4 +1,4 @@
-import { CARDPOOL } from '../data.js';
+import { CARDPOOL } from '../data.js?v=3.29';
 
 /**
  * CardEngine - 負責卡牌庫查詢、隨機數值生成、市集刷新與怪物牌庫初始化。
@@ -80,24 +80,32 @@ export class CardEngine {
      */
     refreshMarket() {
         // 1. 基礎卡 (Basic) - 始終供應
-        const basics = [...CARDPOOL.basic]; // No id needed for logic here, just pass array? Or map to instances?
-        // Wait, init logic used IDs. Here we return defining objects or instances?
-        // Let's keep consistent.
+        const basics = [...CARDPOOL.basic];
 
         // 2. 英雄 (Heroes) - 隨機 4 名 Level 1
-        // Keeping original logic as getRandomHeroes is not defined in the provided context.
         const heroes = this.game.shuffleArray(CARDPOOL.heroes.filter(h => h.hero.level === 1)).slice(0, 4);
 
         // 3. 物品/法術 (Items/Spells) 
-        // v3.22.4: 改為 2 AttackItems + 2 VillageItems (Total 4)
+        // New Logic v3.27.NavFix:
+        // - Attack: 2 (Weapon, MagicBook)
+        // - Dungeon: 2 (Food, LightItem)
+        // - Other: 4 (Everything else)
+
         const attackPool = [...CARDPOOL.attackItems];
-        const villagePool = [...CARDPOOL.villageItems];
+        const dungeonPool = [...CARDPOOL.dungeonSupport];
+        const otherPool = [...CARDPOOL.otherSupport];
 
-        const randomAttack = attackPool.sort(() => 0.5 - Math.random()).slice(0, 2);
-        const randomVillage = villagePool.sort(() => 0.5 - Math.random()).slice(0, 2);
+        const randomAttack = this.game.shuffleArray(attackPool).slice(0, 2);
+        const randomDungeon = this.game.shuffleArray(dungeonPool).slice(0, 2);
+        const randomOther = this.game.shuffleArray(otherPool).slice(0, 4);
 
-        const items = [...randomAttack, ...randomVillage];
-
-        return { basics: basics.slice(0, 4), heroes, items };
+        // Return structured object for UI to render in sections
+        return {
+            basics: basics.slice(0, 4),
+            heroes,
+            attackItems: randomAttack,
+            dungeonItems: randomDungeon,
+            otherItems: randomOther
+        };
     }
 }
