@@ -220,7 +220,7 @@ export const HEROES_DATA = [
             "level": 2,
             "series": "Elf",
             "magicAttack": 3,
-            "strength": 2,
+            "strength": 1,
             "xpToUpgrade": 6,
             "upgradeToId": "hero_elf_lv3"
         },
@@ -245,7 +245,7 @@ export const HEROES_DATA = [
             "level": 3,
             "series": "Elf",
             "magicAttack": 4,
-            "strength": 3,
+            "strength": 2,
             "xpToUpgrade": 0,
             "upgradeToId": null
         },
