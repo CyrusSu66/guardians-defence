@@ -58,7 +58,13 @@ export class CombatEngine {
         g.playedCards.forEach(c => totalLight += (c.light || 0));
 
         // 3. 計算地城需求與懲罰
-        const lightReq = g.combat.targetRank + (auras.lightReqMod || 0);
+        // v3.32: Local Light Requirement (Check Target Monster)
+        let localLightMod = 0;
+        if (monster && monster.abilities && monster.abilities.aura === 'light_req_plus_1') {
+            localLightMod = 1;
+        }
+
+        const lightReq = g.combat.targetRank + (auras.lightReqMod || 0) + localLightMod;
         // v3.21.2: 修正照明懲罰，每欠缺 1 點照明扣除 2 點戰力
         const lightPenalty = Math.max(0, lightReq - totalLight) * 2;
 
@@ -324,8 +330,9 @@ export class CombatEngine {
                 sources.auraSources.push(`[${m.name}] 力量需求+1`);
             }
             if (effect === 'light_req_plus_1') {
-                sources.lightReqMod = 1; // v3.11: 最高 +1
-                sources.auraSources.push(`[${m.name}] 照明需求+1`);
+                // v3.32: Changed to Local Effect (only affects self)
+                // sources.lightReqMod = 1; 
+                // sources.auraSources.push(`[${m.name}] 照明需求+1`);
             }
         });
         return sources;

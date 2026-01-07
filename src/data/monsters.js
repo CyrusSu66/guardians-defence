@@ -180,7 +180,7 @@ export const MONSTERS_DATA = [
         "desc": "騎乘著黑馬的恐怖騎士，他的存在本身就會吞噬周圍的光芒。",
         "count": 3,
         "abilities": {
-            "abilities_desc": "【持續】地城照明需求 +1 (最高累計 1)。",
+            "abilities_desc": "【持續】攻擊此怪物時，照明需求 +1。",
             "aura": "light_req_plus_1"
         }
     },
@@ -491,7 +491,7 @@ export const MONSTERS_DATA = [
         "monster": { "tier": 1, "hp": 2, "xpGain": 1, "breachDamage": 1 },
         "desc": "飄忽不定的靈體火焰，會干擾光源使探險變得困難。",
         "count": 4,
-        "abilities": { "abilities_desc": "【持續】地城照明需求 +1 (最高累計 1)。", "aura": "light_req_plus_1" }
+        "abilities": { "abilities_desc": "【持續】攻擊此怪物時，照明需求 +1。", "aura": "light_req_plus_1" }
     },
     {
         "id": "mon_bomb",

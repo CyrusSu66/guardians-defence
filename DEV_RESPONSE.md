@@ -3,7 +3,7 @@
 ## 📌 最新部署狀態
 - **GitHub Commit**: (即將推送) `fix: hero description newlines and balance updates`
 - **部署分支**: `feature-user-feedback`
-- **版本號**: `v3.31`
+- **版本號**: `v3.28 DataTest`
 
 ## ✅ 本次更新總結 (Session Summary)
 
