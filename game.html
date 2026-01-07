@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>守護者防線 - 核心系統 v1.0</title>
-    <link rel="stylesheet" href="style.css?v=3.27.NavFix">
+    <link rel="stylesheet" href="style.css?v=3.29.Drag">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
@@ -284,15 +284,85 @@
             });
         }
 
-        // Mobile Nav Logic
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
+        // Mobile Nav Logic (Draggable)
+        const nav = document.getElementById('mobileNav');
+        let isDragging = false;
+        let startY, startTop;
+        const dragThreshold = 5; // Pixels to distinguish click from drag
+        let moveDistance = 0;
+
+        // Prevent click if dragged
+        nav.addEventListener('click', (e) => {
+            if (moveDistance > dragThreshold) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, true);
+
+        // Touch Start
+        nav.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            startY = e.touches[0].clientY;
+            const style = window.getComputedStyle(nav);
+            startTop = parseInt(style.top, 10);
+            moveDistance = 0;
+            nav.style.transition = 'none'; // Disable transition during drag
+        }, { passive: false });
+
+        // Touch Move
+        nav.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault(); // Prevent scrolling
+            const currentY = e.touches[0].clientY;
+            const deltaY = currentY - startY;
+            moveDistance = Math.abs(deltaY);
+
+            nav.style.top = (startTop + deltaY) + 'px';
+            nav.style.transform = 'translateY(0)'; // Remove centering transform once dragged
+        }, { passive: false });
+
+        // Touch End
+        nav.addEventListener('touchend', () => {
+            isDragging = false;
+            nav.style.transition = 'opacity 0.3s'; // Restore transition
+        });
+
+        // Mouse Events (for Desktop testing)
+        nav.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startY = e.clientY;
+            const style = window.getComputedStyle(nav);
+            startTop = parseInt(style.top, 10);
+            moveDistance = 0;
+            nav.style.transition = 'none';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const currentY = e.clientY;
+            const deltaY = currentY - startY;
+            moveDistance = Math.abs(deltaY);
+
+            nav.style.top = (startTop + deltaY) + 'px';
+            nav.style.transform = 'translateY(0)';
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+            nav.style.transition = 'opacity 0.3s';
+        });
+
+        // Button Click Delegation (Only if not dragged)
+        nav.addEventListener('click', (e) => {
+            const btn = e.target.closest('.nav-btn');
+            if (btn && moveDistance <= dragThreshold) {
                 const targetId = btn.dataset.target;
                 const targetEl = document.getElementById(targetId);
                 if (targetEl) {
                     targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
-            });
+            }
         });
     </script>
 </body>
