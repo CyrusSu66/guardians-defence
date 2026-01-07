@@ -268,7 +268,7 @@ export const ITEMS_DATA = [
         "subTypes": ["Merchant"],
         "cost": 4, "vp": 0, "goldValue": 1, "light": 0,
         "desc": "只要有錢，什麼都可以交易...包括你的垃圾。",
-        "abilities": { "abilities_desc": "💰 提供 1 金幣\\n🏠 村莊中：【非法交易】銷毀一張手牌，獲得其 2 倍金幣 (最少 1 金)", "onVillage": "trade_trash_for_gold" },
+        "abilities": { "abilities_desc": "💰 提供 1 金幣\n🏠 村莊中：【非法交易】銷毀一張手牌，獲得其 2 倍金幣 (最少 1 金)", "onVillage": "trade_trash_for_gold" },
         "equipment": { "attack": 0, "magicAttack": 0, "weight": 0 }
     },
     // --- Batch 2 Items (v3.26) ---

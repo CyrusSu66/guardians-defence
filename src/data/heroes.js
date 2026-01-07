@@ -121,7 +121,7 @@ export const HEROES_DATA = [
             "upgradeToId": "hero_amazon_lv2"
         },
         "abilities": {
-            "abilities_desc": "⚔️ 戰鬥中：若裝備獵弓，攻擊力+1\\n🏆 戰勝後：戰勝怪物得 1 VP",
+            "abilities_desc": "⚔️ 戰鬥中：若裝備獵弓，攻擊力+1\n🏆 戰勝後：戰勝怪物得 1 VP",
             "onBattle": "synergy_bow",
             "onVictory": "gain_1vp"
         }
@@ -148,7 +148,7 @@ export const HEROES_DATA = [
             "upgradeToId": "hero_amazon_lv3"
         },
         "abilities": {
-            "abilities_desc": "⚔️ 戰鬥中：若裝備獵弓，攻擊力+2\\n🏆 戰勝後：戰勝怪物得 2 VP",
+            "abilities_desc": "⚔️ 戰鬥中：若裝備獵弓，攻擊力+2\n🏆 戰勝後：戰勝怪物得 2 VP",
             "onBattle": "synergy_bow_2",
             "onVictory": "gain_2vp"
         }
@@ -174,7 +174,7 @@ export const HEROES_DATA = [
             "upgradeToId": null
         },
         "abilities": {
-            "abilities_desc": "⚔️ 戰鬥中：若裝備獵弓，攻擊力+3\\n🏆 戰勝後：戰勝怪物得 3 VP",
+            "abilities_desc": "⚔️ 戰鬥中：若裝備獵弓，攻擊力+3\n🏆 戰勝後：戰勝怪物得 3 VP",
             "onBattle": "synergy_bow_3",
             "onVictory": "gain_3vp"
         }
@@ -450,7 +450,7 @@ export const HEROES_DATA = [
             "upgradeToId": "hero_grail_lv3"
         },
         "abilities": {
-            "abilities_desc": "🏠 村莊中：摧毀任意一張卡\\n🏠 村莊中：修復 1 點魔法護罩",
+            "abilities_desc": "🏠 村莊中：摧毀任意一張卡\n🏠 村莊中：修復 1 點魔法護罩",
             "onVillage": "destroy_any_heal_1"
         }
     },
