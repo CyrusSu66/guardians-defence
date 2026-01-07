@@ -1,5 +1,5 @@
 /**
- * 《守護者防線：雷霆遺產》資料庫 (v3.27 Modularized)
+ * 《守護者防線：雷霆遺產》資料庫 (v3.28 Modularized)
  * Refactored to import from sub-modules for easier management.
  */
 
