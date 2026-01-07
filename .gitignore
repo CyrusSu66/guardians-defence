@@ -4,3 +4,6 @@ dist/
 tools/remote_bridge/
 brain/
 *.log
+
+# Private Tools
+tools/data_sync/

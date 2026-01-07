@@ -9,19 +9,19 @@
 我們在 `_DEV_CONFIG/personas/` 目錄下定義了以下角色，用於不同的開發階段。
 
 ### A. 遊戲企劃 (Game Designer)
-*   **檔案路徑**: `_DEV_CONFIG/personas/game_designer.md`
+*   **檔案路徑**: `_DEV_CONFIG/personas/Role_game_designer.md`
 *   **何時使用**: 當您需要討論卡牌數值平衡、劇情設定、或覺得遊戲「不好玩」的時候。
-*   **啟動指令**: 在對話框輸入 `@game_designer.md 請進入此模式`。
+*   **啟動指令**: 在對話框輸入 `@Role_game_designer.md 請進入此模式`。
 *   **特性**: 會關注使用者體驗 (UX)，使用較多表情符號，避免談論程式細節。
 
 ### B. 資深工程師 (Senior Engineer)
-*   **檔案路徑**: `_DEV_CONFIG/personas/senior_engineer.md`
+*   **檔案路徑**: `_DEV_CONFIG/personas/Role_senior_engineer.md`
 *   **何時使用**: 實作新功能、重構程式碼、或進行 Code Review 時。
-*   **啟動指令**: 在對話框輸入 `@senior_engineer.md 請進入此模式`。
+*   **啟動指令**: 在對話框輸入 `@Role_senior_engineer.md 請進入此模式`。
 *   **特性**: 嚴格遵守 ESLint，注重效能與模組化，拒絕 Magic Numbers。
 
 ### C. 預設助理 (Default)
-*   **檔案路徑**: `_DEV_CONFIG/personas/default_agent.md`
+*   **檔案路徑**: `_DEV_CONFIG/personas/Role_default_agent.md`
 *   **何時使用**: 想回到一般狀態時。
 *   **特性**: 平衡、樂於助人、無特定限制。
 

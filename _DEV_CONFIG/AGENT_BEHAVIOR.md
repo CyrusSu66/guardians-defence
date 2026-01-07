@@ -9,13 +9,23 @@
     - 檔案格式應包含：「執行項目」、「遇到的問題」以及「下一步建議」。
     - 這能確保使用者在外部測試網站上也能看到最新的開發進度回報。
 
-## 2. 版本控制 (Git/GitHub)
-- **規則**: 每次完成一段完整的程式碼修改或功能實作後，**必須**自動執行 `git push` 到遠端 `main` 分支。
-- **流程**:
-    1. `git add <files>`
-    2. `git commit -m "Type: Description"`
-    3. `git push origin main`
-- **時機**: 不要累積太多變更，保持小步快跑的提交頻率。
+## 2. 開發流程與版本控制 (Development Workflow)
+- **核心原則**: `main` 分支永遠保持為「穩定可釋出 (Stable Release)」狀態。所有新功能開發、Bug 修復或重構，**必須**在獨立的分支上進行。
+
+- **標準作業流程 (SOP)**:
+    1.  **建立分支 (Branching)**:
+        -   依據任務類型命名：`feature-<name>`, `fix-<bug>`, `refactor-<scope>`。
+        -   指令: `git checkout -b feature-new-mechanic`
+    2.  **開發與提交 (Commit)**:
+        -   保持小步快跑，頻繁提交到該分支。
+        -   指令: `git add .` -> `git commit -m "feat: add logic..."` -> `git push origin feature-new-mechanic`
+    3.  **部署預覽 (Preview)**:
+        -   推送到分支後，Vercel 會自動生成預覽網址 (e.g., `*-git-<branch>-*.vercel.app`)。
+        -   **必須**提供此連結給使用者進行測試驗證。
+    4.  **驗證與合併 (Merge)**:
+        -   當使用者確認功能無誤後，才可合併回主線。
+        -   指令: `git checkout main` -> `git merge feature-new-mechanic` -> `git push origin main`
+    5.  **紀錄**: 若有重大變更，更新 `_DEV_CONFIG/BRANCH_LOG.md`。
 
 ## 3. 遠端開發橋接 (Remote Bridge)
 - **目標**: 允許使用者從外部網絡透過手機或瀏覽器控制主要開發環境。
@@ -31,23 +41,10 @@
     - 行動版 (Mobile): 單欄垂直堆疊佈局，優化手指點擊區域，狀態數值採堆疊顯示 (Stacked Stats) 以節省空間。
     - 確保所有按鈕在觸控裝置上易於點擊 (最小高度 44px)。
 
-## 5. 部署架構與分支策略 (Deployment & Branching)
-- **平台架構 (Vercel Integration)**:
-    - 此專案與 **Vercel** 進行 CI/CD 整合，任何推送到 GitHub 的變更都會自動觸發 Vercel 建置。
-    - **正式站 (Production)**: 對應 `main` 分支 => `https://guardians-defence.vercel.app/`
-    - **預覽站 (Preview)**: 對應任何非 main 的分支 => Vercel 會自動生成獨立網址 (e.g., `*-git-<branch>-*.vercel.app`)。
-
-- **開發流程 (Feature Branch Workflow)**:
-    1. **建立分支**: 當開發重大功能或高風險重構時，請使用 `git checkout -b <branch-name>` 建立新分支。
-    2. **開發與推送**: 在新分支進行開發，完成後推送 (`git push origin <branch-name>`)。
-    3. **預覽確認**: 取得 Vercel 生成的預覽網址，提供給使用者測試。
-    4. **紀錄**: 更新 `_DEV_CONFIG/BRANCH_LOG.md` 以追蹤目前分支狀態。
-    5. **合併**: 確認無誤後，發起 Pull Request (PR) 或直接合併回 `main`。
-
-## 6. 資料同步規範
+## 5. 資料同步規範 (Data Sync)
 - **Google Sheets**: 卡牌數值維護於外部試算表。
 - **Trigger**: 收到「同步 data」指令時，應參照 `_DEV_CONFIG/DATA_SYNC_GUIDE.md` 執行更新。
 - **Source of Truth**: 更新後，以 `src/data/*.js` 為最終執行依據。
 
 ---
-*Last Updated: v3.26.14 (2026-01-05)*
+*Last Updated: v3.27.0 (2026-01-07)*

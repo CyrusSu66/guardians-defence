@@ -18,7 +18,7 @@
 
 ## 3. 同步指令
 當數值調整完畢後，發送以下指令給 AI 代理人：
-> "同步 data" 或 "更新卡牌數值"
+> "同步 data" 或 "更新卡牌數值" (將自動執行 `node tools/data_sync/csv_manager.mjs sync`)
 
 **代理人執行邏輯**:
 1.  讀取上述 GID 對應的 CSV Export URL。

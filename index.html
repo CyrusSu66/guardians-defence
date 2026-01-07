@@ -163,7 +163,7 @@
             document.getElementById('manualPanel').style.display = 'block';
             fetch('Game_Rule/Game_Manual_v3.26.md') // Updated to correct manual file
                 .then(r => r.text())
-                .then(text => document.getElementById('manualText').innerHTML = '<pre style="white-space: pre-wrap;">' + text.substring(0, 1000) + '... (完整版請見 GDD)</pre>');
+                .then(text => document.getElementById('manualText').innerHTML = '<pre style="white-space: pre-wrap;">' + text + '</pre>');
         }
 
         function showDevComm() {
