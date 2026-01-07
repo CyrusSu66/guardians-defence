@@ -41,7 +41,7 @@ export const HEROES_DATA = [
             "series": "Sevin",
             "magicAttack": 0,
             "strength": 2,
-            "xpToUpgrade": 4,
+            "xpToUpgrade": 3,
             "upgradeToId": "hero_sevin_lv2"
         },
         "abilities": {
@@ -117,7 +117,7 @@ export const HEROES_DATA = [
             "series": "Amazon",
             "magicAttack": 0,
             "strength": 2,
-            "xpToUpgrade": 4,
+            "xpToUpgrade": 3,
             "upgradeToId": "hero_amazon_lv2"
         },
         "abilities": {
@@ -196,7 +196,7 @@ export const HEROES_DATA = [
             "series": "Elf",
             "magicAttack": 2,
             "strength": 1,
-            "xpToUpgrade": 4,
+            "xpToUpgrade": 3,
             "upgradeToId": "hero_elf_lv2"
         },
         "abilities": {
@@ -271,7 +271,7 @@ export const HEROES_DATA = [
             "series": "Dwarf",
             "magicAttack": 0,
             "strength": 2,
-            "xpToUpgrade": 4,
+            "xpToUpgrade": 3,
             "upgradeToId": "hero_dwarf_lv2"
         },
         "abilities": {
@@ -346,7 +346,7 @@ export const HEROES_DATA = [
             "series": "Loric",
             "magicAttack": 0,
             "strength": 1,
-            "xpToUpgrade": 4,
+            "xpToUpgrade": 3,
             "upgradeToId": "hero_loric_lv2"
         },
         "abilities": {
@@ -421,7 +421,7 @@ export const HEROES_DATA = [
             "series": "Grail",
             "magicAttack": 1,
             "strength": 1,
-            "xpToUpgrade": 4,
+            "xpToUpgrade": 3,
             "upgradeToId": "hero_grail_lv2"
         },
         "abilities": {
@@ -486,7 +486,7 @@ export const HEROES_DATA = [
         "type": "Hero", "subTypes": ["Cleric", "Fighter"],
         "cost": 4, "vp": 1, "goldValue": 0, "light": 0,
         "desc": "發誓剷除邪惡的信徒，對不死生物毫不留情。",
-        "hero": { "level": 1, "series": "Paladin", "magicAttack": 1, "strength": 2, "xpToUpgrade": 4, "upgradeToId": "hero_paladin_lv2" },
+        "hero": { "level": 1, "series": "Paladin", "magicAttack": 1, "strength": 2, "xpToUpgrade": 3, "upgradeToId": "hero_paladin_lv2" },
         "abilities": { "abilities_desc": "⚔️ 戰鬥中：對不死/惡魔系怪物攻擊力+1", "onBattle": "synergy_undead_demon" }
     },
     {
@@ -514,7 +514,7 @@ export const HEROES_DATA = [
         "type": "Hero", "subTypes": ["Fighter"],
         "cost": 4, "vp": 1, "goldValue": 0, "light": 0,
         "desc": "修煉身心的武者，他的拳頭能擊穿盔甲與靈體。",
-        "hero": { "level": 1, "series": "Monk", "magicAttack": 0, "strength": 2, "xpToUpgrade": 4, "upgradeToId": "hero_monk_lv2" },
+        "hero": { "level": 1, "series": "Monk", "magicAttack": 0, "strength": 1, "xpToUpgrade": 3, "upgradeToId": "hero_monk_lv2" },
         "abilities": { "abilities_desc": "⚔️ 戰鬥中：無視怪物的免疫屬性 (物理/魔法)", "onBattle": "ignore_immunity" }
     },
     {
@@ -523,7 +523,7 @@ export const HEROES_DATA = [
         "type": "Hero", "subTypes": ["Fighter"],
         "cost": 7, "vp": 2, "goldValue": 0, "light": 0,
         "desc": "精通氣功的高手，任何防禦在他眼中都如同薄紙。",
-        "hero": { "level": 2, "series": "Monk", "magicAttack": 1, "strength": 3, "xpToUpgrade": 6, "upgradeToId": "hero_monk_lv3" },
+        "hero": { "level": 2, "series": "Monk", "magicAttack": 1, "strength": 2, "xpToUpgrade": 6, "upgradeToId": "hero_monk_lv3" },
         "abilities": { "abilities_desc": "⚔️ 戰鬥中：無視免疫，且額外+1 攻擊力", "onBattle": "ignore_immunity_bonus_1" }
     },
     {
@@ -532,7 +532,7 @@ export const HEROES_DATA = [
         "type": "Hero", "subTypes": ["Fighter"],
         "cost": 10, "vp": 3, "goldValue": 0, "light": 0,
         "desc": "武道的極致，他的每一擊都蘊含著破壞法則的力量。",
-        "hero": { "level": 3, "series": "Monk", "magicAttack": 2, "strength": 4, "xpToUpgrade": 0, "upgradeToId": null },
+        "hero": { "level": 3, "series": "Monk", "magicAttack": 2, "strength": 3, "xpToUpgrade": 0, "upgradeToId": null },
         "abilities": { "abilities_desc": "⚔️ 戰鬥中：無視免疫，且額外+2 攻擊力", "onBattle": "ignore_immunity_bonus_2" }
     },
     // --- Alchemist Series (鍊金術士) ---
@@ -542,7 +542,7 @@ export const HEROES_DATA = [
         "type": "Hero", "subTypes": ["Wizard"],
         "cost": 4, "vp": 1, "goldValue": 0, "light": 0,
         "desc": "熱衷於研究物品性質的學者，能發揮道具的最大效能。",
-        "hero": { "level": 1, "series": "Alchemist", "magicAttack": 1, "strength": 1, "xpToUpgrade": 4, "upgradeToId": "hero_alchemist_lv2" },
+        "hero": { "level": 1, "series": "Alchemist", "magicAttack": 1, "strength": 1, "xpToUpgrade": 3, "upgradeToId": "hero_alchemist_lv2" },
         "abilities": { "abilities_desc": "⚔️ 戰鬥中：裝備的道具數值加倍 (X2)", "onBattle": "synergy_item_2x" }
     },
     {
@@ -570,8 +570,8 @@ export const HEROES_DATA = [
         "type": "Hero", "subTypes": ["Thief"], // Use Thief for high DEX/CHA flavor
         "cost": 4, "vp": 1, "goldValue": 0, "light": 0,
         "desc": "流浪的歌者，他的歌聲能隨著敵人的強大而越發激昂。",
-        "hero": { "level": 1, "series": "Bard", "magicAttack": 1, "strength": 1, "xpToUpgrade": 4, "upgradeToId": "hero_bard_lv2" },
-        "abilities": { "abilities_desc": "⚔️ 戰鬥中：攻擊力增加量 = 當前地城階級 (Rank)", "onBattle": "scale_with_rank" }
+        "hero": { "level": 1, "series": "Bard", "magicAttack": 1, "strength": 1, "xpToUpgrade": 3, "upgradeToId": "hero_bard_lv2" },
+        "abilities": { "abilities_desc": "⚔️ 戰鬥中：魔攻增加量 = 當前地城階級 (Rank)", "onBattle": "scale_magic_rank" }
     },
     {
         "id": "hero_bard_lv2",
@@ -580,7 +580,7 @@ export const HEROES_DATA = [
         "cost": 7, "vp": 2, "goldValue": 0, "light": 1,
         "desc": "他的英雄史詩能激勵人心，面對越強的地城，戰力越高。",
         "hero": { "level": 2, "series": "Bard", "magicAttack": 1, "strength": 2, "xpToUpgrade": 6, "upgradeToId": "hero_bard_lv3" },
-        "abilities": { "abilities_desc": "⚔️ 戰鬥中：攻擊力增加量 = 地城階級 (Rank) + 1", "onBattle": "scale_with_rank_plus_1" }
+        "abilities": { "abilities_desc": "⚔️ 戰鬥中：魔攻增加量 = 地城階級 (Rank) + 1", "onBattle": "scale_magic_rank_plus_1" }
     },
     {
         "id": "hero_bard_lv3",
@@ -589,6 +589,6 @@ export const HEROES_DATA = [
         "cost": 10, "vp": 3, "goldValue": 0, "light": 1,
         "desc": "傳說中的演奏家，連巨龍都會被他的樂曲所震撼。",
         "hero": { "level": 3, "series": "Bard", "magicAttack": 2, "strength": 2, "xpToUpgrade": 0, "upgradeToId": null },
-        "abilities": { "abilities_desc": "⚔️ 戰鬥中：攻擊力增加量 = 地城階級 (Rank) + 2", "onBattle": "scale_with_rank_plus_2" }
+        "abilities": { "abilities_desc": "⚔️ 戰鬥中：魔攻增加量 = 地城階級 (Rank) + 2", "onBattle": "scale_magic_rank_plus_2" }
     }
 ];

@@ -187,6 +187,10 @@ class GuardiansDefenceGame {
         this.villageEngine.promoteRegular(handIdx, marketHeroId);
     }
 
+    upgradeHero(cardId) {
+        this.villageEngine.upgrade(cardId);
+    }
+
     // --- Delegated Actions (Combat & Dungeon) ---
 
     selectCombatTarget(rank) {

@@ -238,14 +238,14 @@ export class CombatEngine {
                 if (effect.endsWith('_plus_2')) { magAtk += 2; bonuses.push('賢者智慧: +2 Mag'); }
             }
 
-            // v3.26: Bard (Scale with Rank)
-            if (effect.startsWith('scale_with_rank')) {
+            // v3.26: Bard (Scale Magic with Rank)
+            if (effect.startsWith('scale_magic_rank')) {
                 const rankVal = this.game.combat.targetRank || 1; // 1, 2, or 3
                 let bonus = rankVal;
                 if (effect.endsWith('plus_1')) bonus += 1;
                 if (effect.endsWith('plus_2')) bonus += 2;
-                physAtk += bonus;
-                bonuses.push(`英雄史詩(Rank ${rankVal}): +${bonus} Atk`);
+                magAtk += bonus;
+                bonuses.push(`英雄史詩(Rank ${rankVal}): +${bonus} 魔攻`);
             }
 
             // v3.26: Monk (Ignore Immunity)

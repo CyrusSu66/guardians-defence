@@ -24,8 +24,12 @@ export class CardEngine {
      */
     createMonsterDeck() {
         // 1. 隨機選出 3 個種族
-        let groups = ['Vermin', 'Undead', 'Darkness', 'Ancient'];
-        groups = this.game.shuffleArray(groups).slice(0, 3);
+        // 1. 動態取得所有可用種族 (v3.30 Dynamic Race Selection)
+        const allRaces = [...new Set(CARDPOOL.monsters.flatMap(m => m.subTypes))];
+        console.log(`[CardEngine] 可選種族池 (${allRaces.length}): ${allRaces.join(', ')}`);
+
+        // 2. 隨機選出 3 個種族
+        const groups = this.game.shuffleArray(allRaces).slice(0, 3);
         console.log(`[CardEngine] 本局選定種族: ${groups.join(', ')}`);
 
         let deckT1 = [];
