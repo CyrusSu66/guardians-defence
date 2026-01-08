@@ -2,23 +2,97 @@
 
 本專案使用 Google Sheets 作為卡牌數值平衡的外部編輯器，請參照以下流程進行同步。
 
-## 1. Google Sheets 資訊
-*   **試算表連結**: [Guardians Defence Card Data](https://docs.google.com/spreadsheets/d/1ThbZrssjkdZHHY__mxu_pakMSpXZC431ePoZUVjvDw4/edit?usp=sharing)
-*   **分頁 ID (GID)**:
-    *   **Heroes**: `gid=0`
-    *   **Monsters**: `gid=2112158519`
-    *   **Items**: `gid=1755505430`
+## 1. Google Sheets 連結
+[Primal Sun - Card Data](https://docs.google.com/spreadsheets/d/1ThbZrssjkdZHHY__mxu_pakMSpXZC431ePoZUVjvDw4/edit?gid=1755505430#gid=1755505430)
+
+*   **Heroes**: `gid=0`
+*   **Monsters**: `gid=2112158519`
+*   **Items**: `gid=1755505430`
+
 
 ## 2. 欄位結構 (Schema)
-為了確保轉換正確，Google Sheets 的欄位必須保持以下名稱 (Header)：
 
-*   **Heroes**: `ID`, `Name`, `Cost`, `VP`, `STR`, `MagATK`, `Light`, `Desc`, `Hero_Series`, `Hero_Level`, `Ability_Text`, `Ability_Key_Battle`, `Ability_Key_Victory`, `Ability_Key_Village`, `Upgrade_Cost`, `Next_ID`
-*   **Monsters**: `ID`, `Name`, `Tier`, `HP`, `XP`, `Breach_Dmg`, `Type`, `Desc`, `Ability_Text`, `Ability_Key_Breach`, `Ability_Key_Aura`, `Ability_Key_Battle`, `Count`
-*   **Items**: `ID`, `Name`, `Type`, `SubTypes`, `Cost`, `Gold`, `Light`, `Equip_ATK`, `Equip_MagATK`, `Equip_Weight`, `Desc`, `Ability_Text`, `Ability_Key_Battle`, `Ability_Key_Village`
+以下定義 CSV 欄位名稱與 JavaScript 物件屬性的對應關係。
+*   JSON 屬性名稱 (Key) 嚴格遵循 `src/data/*.js` 中的定義。
+*   CSV Header 為 Google Sheets 中的欄位名稱。
+
+### Heroes (英雄)
+| CSV Header | JSON Key (src/data/heroes.js) | 說明 |
+| :--- | :--- | :--- |
+| `ID` | `id` | 唯一識別碼 |
+| `Name` | `name` | 名稱 |
+| `Type` | `type` | 類型 (Hero) |
+| `SubTypes` | `subTypes` | 子類型 (分號分隔) |
+| `Cost` | `cost` | 招募費用 |
+| `VP` | `vp` | 勝利點數 |
+| `Gold` | `goldValue` | 金幣價值 |
+| `Light` | `light` | 光照提供的光亮值 |
+| `Desc` | `desc` | 描述 |
+| `Hero_Series` | `hero.series` | 英雄系列 |
+| `Hero_Level` | `hero.level` | 英雄等級 |
+| `MagATK` | `hero.magicAttack` | 魔法攻擊力 |
+| `STR` | `hero.strength` | 力量 |
+| `Upgrade_Cost` | `hero.xpToUpgrade` | 升級所需 XP |
+| `Next_ID` | `hero.upgradeToId` | 升級後 ID |
+| `Ability_Text` | `abilities.abilities_desc` | 能力描述文字 |
+| `Ability_Key_Battle` | `abilities.onBattle` | 戰鬥觸發 Key |
+| `Ability_Key_Victory` | `abilities.onVictory` | 勝利觸發 Key |
+| `Ability_Key_Village` | `abilities.onVillage` | 村莊觸發 Key |
+*注意：Hero 物件不包含 `Count` 屬性。*
+
+### Monsters (怪物)
+| CSV Header | JSON Key (src/data/monsters.js) | 說明 |
+| :--- | :--- | :--- |
+| `ID` | `id` | 唯一識別碼 |
+| `Name` | `name` | 名稱 |
+| `Type` | `type` | 類型 (Monster) |
+| `SubTypes` | `subTypes` | 子類型 |
+| `Tier` | `monster.tier` | 階級 |
+| `HP` | `monster.hp` | 生命值 |
+| `XP` | `monster.xpGain` | 擊殺經驗值 |
+| `Breach_Dmg` | `monster.breachDamage` | 突破傷害 |
+| `Desc` | `desc` | 描述 |
+| `Count` | `monster.count` | 牌庫數量 |
+| `Ability_Text` | `abilities.abilities_desc` | 能力描述 |
+| `Ability_Key_Breach` | `abilities.onBreach` | 突破觸發 Key |
+| `Ability_Key_Aura` | `abilities.aura` | 光環 Key |
+| `Ability_Key_Battle` | `abilities.battle` | 戰鬥 Key |
+*注意：怪物含有 `Count` 屬性。Cost/VP/Gold/Light 預設為 0。*
+
+### Items (道具)
+| CSV Header | JSON Key (src/data/items.js) | 說明 |
+| :--- | :--- | :--- |
+| `ID` | `id` | 唯一識別碼 |
+| `Name` | `name` | 名稱 |
+| `Type` | `type` | 類型 |
+| `SubTypes` | `subTypes` | 子類型 |
+| `Cost` | `cost` | 購買價格 |
+| `VP` | `vp` | 勝利點數 |
+| `Gold` | `goldValue` | 金幣價值 |
+| `Light` | `light` | 光照值 |
+| `Desc` | `desc` | 描述 |
+| `Equip_ATK` | `equipment.attack` | 裝備攻擊力 |
+| `Equip_MagATK` | `equipment.magicAttack` | 裝備魔攻 |
+| `Equip_Weight` | `equipment.weight` | 裝備重量 |
+| `Ability_Text` | `abilities.abilities_desc` | 能力描述 |
+| `Ability_Key_Battle`| `abilities.onBattle` | 戰鬥觸發 Key |
+| `Ability_Key_Village`| `abilities.onVillage` | 村莊觸發 Key |
+| `Ability_Key_Victory`| `abilities.onVictory` | 勝利觸發 Key |
+| `Ability_Key_Dungeon`| `abilities.onDungeon` | 地城/回合效果 Key |
+*注意：道具不包含 `Count` 屬性。*
 
 ## 3. 同步指令
-當數值調整完畢後，發送以下指令給 AI 代理人：
-> "同步 data" 或 "更新卡牌數值" (將自動執行 `node tools/data_sync/csv_manager.mjs sync`)
+當數值調整完畢後，執行以下指令：
+
+### 匯出 (JS -> CSV)
+```bash
+node tools/data_sync/export_to_sheet.mjs
+```
+
+### 匯入/同步 (Google Sheets -> JS)
+```bash
+node tools/data_sync/import_sheet_to_js.mjs sync
+```
 
 **代理人執行邏輯**:
 1.  讀取上述 GID 對應的 CSV Export URL。

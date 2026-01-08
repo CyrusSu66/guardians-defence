@@ -5,7 +5,7 @@ description: Sync game data from Google Sheets and commit changes automatically
 // turbo-all
 
 1. Run the data sync script to fetch latest CSVs:
-   `node tools/data_sync/csv_manager.mjs sync`
+   `node tools/data_sync/import_sheet_to_js.mjs sync`
 
 2. Stage all changes (new data files):
    `git add .`

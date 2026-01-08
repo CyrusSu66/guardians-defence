@@ -43,9 +43,9 @@ export class CardEngine {
 
             groupMonsters.forEach(template => {
                 const tier = template.monster.tier;
-                // 強制設定數量，覆蓋 data.js 的預設值 (以防未來 data.js 修改但這裡沒變)
-                // T1: 4張, T2: 3張, T3: 3張
-                let count = tier === 1 ? 4 : 3;
+                // T1: 4張, T2: 3張, T3: 3張 (Default if not specified)
+                // v3.3x: Use data-driven count if available
+                let count = template.monster.count || (tier === 1 ? 4 : 3);
                 for (let i = 0; i < count; i++) {
                     const newMonster = JSON.parse(JSON.stringify(template));
                     newMonster.id = `${template.id}_${i}`; // 生成唯一 ID

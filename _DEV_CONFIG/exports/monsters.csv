@@ -1,0 +1,32 @@
+ID,Name,Type,SubTypes,Cost,VP,Gold,Light,Tier,HP,XP,Breach_Dmg,Desc,Ability_Text,Ability_Key_Breach,Ability_Key_Aura,Ability_Key_Battle,Count
+mon_rat,腐化老鼠,Monster,Vermin,0,0,0,0,1,2,1,1,受到黑暗魔力侵蝕的巨大老鼠，成群結隊地啃食村莊的防禦設施。,【進場】污染牌庫 (加入 1 張疾病卡至棄牌堆),add_disease_1,,,4
+mon_centipede,巨型蜈蚣,Monster,Vermin,0,0,0,0,2,3,2,2,擁有堅硬甲殼的多足掠食者，其毒液能麻痺冒險者的心智。,【進場】隨機棄 1 張手牌。,discard_1,,,3
+mon_spider,變異蜘蛛,Monster,Vermin,0,0,0,0,3,6,4,3,受到變異影響的蜘蛛，其織出的網帶有劇毒。,【持續】所有英雄力量 -1,,str_minus_1,,3
+mon_ghost,幽鬼,Monster,Undead,0,0,0,0,1,2,1,1,徘徊在戰場上的怨靈，一般的物理攻擊難以對其造成傷害。,【戰鬥】物理免疫。,,,phys_immune,4
+mon_skeleton,骷髏戰士,Monster,Undead,0,0,0,0,2,3,2,2,被黑魔法喚醒的古代士兵，手持生鏽的鐵劍無情地斬殺生者。,,,,,3
+mon_wraith,死靈,Monster,Undead,0,0,0,0,3,5,4,3,高階的不死生物，其寒冷的氣息能瞬間凍結勇者的裝備。,"【進場】棄 1 張能量或裝備卡。
+【戰鬥】物理免疫。",discard_magic_or_item,,phys_immune,3
+mon_shadow,影魔,Monster,Darkness,0,0,0,0,1,2,1,1,從陰影中誕生的無形殺手，常在光照不足時發動致命突襲。,,,,,4
+mon_nightmare_knight,夢魘騎士,Monster,Darkness,0,0,0,0,2,4,3,3,騎乘著黑馬的恐怖騎士，他的存在本身就會吞噬周圍的光芒。,【持續】攻擊此怪物時，照明需求 +1。,,light_req_plus_1,,3
+mon_harbinger,末日使者,Monster,Darkness,0,0,0,0,3,7,5,4,毀滅的先驅，他所散發的絕望氣場能削弱最堅強的戰士。,【持續】所有英雄戰力 -1。,,atk_minus_1,,3
+mon_slime,粘液怪,Monster,Ancient,0,0,0,0,1,1,1,1,古老遺跡中常見的有機陷阱，雖然弱小但極難徹底消滅。,,,,,4
+mon_young_dragon,幼龍,Monster,Ancient,0,0,0,0,2,5,4,3,雖然尚未成年，但其吐息的威力已足以融化鋼鐵與岩石。,,,,,3
+mon_black_dragon,大黑龍,Monster,Ancient,0,0,0,0,3,8,6,5,傳說中的災厄化身，其鱗片堅不可摧，唯有強大的魔法才能傷其分毫。,【戰鬥】僅魔法攻擊有效。,,,magic_only,3
+mon_goblin_grunt,哥布林雜兵,Monster,Goblin,0,0,0,0,1,2,1,1,狡猾且貪婪的小型亞人，擅長偷襲與破壞冒險者的補給。,【進場】破壞 1 張手牌。,destroy_hand_1,,,4
+mon_goblin_raider,哥布林突襲者,Monster,Goblin,0,0,0,0,2,4,2,2,裝備更精良的哥布林精英，會優先攻擊攜帶物資的隊員。,【進場】破壞 2 張手牌。,destroy_hand_2,,,3
+mon_goblin_king,哥布林王,Monster,Goblin,0,0,0,0,3,7,4,3,統率哥布林大軍的魁梧暴君，其麾下的掠奪行動將更加殘暴。,【進場】破壞 2 張手牌 + 1 隨機物品。,destroy_hand_2_plus_1,,,3
+mon_green_slime,綠色泥糊,Monster,Mire,0,0,0,0,1,2,1,2,帶有強烈腐蝕性的酸性軟泥，散發著令人作嘔的惡臭。,【進場】污染牌庫 (加入 1 張疾病卡至棄牌堆),add_disease_1,,,4
+mon_black_slime,黑色史萊姆,Monster,Mire,0,0,0,0,1,3,2,2,猶如焦油般黏稠的黑暗物質，能輕易困住大意的冒險者。,【進場】污染牌庫 (加入 1 張疾病卡至棄牌堆),add_disease_1,,,3
+mon_red_gel,紅色凝膠獸,Monster,Mire,0,0,0,0,2,6,4,2,外表晶瑩剔透但極度危險，能吸收衝擊力並削弱武器的鋒利度。,【持續】所有英雄攻擊力 -1。,,atk_minus_1,,3
+mon_dire_wolf,恐狼,Monster,Beast,0,0,0,0,1,2,1,2,成群結隊的巨狼，牠們的嚎叫能讓最勇敢的戰士膽寒。,,,,,4
+mon_chimera,奇美拉,Monster,Beast,0,0,0,0,2,4,3,3,獅頭、羊身、蛇尾的異怪，每一次咆哮都會震懾人心。,【進場】隨機棄 1 張手牌。,discard_1,,,3
+mon_behemoth,貝希摩斯,Monster,Beast,0,0,0,0,3,8,5,4,陸地上的霸主，牠的每一步都能引發小型地震。,,,,,3
+mon_clockwork_scout,發條偵察兵,Monster,Construct,0,0,0,0,1,2,1,1,不知疲倦的機械守衛，專門負責標記入侵者的位置。,,,,,4
+mon_stone_golem,岩石巨像,Monster,Construct,0,0,0,0,2,5,3,2,古代魔法驅動的岩石巨人，對魔法攻擊完全免疫。,【戰鬥】魔法免疫。,,,magic_immune,3
+mon_magitek_armor,魔導裝甲,Monster,Construct,0,0,0,0,3,7,5,4,失落文明的戰爭兵器，裝備了能摧毀一切的重型武裝。,【進場】破壞 2 張手牌。,destroy_hand_2,,,3
+mon_wisp,鬼火,Monster,Elemental,0,0,0,0,1,2,1,1,飄忽不定的靈體火焰，會干擾光源使探險變得困難。,【持續】攻擊此怪物時，照明需求 +1。,,light_req_plus_1,,4
+mon_bomb,炸彈怪,Monster,Elemental,0,0,0,0,2,3,2,4,極不穩定的火元素生物，受到攻擊就會膨脹爆炸。,,,,,3
+mon_ifrit,伊弗利特,Monster,Elemental,0,0,0,0,3,6,4,4,烈焰深淵的魔神，其高溫靈氣能讓英雄精疲力竭。,【持續】所有英雄力量 -1。,,str_minus_1,,3
+mon_imp,小惡魔,Monster,Demon,0,0,0,0,1,1,1,1,喜歡惡作劇的低階惡魔，常趁人不備竊取物品。,【進場】隨機棄 1 張手牌。,discard_1,,,4
+mon_gargoyle,石像鬼,Monster,Demon,0,0,0,0,2,4,3,2,偽裝成雕像的狡猾惡魔，皮膚堅硬如石，刀槍不入。,【戰鬥】物理免疫。,,,phys_immune,3
+mon_archdemon,大惡魔,Monster,Demon,0,0,0,0,3,7,5,3,地獄軍團的高階指揮官，擁有強大的黑暗魔力。,【進場】破壞 2 張手牌 + 1 隨機物品。,destroy_hand_2_plus_1,,,3

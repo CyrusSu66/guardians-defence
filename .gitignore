@@ -4,6 +4,7 @@ dist/
 tools/remote_bridge/
 brain/
 *.log
+cloudflared*
 
-# Private Tools
-tools/data_sync/
+# Private Config (contains Google Sheet IDs)
+tools/data_sync/sync_config.local.js
