@@ -4,7 +4,8 @@
  */
 
 import { CARDPOOL, GameState, getCardById } from './data.js?v=3.29';
-import { UIManager } from './ui.js?v=3.29';
+// UIManager removed for React Migration
+// import { UIManager } from './ui.js?v=3.29';
 import { CombatEngine } from './engine/CombatEngine.js?v=3.29';
 import { VillageEngine } from './engine/VillageEngine.js?v=3.29';
 import { DungeonEngine } from './engine/DungeonEngine.js?v=3.29';
@@ -20,9 +21,12 @@ class GuardiansDefenceGame {
         this.villageEngine = new VillageEngine(this);
         this.dungeonEngine = new DungeonEngine(this);
 
-        this.ui = new UIManager(this);
+        // React Subscriber Support
+        this.listeners = [];
+
+        // this.ui = new UIManager(this); // Removed
         this.init();
-        this.setupErrorHandler();
+        // this.setupErrorHandler(); // Disabled for now to avoid console noise or circular deps
     }
 
     setupErrorHandler() {
@@ -57,7 +61,9 @@ class GuardiansDefenceGame {
         this.hasDestroyed = false;
         this.selectedDestroyIdx = null;
 
-        if (this.ui) this.ui.updateUI();
+        this.selectedDestroyIdx = null;
+
+        this.notifySubscribers();
     }
 
     // --- 遊戲初始化 ---
@@ -122,6 +128,7 @@ class GuardiansDefenceGame {
 
         setTimeout(() => {
             this.state = GameState.VILLAGE;
+            // Note: currentAction remains null - player must choose action (Village/Dungeon/Rest)
             this.updateUI();
         }, 300);
     }
@@ -617,11 +624,8 @@ class GuardiansDefenceGame {
     }
 
     showDeckModal(type) {
-        if (!this.ui) return;
-        const list = type === 'deck' ? [...this.deck] : [...this.discard];
-        const title = type === 'deck' ? '查看牌庫 (隨機順序)' : '查看棄牌堆';
-        if (type === 'deck') this.shuffle(list);
-        this.ui.renderDeckView(title, list);
+        // Deprecated for React
+        console.log("Mock Show Deck Modal:", type);
     }
 
     shuffleArray(array) {
@@ -643,26 +647,77 @@ class GuardiansDefenceGame {
     addLog(msg, type) {
         this.log.push({ message: msg, type });
         if (this.log.length > 50) this.log.shift();
-        this.updateUI();
-
-        // Auto-scroll to bottom
-        setTimeout(() => {
-            const el = document.getElementById('gameLog');
-            if (el && el.parentElement) {
-                // Scroll the parent container (which has overflow-y: auto)
-                el.parentElement.scrollTop = el.parentElement.scrollHeight;
-            }
-        }, 0);
+        this.notifySubscribers();
     }
 
     updateUI() {
-        if (this.ui) this.ui.updateUI();
+        this.notifySubscribers();
+    }
+
+    // --- React Integration Methods ---
+
+    subscribe(listener) {
+        this.listeners.push(listener);
+        // Return unsubscribe function
+        return () => {
+            this.listeners = this.listeners.filter(l => l !== listener);
+        };
+    }
+
+    notifySubscribers() {
+        this.listeners.forEach(listener => listener(this.getState()));
+    }
+
+    /**
+     * Returns a snapshot of the current game state for React rendering.
+     * We try to return a stable object structure.
+     */
+    getState() {
+        return {
+            meta: {
+                version: this.version,
+                state: this.state,
+                turn: this.turn,
+                currentAction: this.currentAction
+            },
+            resources: {
+                hp: this.villageHP,
+                gold: this.currentGold,
+                xp: this.currentXP,
+                score: this.totalScore
+            },
+            inventory: {
+                deckCount: this.deck.length,
+                discardCount: this.discard.length,
+                hand: this.hand, // Array of Card Objects
+                savedCards: this.savedCards || [],
+                playedCards: this.playedCards
+            },
+            dungeon: {
+                rank1: this.dungeonHall.rank1,
+                rank2: this.dungeonHall.rank2,
+                rank3: this.dungeonHall.rank3,
+                deckSize: this.monsterDeck ? this.monsterDeck.length : 0
+            },
+            market: this.marketItems, // { heroes: [], items: [], ... }
+            combat: this.combat,
+            logs: this.log,
+            flags: {
+                hasBought: this.hasBought,
+                hasDestroyed: this.hasDestroyed,
+                selectedDestroyIdx: this.selectedDestroyIdx,
+                pendingGrailEffect: this.pendingGrailEffect || false,
+                pendingMerchantTrade: this.pendingMerchantTrade || false,
+                pendingPriestCleanse: this.pendingPriestCleanse || false,
+                pendingBagRetain: this.pendingBagRetain || false,
+                isGameOver: this.state === GameState.GAME_OVER
+            }
+        };
     }
 
     gameOver() {
         this.state = GameState.GAME_OVER;
-        this.updateUI();
-        if (this.ui) this.ui.showGameOver(this.totalScore);
+        this.notifySubscribers();
     }
 }
 

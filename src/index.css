@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Utilities copied from original style.css if needed, or reimplemented */
+body {
+    background-color: #131313;
+    color: #ecf0f1;
+}
